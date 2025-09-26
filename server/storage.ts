@@ -57,6 +57,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
+    // Check if user already exists
+    const existingUser = await this.getUser(userData.id);
+    
     // Generate referral code if not provided
     if (!userData.referralCode) {
       userData.referralCode = this.generateReferralCode();
@@ -74,8 +77,8 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
 
-    // Create default referral links for new users
-    if (user) {
+    // Create default referral links only for new users
+    if (user && !existingUser) {
       await this.createDefaultReferralLinks(user.id);
     }
 
