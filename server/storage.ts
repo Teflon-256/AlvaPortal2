@@ -471,5 +471,5 @@ export class MemoryStorage implements IStorage {
   }
 }
 
-// Use memory storage temporarily until database issue is resolved
-export const storage = new MemoryStorage();
+// Use database storage for persistent data
+export const storage = new DatabaseStorage();
