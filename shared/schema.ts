@@ -96,6 +96,17 @@ export const referralLinks = pgTable("referral_links", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Broker requests for "Other" broker submissions
+export const brokerRequests = pgTable("broker_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  brokerName: varchar("broker_name").notNull(),
+  status: varchar("status").default('pending'), // 'pending', 'approved', 'rejected'
+  adminNotes: text("admin_notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many, one }) => ({
   tradingAccounts: many(tradingAccounts),
@@ -103,6 +114,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   referredEarnings: many(referralEarnings, { relationName: "referredEarnings" }),
   masterCopierConnections: many(masterCopierConnections),
   referralLinks: many(referralLinks),
+  brokerRequests: many(brokerRequests),
   referrer: one(users, {
     fields: [users.referredBy],
     references: [users.id],
@@ -148,6 +160,13 @@ export const referralLinksRelations = relations(referralLinks, ({ one }) => ({
   }),
 }));
 
+export const brokerRequestsRelations = relations(brokerRequests, ({ one }) => ({
+  user: one(users, {
+    fields: [brokerRequests.userId],
+    references: [users.id],
+  }),
+}));
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -179,6 +198,12 @@ export const insertReferralLinkSchema = createInsertSchema(referralLinks).omit({
   updatedAt: true,
 });
 
+export const insertBrokerRequestSchema = createInsertSchema(brokerRequests).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -190,3 +215,5 @@ export type InsertMasterCopierConnection = z.infer<typeof insertMasterCopierConn
 export type MasterCopierConnection = typeof masterCopierConnections.$inferSelect;
 export type InsertReferralLink = z.infer<typeof insertReferralLinkSchema>;
 export type ReferralLink = typeof referralLinks.$inferSelect;
+export type InsertBrokerRequest = z.infer<typeof insertBrokerRequestSchema>;
+export type BrokerRequest = typeof brokerRequests.$inferSelect;
