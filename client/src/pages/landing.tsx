@@ -1,9 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChartLine, Link, Bot, Users, Shield, Headphones, TrendingUp, Zap, DollarSign } from "lucide-react";
+import { ChartLine, Link, Bot, Users, Shield, Headphones, TrendingUp, Zap, DollarSign, MessageCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import futuristicWallStreet from "@assets/generated_images/Futuristic_Wall_Street_9156e3fe.png";
 
 export default function Landing() {
+  const { t } = useTranslation();
+  
   const handleGetStarted = () => {
     window.location.href = "/api/login";
   };
@@ -23,23 +28,25 @@ export default function Landing() {
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-muted-foreground hover:text-primary transition-colors" data-testid="nav-features">Features</a>
               <a href="#about" className="text-muted-foreground hover:text-primary transition-colors" data-testid="nav-about">About</a>
-              <a href="#contact" className="text-muted-foreground hover:text-primary transition-colors" data-testid="nav-contact">Contact</a>
+              <a href="#contact" className="text-muted-foreground hover:text-primary transition-colors" data-testid="nav-contact">{t('contactUs')}</a>
             </div>
             <div className="flex items-center space-x-4">
+              <LanguageSelector />
+              <ThemeToggle />
               <Button 
                 variant="ghost" 
                 onClick={handleGetStarted} 
                 className="text-muted-foreground hover:text-primary"
                 data-testid="nav-signin"
               >
-                Sign In
+                {t('signIn')}
               </Button>
               <Button 
                 onClick={handleGetStarted} 
                 className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 data-testid="nav-get-started"
               >
-                Get Started
+                {t('getStarted')}
               </Button>
             </div>
           </div>
@@ -60,12 +67,12 @@ export default function Landing() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-center lg:text-left">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold leading-tight mb-6" data-testid="hero-title">
-                Alva Capital
-                <span className="gradient-text block">Account Management</span>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold leading-tight mb-6 antialiased" data-testid="hero-title">
+                {t('heroTitle')}
+                <span className="gradient-text block">{t('heroSubtitle')}</span>
               </h1>
-              <p className="text-xl text-muted-foreground mb-8 leading-relaxed" data-testid="hero-description">
-                Connect your trading accounts to our master copier system, track performance, and earn through our exclusive referral program. Experience premium capital management.
+              <p className="text-xl text-muted-foreground mb-8 leading-relaxed antialiased" data-testid="hero-description">
+                {t('heroDescription')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button 
@@ -74,7 +81,7 @@ export default function Landing() {
                   className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg font-semibold transition-all transform hover:scale-105"
                   data-testid="hero-start-trading"
                 >
-                  Start Trading
+                  {t('startTrading')}
                 </Button>
                 <Button 
                   variant="outline" 
@@ -156,9 +163,9 @@ export default function Landing() {
       <section id="features" className="py-20 bg-muted/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-serif font-bold gradient-text mb-4" data-testid="features-title">Premium Trading Features</h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto" data-testid="features-description">
-              Experience the power of professional trading with our cutting-edge platform and exclusive features
+            <h2 className="text-3xl lg:text-4xl font-serif font-bold gradient-text mb-4 antialiased" data-testid="features-title">{t('whyChooseUs')}</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto antialiased" data-testid="features-description">
+              {t('multiPlatformDesc')}
             </p>
           </div>
 
@@ -215,14 +222,37 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Contact Section */}
+      <section id="contact" className="py-20 bg-muted/10">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl lg:text-4xl font-serif font-bold gradient-text mb-6 antialiased" data-testid="contact-title">
+            {t('contactUs')}
+          </h2>
+          <p className="text-xl text-muted-foreground mb-8 antialiased" data-testid="contact-description">
+            {t('getInTouch')}
+          </p>
+          <div className="flex justify-center">
+            <Button 
+              onClick={() => window.open('https://wa.link/jtjivz', '_blank')}
+              size="lg"
+              className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg font-semibold transition-all transform hover:scale-105"
+              data-testid="whatsapp-contact"
+            >
+              <MessageCircle className="h-5 w-5 mr-2" />
+              {t('whatsappSupport')}
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10"></div>
         <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl lg:text-4xl font-serif font-bold gradient-text mb-6" data-testid="cta-title">
+          <h2 className="text-3xl lg:text-4xl font-serif font-bold gradient-text mb-6 antialiased" data-testid="cta-title">
             Ready to Elevate Your Trading?
           </h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto" data-testid="cta-description">
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto antialiased" data-testid="cta-description">
             Join thousands of successful traders using our premium platform. Start earning today with our AI-powered copy trading system and lucrative referral program.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -232,7 +262,7 @@ export default function Landing() {
               className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg font-semibold transition-all transform hover:scale-105"
               data-testid="cta-start-trading"
             >
-              Start Trading Now
+              {t('startTrading')} Now
             </Button>
             <Button 
               variant="outline" 

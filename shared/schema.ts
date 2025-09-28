@@ -35,7 +35,7 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   referralCode: varchar("referral_code").unique(),
-  referredBy: varchar("referred_by").references(() => users.id),
+  referredBy: varchar("referred_by"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

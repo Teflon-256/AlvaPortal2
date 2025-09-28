@@ -53,7 +53,6 @@ const resources = {
       "welcomeBack": "Welcome Back",
       "portfolioValue": "Portfolio Value",
       "todaysPnL": "Today's P&L",
-      "referrals": "Referrals",
       "earnings": "Earnings",
       "tradingAccounts": "Trading Accounts",
       "startTrading": "Start Trading",
