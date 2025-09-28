@@ -4,6 +4,7 @@ import {
   referralEarnings,
   masterCopierConnections,
   referralLinks,
+  brokerRequests,
   type User,
   type UpsertUser,
   type TradingAccount,
@@ -14,6 +15,8 @@ import {
   type InsertMasterCopierConnection,
   type ReferralLink,
   type InsertReferralLink,
+  type BrokerRequest,
+  type InsertBrokerRequest,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc } from "drizzle-orm";
@@ -47,6 +50,11 @@ export interface IStorage {
   getReferralLinks(userId: string): Promise<ReferralLink[]>;
   createReferralLink(link: InsertReferralLink): Promise<ReferralLink>;
   updateReferralLinkStats(linkId: string, clicks?: number, conversions?: number): Promise<void>;
+  
+  // Broker request operations
+  getBrokerRequests(): Promise<BrokerRequest[]>;
+  createBrokerRequest(request: InsertBrokerRequest): Promise<BrokerRequest>;
+  updateBrokerRequestStatus(requestId: string, status: string, adminNotes?: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -224,6 +232,38 @@ export class DatabaseStorage implements IStorage {
       .update(referralLinks)
       .set(updateData)
       .where(eq(referralLinks.id, linkId));
+  }
+
+  // Broker request operations
+  async getBrokerRequests(): Promise<BrokerRequest[]> {
+    return await db
+      .select()
+      .from(brokerRequests)
+      .orderBy(desc(brokerRequests.createdAt));
+  }
+
+  async createBrokerRequest(request: InsertBrokerRequest): Promise<BrokerRequest> {
+    const [newRequest] = await db
+      .insert(brokerRequests)
+      .values(request)
+      .returning();
+    return newRequest;
+  }
+
+  async updateBrokerRequestStatus(requestId: string, status: string, adminNotes?: string): Promise<void> {
+    const updateData: any = { 
+      status, 
+      updatedAt: new Date() 
+    };
+    
+    if (adminNotes) {
+      updateData.adminNotes = adminNotes;
+    }
+
+    await db
+      .update(brokerRequests)
+      .set(updateData)
+      .where(eq(brokerRequests.id, requestId));
   }
 
   // Helper methods
@@ -436,6 +476,19 @@ export class MemoryStorage implements IStorage {
         break;
       }
     }
+  }
+
+  // Broker request operations (not supported in memory storage)
+  async getBrokerRequests(): Promise<BrokerRequest[]> {
+    return [];
+  }
+
+  async createBrokerRequest(request: InsertBrokerRequest): Promise<BrokerRequest> {
+    throw new Error("Broker requests not supported in memory storage");
+  }
+
+  async updateBrokerRequestStatus(requestId: string, status: string, adminNotes?: string): Promise<void> {
+    throw new Error("Broker requests not supported in memory storage");
   }
 
   // Helper methods

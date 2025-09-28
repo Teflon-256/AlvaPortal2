@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
+import Admin from "@/pages/admin";
 import "@/i18n";
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Home} />
+          <Route path="/admin" component={Admin} />
         </>
       )}
       <Route component={NotFound} />

@@ -31,12 +31,26 @@ import {
   Award
 } from "lucide-react";
 import { SiBinance } from "react-icons/si";
+import { useTranslation } from "react-i18next";
+import { Link } from "wouter";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { TradingAccountForm } from "@/components/TradingAccountForm";
 import futuristicExchange from "@assets/generated_images/Futuristic_stock_exchange_wallpaper_8045bc0a.png";
 
 // Form schemas
 const connectAccountSchema = z.object({
-  broker: z.enum(['exness', 'bybit', 'binance']),
-  accountId: z.string().min(1, "Account Number is required"),
+  broker: z.enum(['exness', 'bybit', 'binance', 'other']),
+  accountId: z.string().optional(),
+  brokerName: z.string().optional(),
+}).refine((data) => {
+  if (data.broker === 'other') {
+    return data.brokerName && data.brokerName.length > 0;
+  }
+  return true;
+}, {
+  message: "Broker name is required for other brokers",
+  path: ["brokerName"],
 });
 
 type ConnectAccountForm = z.infer<typeof connectAccountSchema>;
@@ -56,6 +70,7 @@ interface DashboardData {
 export default function Home() {
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [connectDialogOpen, setConnectDialogOpen] = useState(false);
 
   // Redirect if not authenticated
@@ -252,8 +267,21 @@ export default function Home() {
               <span className="text-xl font-serif font-bold gradient-text" data-testid="nav-logo">AlvaCapital</span>
             </div>
             <div className="flex items-center space-x-4">
+              <LanguageSelector />
+              <ThemeToggle />
+              <Link href="/admin">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-border/50 text-foreground hover:bg-accent/50"
+                  data-testid="admin-link"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Admin
+                </Button>
+              </Link>
               <div className="flex items-center space-x-2">
-                {user.profileImageUrl && (
+                {user?.profileImageUrl && (
                   <img 
                     src={user.profileImageUrl} 
                     alt="Profile" 
@@ -280,10 +308,10 @@ export default function Home() {
       {/* Dashboard Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         <div className="mb-8">
-          <h1 className="text-3xl lg:text-4xl font-serif font-bold gradient-text mb-2" data-testid="dashboard-title">
-            Welcome Back, {user.firstName || 'Trader'}
+          <h1 className="text-3xl lg:text-4xl font-serif font-bold gradient-text mb-2 antialiased" data-testid="dashboard-title">
+            {t('welcomeBack')}, {user?.firstName || 'Trader'}
           </h1>
-          <p className="text-muted-foreground" data-testid="dashboard-subtitle">
+          <p className="text-muted-foreground antialiased" data-testid="dashboard-subtitle">
             Advanced trading management. Simplified.
           </p>
         </div>
@@ -375,58 +403,9 @@ export default function Home() {
                     </DialogTrigger>
                     <DialogContent data-testid="connect-account-dialog">
                       <DialogHeader>
-                        <DialogTitle>Connect Trading Account</DialogTitle>
+                        <DialogTitle>{t('addAccount')}</DialogTitle>
                       </DialogHeader>
-                      <Form {...connectForm}>
-                        <form onSubmit={connectForm.handleSubmit((data) => connectAccountMutation.mutate(data))} className="space-y-4">
-                          <FormField
-                            control={connectForm.control}
-                            name="broker"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Broker</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger data-testid="broker-select">
-                                      <SelectValue placeholder="Select a broker" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="exness">Exness</SelectItem>
-                                    <SelectItem value="bybit">Bybit</SelectItem>
-                                    <SelectItem value="binance">Binance</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={connectForm.control}
-                            name="accountId"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Account Number</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Enter your account number" {...field} data-testid="account-number-input" />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <div className="flex justify-end space-x-2">
-                            <Button type="button" variant="outline" onClick={() => setConnectDialogOpen(false)} data-testid="cancel-connect">
-                              Cancel
-                            </Button>
-                            <Button type="submit" disabled={connectAccountMutation.isPending} data-testid="submit-connect">
-                              {connectAccountMutation.isPending ? (
-                                <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                              ) : null}
-                              Connect Account
-                            </Button>
-                          </div>
-                        </form>
-                      </Form>
+                      <TradingAccountForm onSuccess={() => setConnectDialogOpen(false)} />
                     </DialogContent>
                   </Dialog>
                 </div>
@@ -606,7 +585,7 @@ export default function Home() {
                     ))
                   )}
                 </div>
-                {dashboardData?.referralEarnings?.length > 3 && (
+                {(dashboardData?.recentReferralEarnings?.length ?? 0) > 3 && (
                   <Button variant="ghost" className="w-full mt-4 text-primary hover:text-primary/80" data-testid="view-all-earnings">
                     View All Earnings
                   </Button>

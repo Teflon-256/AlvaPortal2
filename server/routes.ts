@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertTradingAccountSchema, insertReferralEarningSchema, insertMasterCopierConnectionSchema } from "@shared/schema";
+import { insertTradingAccountSchema, insertReferralEarningSchema, insertMasterCopierConnectionSchema, insertBrokerRequestSchema } from "@shared/schema";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 
@@ -204,6 +204,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching referral link:", error);
       res.status(500).json({ message: "Failed to fetch referral link" });
+    }
+  });
+
+  // Broker request routes
+  app.post('/api/broker-requests', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const validatedData = insertBrokerRequestSchema.parse({
+        ...req.body,
+        userId
+      });
+      
+      const brokerRequest = await storage.createBrokerRequest(validatedData);
+      res.status(201).json(brokerRequest);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.toString() });
+      }
+      console.error("Error creating broker request:", error);
+      res.status(500).json({ message: "Failed to create broker request" });
+    }
+  });
+
+  app.get('/api/broker-requests', isAuthenticated, async (req: any, res) => {
+    try {
+      // For now, only allow admin access - you can add admin check here later
+      const requests = await storage.getBrokerRequests();
+      res.json(requests);
+    } catch (error) {
+      console.error("Error fetching broker requests:", error);
+      res.status(500).json({ message: "Failed to fetch broker requests" });
+    }
+  });
+
+  app.patch('/api/broker-requests/:requestId', isAuthenticated, async (req: any, res) => {
+    try {
+      // For now, only allow admin access - you can add admin check here later
+      const { requestId } = req.params;
+      const { status, adminNotes } = req.body;
+      
+      await storage.updateBrokerRequestStatus(requestId, status, adminNotes);
+      res.json({ message: "Broker request updated successfully" });
+    } catch (error) {
+      console.error("Error updating broker request:", error);
+      res.status(500).json({ message: "Failed to update broker request" });
     }
   });
 
