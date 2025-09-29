@@ -86,6 +86,7 @@ export default function Landing() {
                 <Button 
                   variant="outline" 
                   size="lg"
+                  onClick={() => window.open('http://www.youtube.com/@profitmaxing', '_blank')}
                   className="border-border hover:border-primary text-foreground px-8 py-4 text-lg font-semibold"
                   data-testid="hero-learn-more"
                 >
