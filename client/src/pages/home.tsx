@@ -225,25 +225,25 @@ export default function Home() {
     exness: { 
       icon: () => (
         <div className="w-6 h-6 bg-white rounded flex items-center justify-center">
-          <span className="text-xs font-bold text-orange-600">EX</span>
+          <span className="text-xs font-bold text-blue-600">EX</span>
         </div>
       ), 
-      color: "bg-gradient-to-br from-orange-500 to-orange-600", 
+      color: "bg-gradient-to-br from-blue-600 to-blue-700", 
       textColor: "text-white" 
     },
     bybit: { 
       icon: () => (
         <div className="w-6 h-6 bg-white rounded flex items-center justify-center">
-          <span className="text-xs font-bold text-amber-500">BY</span>
+          <span className="text-xs font-bold text-blue-600">BY</span>
         </div>
       ), 
-      color: "bg-gradient-to-br from-amber-500 to-yellow-500", 
+      color: "bg-gradient-to-br from-blue-500 to-blue-600", 
       textColor: "text-white" 
     },
     binance: { 
-      icon: () => <SiBinance className="w-6 h-6 text-yellow-500" />, 
-      color: "bg-gradient-to-br from-yellow-400 to-amber-400", 
-      textColor: "text-black" 
+      icon: () => <SiBinance className="w-6 h-6 text-blue-600" />, 
+      color: "bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800", 
+      textColor: "text-blue-600 dark:text-blue-400" 
     }
   };
 
