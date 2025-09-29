@@ -54,7 +54,7 @@ app.use((req, res, next) => {
     await setupVite(app, server);
   } else {
     // Serve static files from Vite build output
-    const distPath = path.join(__dirname, "../dist/public");
+    const distPath = path.join(import.meta.dirname, "../dist/public");
     app.use(express.static(distPath));
 
     // Serve index.html at root
