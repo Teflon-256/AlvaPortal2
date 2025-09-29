@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import futuristicWallStreet from "@assets/generated_images/Futuristic_Wall_Street_9156e3fe.png";
+import alvaCapitalLogo from "@assets/image_1759129583507.png";
 
 export default function Landing() {
   const { t } = useTranslation();
@@ -13,16 +14,23 @@ export default function Landing() {
     window.location.href = "/api/login";
   };
 
+  const handleLogoClick = () => {
+    window.location.href = "/";
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Navigation */}
       <nav className="bg-background/95 backdrop-blur-sm border-b border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
-                <ChartLine className="text-white h-4 w-4" />
-              </div>
+            <div className="flex items-center space-x-2 cursor-pointer" onClick={handleLogoClick}>
+              <img 
+                src={alvaCapitalLogo} 
+                alt="AlvaCapital Logo" 
+                className="w-10 h-10 object-contain"
+                data-testid="logo-image"
+              />
               <span className="text-xl font-serif font-bold gradient-text" data-testid="logo-text">AlvaCapital</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
@@ -282,10 +290,12 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
-                  <ChartLine className="text-white h-4 w-4" />
-                </div>
+              <div className="flex items-center space-x-2 mb-4 cursor-pointer" onClick={handleLogoClick}>
+                <img 
+                  src={alvaCapitalLogo} 
+                  alt="AlvaCapital Logo" 
+                  className="w-8 h-8 object-contain"
+                />
                 <span className="text-xl font-serif font-bold gradient-text">AlvaCapital</span>
               </div>
               <p className="text-muted-foreground mb-4">Premium trading platform for professional investors and traders worldwide.</p>
