@@ -23,6 +23,7 @@ function Router() {
       <Route path="/faq" component={FAQ} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
+      <Route path="/admin" component={Admin} />
       
       {/* Authentication-based routes */}
       {isLoading || !isAuthenticated ? (
@@ -30,7 +31,6 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Home} />
-          <Route path="/admin" component={Admin} />
         </>
       )}
       <Route component={NotFound} />
