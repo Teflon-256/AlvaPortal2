@@ -355,32 +355,28 @@ export default function Landing() {
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4">Platform</h4>
+              <h4 className="font-semibold mb-4">Brokers</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-features">Features</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-pricing">Pricing</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-security">Security</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-api">API</a></li>
+                <li><a href="https://my.exness.com/pa/socialtrading/" target="_blank" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-exness">Exness</a></li>
+                <li><a href="https://finestel.com/app/copy-trading/U42AN0-S37396" target="_blank" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-bybit">Bybit</a></li>
+                <li><a href="https://finestel.com/app/copy-trading/SS98X3-S66396" target="_blank" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-binance">Binance</a></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-help">Help Center</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-contact">Contact</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-community">Community</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-status">Status</a></li>
+                <li><a href="/faq" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-help">Help Center</a></li>
+                <li><a href="https://wa.link/jtjivz" target="_blank" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-contact">Contact</a></li>
+                <li><a href="https://t.me/profitmaxingsignals" target="_blank" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-community">Community</a></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-privacy">Privacy</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-terms">Terms</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-license">License</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-compliance">Compliance</a></li>
+                <li><a href="/privacy" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-privacy">Privacy</a></li>
+                <li><a href="/terms" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-terms">Terms</a></li>
               </ul>
             </div>
           </div>

@@ -9,6 +9,9 @@ import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
 import Admin from "@/pages/admin";
+import FAQ from "@/pages/faq";
+import Privacy from "@/pages/privacy";
+import Terms from "@/pages/terms";
 import "@/i18n";
 
 function Router() {
@@ -16,6 +19,12 @@ function Router() {
 
   return (
     <Switch>
+      {/* Public routes accessible regardless of authentication */}
+      <Route path="/faq" component={FAQ} />
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/terms" component={Terms} />
+      
+      {/* Authentication-based routes */}
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={Landing} />
       ) : (
