@@ -37,6 +37,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { TradingAccountForm } from "@/components/TradingAccountForm";
 import futuristicExchange from "@assets/generated_images/Futuristic_stock_exchange_wallpaper_8045bc0a.png";
+import alvaCapitalLogo from "@assets/image_1759129583507.png";
 
 // Form schemas
 const connectAccountSchema = z.object({
@@ -260,12 +261,17 @@ export default function Home() {
       <nav className="bg-background/95 backdrop-blur-sm border-b border-border sticky top-0 z-50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
-                <ChartLine className="text-white h-4 w-4" />
+            <Link href="/">
+              <div className="flex items-center space-x-2 cursor-pointer">
+                <img 
+                  src={alvaCapitalLogo} 
+                  alt="AlvaCapital Logo" 
+                  className="w-10 h-10 object-contain"
+                  data-testid="logo-image"
+                />
+                <span className="text-xl font-serif font-bold gradient-text" data-testid="nav-logo">AlvaCapital</span>
               </div>
-              <span className="text-xl font-serif font-bold gradient-text" data-testid="nav-logo">AlvaCapital</span>
-            </div>
+            </Link>
             <div className="flex items-center space-x-4">
               <LanguageSelector />
               <ThemeToggle />
