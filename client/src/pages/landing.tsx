@@ -249,14 +249,14 @@ export default function Landing() {
                 title: "Bank-Level Security",
                 description: "Military-grade encryption, secure API connections, and advanced authentication to protect your investments.",
                 color: "text-orange-400",
-                onClick: () => {}
+                onClick: () => window.location.href = '/api/login'
               },
               {
                 icon: Headphones,
                 title: "24/7 Support",
                 description: "Premium support from our expert team, available around the clock to assist with your trading needs.",
                 color: "text-red-400",
-                onClick: () => {}
+                onClick: () => window.open('https://wa.link/jtjivz', '_blank')
               }
             ].map((feature, index) => (
               <Card key={index} className="premium-card text-center cursor-pointer hover:scale-105 transition-transform" data-testid={`feature-${feature.title.toLowerCase().replace(/\s+/g, '-')}`} onClick={feature.onClick}>
