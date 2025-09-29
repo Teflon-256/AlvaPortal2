@@ -4,6 +4,17 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
+// Handle www redirect
+app.use((req, res, next) => {
+  const host = req.get('host');
+  if (host && host.startsWith('www.')) {
+    const nonWwwHost = host.slice(4); // Remove 'www.'
+    return res.redirect(301, `https://${nonWwwHost}${req.originalUrl}`);
+  }
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

@@ -35,7 +35,8 @@ export default function AdminPage() {
   const [adminNotes, setAdminNotes] = useState('');
 
   // Check if user is authorized to access admin panel
-  const isAuthorizedAdmin = user?.email === 'sahabyoona@gmail.com';
+  const authorizedAdminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
+  const isAuthorizedAdmin = Boolean(user?.email && authorizedAdminEmails.includes(user.email));
 
   const { data: brokerRequests = [], isLoading } = useQuery({
     queryKey: ['/api/broker-requests'],
