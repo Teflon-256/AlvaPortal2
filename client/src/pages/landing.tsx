@@ -1,14 +1,19 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChartLine, Link, Bot, Users, Shield, Headphones, TrendingUp, Zap, DollarSign, MessageCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ChartLine, Link, Bot, Users, Shield, Headphones, TrendingUp, Zap, DollarSign, MessageCircle, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { TradingAccountForm } from "@/components/TradingAccountForm";
 import futuristicWallStreet from "@assets/generated_images/Futuristic_Wall_Street_9156e3fe.png";
 import alvaCapitalLogo from "@assets/image_1759129583507.png";
 
 export default function Landing() {
   const { t } = useTranslation();
+  const [multiBrokerOpen, setMultiBrokerOpen] = useState(false);
+  const [copyTradingOpen, setCopyTradingOpen] = useState(false);
   
   const handleGetStarted = () => {
     window.location.href = "/api/login";
@@ -16,6 +21,37 @@ export default function Landing() {
 
   const handleLogoClick = () => {
     window.location.href = "/";
+  };
+
+  const handleMultiBrokerClick = () => {
+    setMultiBrokerOpen(true);
+  };
+
+  const handleCopyTradingClick = () => {
+    setCopyTradingOpen(true);
+  };
+
+  const handleRealTimeAnalyticsClick = () => {
+    window.location.href = "/api/login";
+  };
+
+  const handleReferralProgramClick = () => {
+    window.location.href = "/api/login";
+  };
+
+  // Copy trading links
+  const copyTradingLinks = {
+    exness: "https://my.exness.com/pa/socialtrading/",
+    bybit: "https://finestel.com/app/copy-trading/U42AN0-S37396",
+    binance: "https://finestel.com/app/copy-trading/SS98X3-S66396"
+  };
+
+  const handleStartTrading = (broker: string) => {
+    const link = copyTradingLinks[broker as keyof typeof copyTradingLinks];
+    if (link) {
+      window.open(link, '_blank');
+      setMultiBrokerOpen(false);
+    }
   };
 
   return (
@@ -184,45 +220,51 @@ export default function Landing() {
                 icon: Link,
                 title: "Multi-Broker Integration",
                 description: "Connect your Exness, Bybit, and Binance accounts seamlessly for unified portfolio management and automated trading.",
-                color: "text-primary"
+                color: "text-primary",
+                onClick: handleMultiBrokerClick
               },
               {
                 icon: Bot,
                 title: "AI Copy Trading",
                 description: "Advanced copy trading system that mirrors our master traders' strategies across all your connected accounts.",
-                color: "text-green-400"
+                color: "text-green-400",
+                onClick: handleCopyTradingClick
               },
               {
                 icon: TrendingUp,
                 title: "Real-time Analytics",
                 description: "Get instant portfolio updates, performance metrics, and detailed analytics across all your trading accounts.",
-                color: "text-blue-400"
+                color: "text-blue-400",
+                onClick: handleRealTimeAnalyticsClick
               },
               {
                 icon: Users,
                 title: "Referral Program",
                 description: "Earn 10% commission on fees from investors you refer. Build your network and grow your passive income.",
-                color: "text-purple-400"
+                color: "text-purple-400",
+                onClick: handleReferralProgramClick
               },
               {
                 icon: Shield,
                 title: "Bank-Level Security",
                 description: "Military-grade encryption, secure API connections, and advanced authentication to protect your investments.",
-                color: "text-orange-400"
+                color: "text-orange-400",
+                onClick: () => {}
               },
               {
                 icon: Headphones,
                 title: "24/7 Support",
                 description: "Premium support from our expert team, available around the clock to assist with your trading needs.",
-                color: "text-red-400"
+                color: "text-red-400",
+                onClick: () => {}
               }
             ].map((feature, index) => (
-              <Card key={index} className="premium-card text-center" data-testid={`feature-${feature.title.toLowerCase().replace(/\s+/g, '-')}`}>
+              <Card key={index} className="premium-card text-center cursor-pointer hover:scale-105 transition-transform" data-testid={`feature-${feature.title.toLowerCase().replace(/\s+/g, '-')}`} onClick={feature.onClick}>
                 <CardContent className="p-8">
                   <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
                     <feature.icon className={`${feature.color} h-8 w-8`} />
                   </div>
-                  <h3 className="text-xl font-semibold mb-4">{feature.title}</h3>
+                  <h3 className="text-xl font-semibold mb-4 hover:text-primary transition-colors">{feature.title}</h3>
                   <p className="text-muted-foreground">{feature.description}</p>
                 </CardContent>
               </Card>
@@ -348,6 +390,78 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      {/* Multi-Broker Integration Popup */}
+      <Dialog open={multiBrokerOpen} onOpenChange={setMultiBrokerOpen}>
+        <DialogContent className="max-w-md" data-testid="multi-broker-dialog">
+          <DialogHeader>
+            <DialogTitle>Multi-Broker Integration</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground mb-6">
+              Connect your trading accounts from trusted brokers and start copy trading with our master strategies.
+            </p>
+            
+            {/* Exness */}
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div>
+                <h4 className="font-semibold">Exness</h4>
+                <p className="text-sm text-muted-foreground">Forex, Indices, Commodities</p>
+              </div>
+              <Button 
+                onClick={() => handleStartTrading('exness')}
+                size="sm"
+                data-testid="start-trading-exness"
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Start Trading
+              </Button>
+            </div>
+
+            {/* Bybit */}
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div>
+                <h4 className="font-semibold">Bybit</h4>
+                <p className="text-sm text-muted-foreground">Forex, Indices, Commodities, Stocks, Crypto-currencies Spot and Futures</p>
+              </div>
+              <Button 
+                onClick={() => handleStartTrading('bybit')}
+                size="sm"
+                data-testid="start-trading-bybit"
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Start Trading
+              </Button>
+            </div>
+
+            {/* Binance */}
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div>
+                <h4 className="font-semibold">Binance</h4>
+                <p className="text-sm text-muted-foreground">Crypto-currencies Spot and Futures</p>
+              </div>
+              <Button 
+                onClick={() => handleStartTrading('binance')}
+                size="sm"
+                data-testid="start-trading-binance"
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Start Trading
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Copy Trading Popup */}
+      <Dialog open={copyTradingOpen} onOpenChange={setCopyTradingOpen}>
+        <DialogContent data-testid="copy-trading-dialog">
+          <DialogHeader>
+            <DialogTitle>AI Copy Trading</DialogTitle>
+          </DialogHeader>
+          <TradingAccountForm onSuccess={() => setCopyTradingOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
