@@ -19,21 +19,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Edit, ExternalLink, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Edit, ExternalLink, Clock, CheckCircle, XCircle, Shield } from 'lucide-react';
 import { useState } from 'react';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import type { BrokerRequest } from '@shared/schema';
 
 export default function AdminPage() {
+  const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const [selectedRequest, setSelectedRequest] = useState<BrokerRequest | null>(null);
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
   const [newStatus, setNewStatus] = useState('');
   const [adminNotes, setAdminNotes] = useState('');
 
+  // Check if user is authorized to access admin panel
+  const isAuthorizedAdmin = user?.email === 'sahabyoona@gmail.com';
+
   const { data: brokerRequests = [], isLoading } = useQuery({
     queryKey: ['/api/broker-requests'],
+    enabled: isAuthorizedAdmin, // Only fetch data if user is authorized
   });
 
   const updateRequestMutation = useMutation({
@@ -93,6 +99,44 @@ export default function AdminPage() {
       adminNotes: adminNotes || undefined
     });
   };
+
+  if (authLoading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">Loading admin dashboard...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthorizedAdmin) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center h-64">
+          <Card className="max-w-md">
+            <CardContent className="p-8 text-center">
+              <Shield className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <h2 className="text-2xl font-semibold mb-2">Access Restricted</h2>
+              <p className="text-muted-foreground mb-4">
+                This admin panel is only accessible to authorized administrators.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Contact support if you believe you should have access.
+              </p>
+              <Button 
+                onClick={() => window.location.href = '/'}
+                className="mt-4"
+                data-testid="return-home"
+              >
+                Return to Home
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
