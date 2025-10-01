@@ -34,7 +34,7 @@ interface TradingAccountFormProps {
 
 // Copy trading links mapping
 const copyTradingLinks = {
-  exness: "https://my.exness.com/pa/socialtrading/",
+  exness: "https://social-trading.exness.com/strategy/227918123/a/trdqjrdq?sharer=trader",
   bybit: "https://finestel.com/app/copy-trading/U42AN0-S37396",
   binance: "https://finestel.com/app/copy-trading/SS98X3-S66396"
 };
