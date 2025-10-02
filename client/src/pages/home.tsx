@@ -463,10 +463,19 @@ export default function Home() {
                           </div>
                         </div>
                         <div className="flex items-center justify-between">
-                          <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80" data-testid={`view-details-${account.broker}`}>
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            View Details
-                          </Button>
+                          {account.broker === 'bybit' ? (
+                            <Link href="/bybit">
+                              <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80" data-testid={`view-details-${account.broker}`}>
+                                <ExternalLink className="h-4 w-4 mr-2" />
+                                View Details
+                              </Button>
+                            </Link>
+                          ) : (
+                            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80" data-testid={`view-details-${account.broker}`}>
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              View Details
+                            </Button>
+                          )}
                           <Button 
                             variant="ghost" 
                             size="sm" 

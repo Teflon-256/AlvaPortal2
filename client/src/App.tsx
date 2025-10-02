@@ -9,6 +9,7 @@ import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
 import Admin from "@/pages/admin";
+import Bybit from "@/pages/bybit";
 import FAQ from "@/pages/faq";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
@@ -31,6 +32,7 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Home} />
+          <Route path="/bybit" component={Bybit} />
         </>
       )}
       <Route component={NotFound} />

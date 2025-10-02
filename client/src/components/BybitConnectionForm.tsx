@@ -22,11 +22,11 @@ const bybitConnectionSchema = z.object({
 type BybitConnectionForm = z.infer<typeof bybitConnectionSchema>;
 
 interface BybitConnectionFormProps {
-  accountId: string;
-  onSuccess: () => void;
+  accountId?: string;
+  onSuccess?: () => void;
 }
 
-export function BybitConnectionForm({ accountId, onSuccess }: BybitConnectionFormProps) {
+export function BybitConnectionForm({ accountId = "", onSuccess }: BybitConnectionFormProps) {
   const { toast } = useToast();
   const [showApiSecret, setShowApiSecret] = useState(false);
 
@@ -56,7 +56,7 @@ export function BybitConnectionForm({ accountId, onSuccess }: BybitConnectionFor
       });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
       form.reset();
-      onSuccess();
+      onSuccess?.();
     },
     onError: (error: any) => {
       toast({
