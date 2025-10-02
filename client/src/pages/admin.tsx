@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Select,
   SelectContent,
@@ -19,12 +20,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Edit, ExternalLink, Clock, CheckCircle, XCircle, Shield } from 'lucide-react';
+import { Edit, ExternalLink, Clock, CheckCircle, XCircle, Shield, FileText, Key, Users } from 'lucide-react';
 import { useState } from 'react';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import type { BrokerRequest } from '@shared/schema';
+import { MasterAccountConfig } from '@/components/MasterAccountConfig';
+import { CopierManagement } from '@/components/CopierManagement';
 
 export default function AdminPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -151,14 +154,27 @@ export default function AdminPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <Badge variant="outline" className="text-lg px-3 py-1">
-          {(brokerRequests as BrokerRequest[]).length} Total Requests
-        </Badge>
-      </div>
+      <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
-      <div className="grid gap-6">
+      <Tabs defaultValue="broker-requests" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="broker-requests" className="flex items-center gap-2" data-testid="tab-broker-requests">
+            <FileText className="w-4 h-4" />
+            Broker Requests
+            <Badge variant="secondary" className="ml-1">{(brokerRequests as BrokerRequest[]).length}</Badge>
+          </TabsTrigger>
+          <TabsTrigger value="master-account" className="flex items-center gap-2" data-testid="tab-master-account">
+            <Key className="w-4 h-4" />
+            Master Account
+          </TabsTrigger>
+          <TabsTrigger value="copiers" className="flex items-center gap-2" data-testid="tab-copiers">
+            <Users className="w-4 h-4" />
+            Copier Management
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="broker-requests" className="mt-6">
+          <div className="grid gap-6">
         {(brokerRequests as BrokerRequest[]).length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center">
@@ -231,7 +247,17 @@ export default function AdminPage() {
             </Card>
           ))
         )}
-      </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="master-account" className="mt-6">
+          <MasterAccountConfig />
+        </TabsContent>
+
+        <TabsContent value="copiers" className="mt-6">
+          <CopierManagement />
+        </TabsContent>
+      </Tabs>
 
       <Dialog open={updateDialogOpen} onOpenChange={setUpdateDialogOpen}>
         <DialogContent data-testid="update-request-dialog">
