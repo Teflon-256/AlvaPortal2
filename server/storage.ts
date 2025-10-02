@@ -5,6 +5,9 @@ import {
   masterCopierConnections,
   referralLinks,
   brokerRequests,
+  adminSettings,
+  profitTransfers,
+  actionLog,
   type User,
   type UpsertUser,
   type TradingAccount,
@@ -17,6 +20,12 @@ import {
   type InsertReferralLink,
   type BrokerRequest,
   type InsertBrokerRequest,
+  type AdminSetting,
+  type InsertAdminSetting,
+  type ProfitTransfer,
+  type InsertProfitTransfer,
+  type ActionLog,
+  type InsertActionLog,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc } from "drizzle-orm";
@@ -55,6 +64,24 @@ export interface IStorage {
   getBrokerRequests(): Promise<BrokerRequest[]>;
   createBrokerRequest(request: InsertBrokerRequest): Promise<BrokerRequest>;
   updateBrokerRequestStatus(requestId: string, status: string, adminNotes?: string): Promise<void>;
+  
+  // Admin settings operations
+  getAdminSetting(key: string): Promise<AdminSetting | undefined>;
+  setAdminSetting(setting: InsertAdminSetting): Promise<AdminSetting>;
+  
+  // Profit transfer operations
+  getProfitTransfers(userId: string): Promise<ProfitTransfer[]>;
+  createProfitTransfer(transfer: InsertProfitTransfer): Promise<ProfitTransfer>;
+  updateProfitTransferStatus(transferId: string, status: string, bybitTransactionId?: string, errorMessage?: string): Promise<void>;
+  
+  // Action log operations
+  getActionLogs(userId: string, limit?: number): Promise<ActionLog[]>;
+  createActionLog(log: InsertActionLog): Promise<ActionLog>;
+  
+  // Trading account with API keys
+  updateTradingAccountApiKeys(accountId: string, apiKeyEncrypted: string, apiSecretEncrypted: string): Promise<void>;
+  updateTradingAccountSettings(accountId: string, tradingCapital?: string, maxRiskPercentage?: string, copyStatus?: string): Promise<void>;
+  getTradingAccountById(accountId: string): Promise<TradingAccount | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -264,6 +291,143 @@ export class DatabaseStorage implements IStorage {
       .update(brokerRequests)
       .set(updateData)
       .where(eq(brokerRequests.id, requestId));
+  }
+
+  // Admin settings operations
+  async getAdminSetting(key: string): Promise<AdminSetting | undefined> {
+    const [setting] = await db
+      .select()
+      .from(adminSettings)
+      .where(eq(adminSettings.settingKey, key));
+    return setting;
+  }
+
+  async setAdminSetting(setting: InsertAdminSetting): Promise<AdminSetting> {
+    const [result] = await db
+      .insert(adminSettings)
+      .values(setting)
+      .onConflictDoUpdate({
+        target: adminSettings.settingKey,
+        set: {
+          settingValue: setting.settingValue,
+          description: setting.description,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return result;
+  }
+
+  // Profit transfer operations
+  async getProfitTransfers(userId: string): Promise<ProfitTransfer[]> {
+    return await db
+      .select()
+      .from(profitTransfers)
+      .where(eq(profitTransfers.userId, userId))
+      .orderBy(desc(profitTransfers.createdAt));
+  }
+
+  async createProfitTransfer(transfer: InsertProfitTransfer): Promise<ProfitTransfer> {
+    const [newTransfer] = await db
+      .insert(profitTransfers)
+      .values(transfer)
+      .returning();
+    return newTransfer;
+  }
+
+  async updateProfitTransferStatus(
+    transferId: string, 
+    status: string, 
+    bybitTransactionId?: string, 
+    errorMessage?: string
+  ): Promise<void> {
+    const updateData: any = { 
+      transferStatus: status,
+      completedAt: status === 'completed' ? new Date() : undefined,
+    };
+    
+    if (bybitTransactionId) {
+      updateData.bybitTransactionId = bybitTransactionId;
+    }
+    
+    if (errorMessage) {
+      updateData.errorMessage = errorMessage;
+    }
+
+    await db
+      .update(profitTransfers)
+      .set(updateData)
+      .where(eq(profitTransfers.id, transferId));
+  }
+
+  // Action log operations
+  async getActionLogs(userId: string, limit: number = 100): Promise<ActionLog[]> {
+    return await db
+      .select()
+      .from(actionLog)
+      .where(eq(actionLog.userId, userId))
+      .orderBy(desc(actionLog.createdAt))
+      .limit(limit);
+  }
+
+  async createActionLog(log: InsertActionLog): Promise<ActionLog> {
+    const [newLog] = await db
+      .insert(actionLog)
+      .values(log)
+      .returning();
+    return newLog;
+  }
+
+  // Trading account with API keys operations
+  async updateTradingAccountApiKeys(
+    accountId: string, 
+    apiKeyEncrypted: string, 
+    apiSecretEncrypted: string
+  ): Promise<void> {
+    await db
+      .update(tradingAccounts)
+      .set({ 
+        apiKeyEncrypted, 
+        apiSecretEncrypted,
+        updatedAt: new Date()
+      })
+      .where(eq(tradingAccounts.id, accountId));
+  }
+
+  async updateTradingAccountSettings(
+    accountId: string, 
+    tradingCapital?: string, 
+    maxRiskPercentage?: string, 
+    copyStatus?: string
+  ): Promise<void> {
+    const updateData: any = { 
+      updatedAt: new Date() 
+    };
+    
+    if (tradingCapital !== undefined) {
+      updateData.tradingCapital = tradingCapital;
+    }
+    
+    if (maxRiskPercentage !== undefined) {
+      updateData.maxRiskPercentage = maxRiskPercentage;
+    }
+    
+    if (copyStatus !== undefined) {
+      updateData.copyStatus = copyStatus;
+    }
+
+    await db
+      .update(tradingAccounts)
+      .set(updateData)
+      .where(eq(tradingAccounts.id, accountId));
+  }
+
+  async getTradingAccountById(accountId: string): Promise<TradingAccount | undefined> {
+    const [account] = await db
+      .select()
+      .from(tradingAccounts)
+      .where(eq(tradingAccounts.id, accountId));
+    return account;
   }
 
   // Helper methods
@@ -489,6 +653,50 @@ export class MemoryStorage implements IStorage {
 
   async updateBrokerRequestStatus(requestId: string, status: string, adminNotes?: string): Promise<void> {
     throw new Error("Broker requests not supported in memory storage");
+  }
+
+  // Admin settings operations (not supported in memory storage)
+  async getAdminSetting(key: string): Promise<AdminSetting | undefined> {
+    return undefined;
+  }
+
+  async setAdminSetting(setting: InsertAdminSetting): Promise<AdminSetting> {
+    throw new Error("Admin settings not supported in memory storage");
+  }
+
+  // Profit transfer operations (not supported in memory storage)
+  async getProfitTransfers(userId: string): Promise<ProfitTransfer[]> {
+    return [];
+  }
+
+  async createProfitTransfer(transfer: InsertProfitTransfer): Promise<ProfitTransfer> {
+    throw new Error("Profit transfers not supported in memory storage");
+  }
+
+  async updateProfitTransferStatus(transferId: string, status: string, bybitTransactionId?: string, errorMessage?: string): Promise<void> {
+    throw new Error("Profit transfers not supported in memory storage");
+  }
+
+  // Action log operations (not supported in memory storage)
+  async getActionLogs(userId: string, limit?: number): Promise<ActionLog[]> {
+    return [];
+  }
+
+  async createActionLog(log: InsertActionLog): Promise<ActionLog> {
+    throw new Error("Action logs not supported in memory storage");
+  }
+
+  // Trading account with API keys (not supported in memory storage)
+  async updateTradingAccountApiKeys(accountId: string, apiKeyEncrypted: string, apiSecretEncrypted: string): Promise<void> {
+    throw new Error("API key storage not supported in memory storage");
+  }
+
+  async updateTradingAccountSettings(accountId: string, tradingCapital?: string, maxRiskPercentage?: string, copyStatus?: string): Promise<void> {
+    throw new Error("Trading account settings not supported in memory storage");
+  }
+
+  async getTradingAccountById(accountId: string): Promise<TradingAccount | undefined> {
+    return undefined;
   }
 
   // Helper methods

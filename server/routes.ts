@@ -5,6 +5,8 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertTradingAccountSchema, insertReferralEarningSchema, insertMasterCopierConnectionSchema, insertBrokerRequestSchema } from "@shared/schema";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { encrypt, decrypt } from "./crypto";
+import { BybitService } from "./bybit";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -250,6 +252,198 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating broker request:", error);
       res.status(500).json({ message: "Failed to update broker request" });
+    }
+  });
+
+  // Bybit API routes
+  app.post('/api/bybit/connect', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { accountId, apiKey, apiSecret, tradingCapital, maxRiskPercentage } = req.body;
+      
+      if (!accountId || !apiKey || !apiSecret) {
+        return res.status(400).json({ message: "Account ID, API key and secret are required" });
+      }
+
+      const bybitService = new BybitService({ apiKey, apiSecret });
+      const isValid = await bybitService.testConnection();
+      
+      if (!isValid) {
+        return res.status(400).json({ message: "Invalid API credentials" });
+      }
+
+      const apiKeyEncrypted = encrypt(apiKey);
+      const apiSecretEncrypted = encrypt(apiSecret);
+      
+      await storage.updateTradingAccountApiKeys(accountId, apiKeyEncrypted, apiSecretEncrypted);
+      
+      if (tradingCapital || maxRiskPercentage) {
+        await storage.updateTradingAccountSettings(accountId, tradingCapital, maxRiskPercentage);
+      }
+
+      await storage.createActionLog({
+        userId,
+        action: 'connect_bybit_account',
+        description: 'Connected Bybit account with API keys',
+        metadata: { accountId },
+        ipAddress: req.ip,
+      });
+
+      res.json({ message: "Bybit account connected successfully" });
+    } catch (error: any) {
+      console.error("Error connecting Bybit account:", error);
+      res.status(500).json({ message: error.message || "Failed to connect Bybit account" });
+    }
+  });
+
+  app.get('/api/bybit/balance/:accountId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { accountId } = req.params;
+      const account = await storage.getTradingAccountById(accountId);
+      
+      if (!account || !account.apiKeyEncrypted || !account.apiSecretEncrypted) {
+        return res.status(404).json({ message: "Bybit account not found or not connected" });
+      }
+
+      const bybitService = BybitService.createFromEncrypted(
+        account.apiKeyEncrypted,
+        account.apiSecretEncrypted
+      );
+      
+      const balances = await bybitService.getWalletBalance();
+      res.json({ balances });
+    } catch (error: any) {
+      console.error("Error fetching Bybit balance:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch balance" });
+    }
+  });
+
+  app.get('/api/bybit/positions/:accountId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { accountId } = req.params;
+      const account = await storage.getTradingAccountById(accountId);
+      
+      if (!account || !account.apiKeyEncrypted || !account.apiSecretEncrypted) {
+        return res.status(404).json({ message: "Bybit account not found or not connected" });
+      }
+
+      const bybitService = BybitService.createFromEncrypted(
+        account.apiKeyEncrypted,
+        account.apiSecretEncrypted
+      );
+      
+      const positions = await bybitService.getPositions();
+      res.json({ positions });
+    } catch (error: any) {
+      console.error("Error fetching Bybit positions:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch positions" });
+    }
+  });
+
+  app.get('/api/bybit/transactions/:accountId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { accountId } = req.params;
+      const account = await storage.getTradingAccountById(accountId);
+      
+      if (!account || !account.apiKeyEncrypted || !account.apiSecretEncrypted) {
+        return res.status(404).json({ message: "Bybit account not found or not connected" });
+      }
+
+      const bybitService = BybitService.createFromEncrypted(
+        account.apiKeyEncrypted,
+        account.apiSecretEncrypted
+      );
+      
+      const transactions = await bybitService.getTransactionHistory();
+      res.json({ transactions });
+    } catch (error: any) {
+      console.error("Error fetching Bybit transactions:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch transactions" });
+    }
+  });
+
+  app.get('/api/bybit/performance/:accountId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { accountId } = req.params;
+      const account = await storage.getTradingAccountById(accountId);
+      
+      if (!account || !account.apiKeyEncrypted || !account.apiSecretEncrypted) {
+        return res.status(404).json({ message: "Bybit account not found or not connected" });
+      }
+
+      const bybitService = BybitService.createFromEncrypted(
+        account.apiKeyEncrypted,
+        account.apiSecretEncrypted
+      );
+      
+      const performance = await bybitService.getPerformanceStats();
+      res.json(performance);
+    } catch (error: any) {
+      console.error("Error fetching Bybit performance:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch performance stats" });
+    }
+  });
+
+  // Admin settings routes
+  app.get('/api/admin/settings/:key', isAuthenticated, async (req: any, res) => {
+    try {
+      const { key } = req.params;
+      const setting = await storage.getAdminSetting(key);
+      
+      if (!setting) {
+        return res.status(404).json({ message: "Setting not found" });
+      }
+      
+      res.json(setting);
+    } catch (error) {
+      console.error("Error fetching admin setting:", error);
+      res.status(500).json({ message: "Failed to fetch setting" });
+    }
+  });
+
+  app.post('/api/admin/settings', isAuthenticated, async (req: any, res) => {
+    try {
+      const { settingKey, settingValue, description } = req.body;
+      
+      const encryptedValue = settingKey.includes('api_key') || settingKey.includes('api_secret') 
+        ? encrypt(settingValue)
+        : settingValue;
+      
+      const setting = await storage.setAdminSetting({
+        settingKey,
+        settingValue: encryptedValue,
+        description,
+      });
+      
+      res.json(setting);
+    } catch (error) {
+      console.error("Error setting admin setting:", error);
+      res.status(500).json({ message: "Failed to set setting" });
+    }
+  });
+
+  // Profit transfers routes
+  app.get('/api/profit-transfers', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const transfers = await storage.getProfitTransfers(userId);
+      res.json(transfers);
+    } catch (error) {
+      console.error("Error fetching profit transfers:", error);
+      res.status(500).json({ message: "Failed to fetch profit transfers" });
+    }
+  });
+
+  // Action logs routes
+  app.get('/api/action-logs', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const limit = parseInt(req.query.limit as string) || 100;
+      const logs = await storage.getActionLogs(userId, limit);
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching action logs:", error);
+      res.status(500).json({ message: "Failed to fetch action logs" });
     }
   });
 
