@@ -51,7 +51,10 @@ export const tradingAccounts = pgTable("trading_accounts", {
   dailyPnL: decimal("daily_pnl", { precision: 15, scale: 2 }).default('0.00'),
   copyStatus: varchar("copy_status").default('inactive'), // 'active', 'inactive', 'paused'
   isConnected: boolean("is_connected").default(true),
-  apiKeyEncrypted: text("api_key_encrypted"), // Encrypted API credentials
+  apiKeyEncrypted: text("api_key_encrypted"), // Encrypted API key
+  apiSecretEncrypted: text("api_secret_encrypted"), // Encrypted API secret
+  tradingCapital: decimal("trading_capital", { precision: 15, scale: 2 }), // Amount user wants to trade
+  maxRiskPercentage: decimal("max_risk_percentage", { precision: 5, scale: 2 }).default('2.00'), // Max exposure across all trades
   lastSyncAt: timestamp("last_sync_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -107,6 +110,43 @@ export const brokerRequests = pgTable("broker_requests", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Admin settings for master account and profit transfers
+export const adminSettings = pgTable("admin_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  settingKey: varchar("setting_key").unique().notNull(), // e.g., 'master_account', 'transfer_user_id'
+  settingValue: text("setting_value"), // Encrypted for sensitive data
+  description: text("description"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Profit transfers log - tracks all 50/50 profit splits and transfers
+export const profitTransfers = pgTable("profit_transfers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  tradingAccountId: varchar("trading_account_id").notNull().references(() => tradingAccounts.id),
+  totalProfit: decimal("total_profit", { precision: 15, scale: 2 }).notNull(),
+  userShare: decimal("user_share", { precision: 15, scale: 2 }).notNull(), // 50%
+  platformShare: decimal("platform_share", { precision: 15, scale: 2 }).notNull(), // 50%
+  transferAmount: decimal("transfer_amount", { precision: 15, scale: 2 }).notNull(), // Amount transferred in USDT
+  transferStatus: varchar("transfer_status").default('pending'), // 'pending', 'completed', 'failed'
+  transferType: varchar("transfer_type").notNull(), // 'weekly', 'withdrawal_triggered'
+  bybitTransactionId: varchar("bybit_transaction_id"),
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+});
+
+// Action log - tracks all user actions in the portal
+export const actionLog = pgTable("action_log", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  action: varchar("action").notNull(), // 'connect_account', 'disconnect_account', 'update_settings', 'profit_transfer', etc.
+  description: text("description").notNull(),
+  metadata: jsonb("metadata"), // Additional data about the action
+  ipAddress: varchar("ip_address"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many, one }) => ({
   tradingAccounts: many(tradingAccounts),
@@ -115,6 +155,8 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   masterCopierConnections: many(masterCopierConnections),
   referralLinks: many(referralLinks),
   brokerRequests: many(brokerRequests),
+  profitTransfers: many(profitTransfers),
+  actionLog: many(actionLog),
   referrer: one(users, {
     fields: [users.referredBy],
     references: [users.id],
@@ -127,6 +169,7 @@ export const tradingAccountsRelations = relations(tradingAccounts, ({ one, many 
     references: [users.id],
   }),
   masterCopierConnections: many(masterCopierConnections),
+  profitTransfers: many(profitTransfers),
 }));
 
 export const referralEarningsRelations = relations(referralEarnings, ({ one }) => ({
@@ -163,6 +206,24 @@ export const referralLinksRelations = relations(referralLinks, ({ one }) => ({
 export const brokerRequestsRelations = relations(brokerRequests, ({ one }) => ({
   user: one(users, {
     fields: [brokerRequests.userId],
+    references: [users.id],
+  }),
+}));
+
+export const profitTransfersRelations = relations(profitTransfers, ({ one }) => ({
+  user: one(users, {
+    fields: [profitTransfers.userId],
+    references: [users.id],
+  }),
+  tradingAccount: one(tradingAccounts, {
+    fields: [profitTransfers.tradingAccountId],
+    references: [tradingAccounts.id],
+  }),
+}));
+
+export const actionLogRelations = relations(actionLog, ({ one }) => ({
+  user: one(users, {
+    fields: [actionLog.userId],
     references: [users.id],
   }),
 }));
@@ -204,6 +265,22 @@ export const insertBrokerRequestSchema = createInsertSchema(brokerRequests).omit
   updatedAt: true,
 });
 
+export const insertAdminSettingSchema = createInsertSchema(adminSettings).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const insertProfitTransferSchema = createInsertSchema(profitTransfers).omit({
+  id: true,
+  createdAt: true,
+  completedAt: true,
+});
+
+export const insertActionLogSchema = createInsertSchema(actionLog).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -217,3 +294,9 @@ export type InsertReferralLink = z.infer<typeof insertReferralLinkSchema>;
 export type ReferralLink = typeof referralLinks.$inferSelect;
 export type InsertBrokerRequest = z.infer<typeof insertBrokerRequestSchema>;
 export type BrokerRequest = typeof brokerRequests.$inferSelect;
+export type InsertAdminSetting = z.infer<typeof insertAdminSettingSchema>;
+export type AdminSetting = typeof adminSettings.$inferSelect;
+export type InsertProfitTransfer = z.infer<typeof insertProfitTransferSchema>;
+export type ProfitTransfer = typeof profitTransfers.$inferSelect;
+export type InsertActionLog = z.infer<typeof insertActionLogSchema>;
+export type ActionLog = typeof actionLog.$inferSelect;
