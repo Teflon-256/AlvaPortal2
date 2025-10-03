@@ -123,7 +123,7 @@ export default function Landing() {
                 <Button 
                   onClick={handleGetStarted} 
                   size="lg"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg font-semibold transition-all transform hover:scale-105"
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 text-lg font-semibold rounded-xl transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
                   data-testid="hero-start-trading"
                 >
                   {t('startTrading')}
@@ -132,7 +132,7 @@ export default function Landing() {
                   variant="outline" 
                   size="lg"
                   onClick={() => window.open('http://www.youtube.com/@profitmaxing', '_blank')}
-                  className="border-border hover:border-primary text-foreground px-8 py-4 text-lg font-semibold"
+                  className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/20 px-8 py-4 text-lg font-semibold rounded-xl transition-all transform hover:scale-105"
                   data-testid="hero-learn-more"
                 >
                   Learn More
