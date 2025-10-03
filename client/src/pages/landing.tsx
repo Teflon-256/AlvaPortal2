@@ -10,6 +10,10 @@ import { TradingAccountForm } from "@/components/TradingAccountForm";
 import { MarketPrices } from "@/components/MarketPrices";
 import alvaCapitalLogo from "@assets/image_1759129583507.png";
 import laptopTrading from "@assets/Copilot_20251003_161134_1759498837182.png";
+import tabletMarket from "@assets/1759495482418_100_1759499270310.png";
+import mobileDerivatives from "@assets/1759495444187_100_1759499291943.png";
+import iphoneTrading from "@assets/1759495512620_100_1759499304236.png";
+import mobileBtcChart from "@assets/1759495369009_100_1759499337910.png";
 
 export default function Landing() {
   const { t } = useTranslation();
@@ -212,7 +216,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
           <div className="w-[300px] rounded-2xl shadow-2xl overflow-hidden border-4 border-gray-800 transform hover:scale-105 transition-transform">
             <img 
-              src="/attached_assets/1759495482418_100_1759499270310.PNG"
+              src={tabletMarket}
               alt="Bybit Market Sentiment and Data"
               className="w-full h-auto"
             />
@@ -228,7 +232,7 @@ export default function Landing() {
             <div className="lg:col-span-3 flex justify-center">
               <div className="w-[180px] rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-900 transform hover:scale-105 transition-transform">
                 <img 
-                  src="/attached_assets/1759495444187_100_1759499291943.PNG"
+                  src={mobileDerivatives}
                   alt="Bybit Derivatives Trading"
                   className="w-full h-auto"
                 />
@@ -248,7 +252,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
           <div className="w-[200px] rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-900 transform hover:scale-105 transition-transform">
             <img 
-              src="/attached_assets/1759495512620_100_1759499304236.PNG"
+              src={iphoneTrading}
               alt="Bybit Mobile Trading"
               className="w-full h-auto"
             />
@@ -330,7 +334,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
           <div className="w-[200px] rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-900 transform hover:scale-105 transition-transform">
             <img 
-              src="/attached_assets/1759495369009_100_1759499337910.PNG"
+              src={mobileBtcChart}
               alt="Bybit BTC Trading Chart"
               className="w-full h-auto"
             />
