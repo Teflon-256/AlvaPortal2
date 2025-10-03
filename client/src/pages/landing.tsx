@@ -207,10 +207,52 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Image 1 - Above Live Quotes */}
+      <section className="py-8 bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
+          <div className="w-[300px] rounded-2xl shadow-2xl overflow-hidden border-4 border-gray-800 transform hover:scale-105 transition-transform">
+            <img 
+              src="/attached_assets/1759495482418_100_1759499270310.PNG"
+              alt="Bybit Market Sentiment and Data"
+              className="w-full h-auto"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Market Prices Section */}
       <section className="py-16 bg-background border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <MarketPrices />
+          <div className="grid lg:grid-cols-12 gap-8 items-start">
+            {/* Image 2 - Left side on same line as live quotes */}
+            <div className="lg:col-span-3 flex justify-center">
+              <div className="w-[180px] rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-900 transform hover:scale-105 transition-transform">
+                <img 
+                  src="/attached_assets/1759495444187_100_1759499291943.PNG"
+                  alt="Bybit Derivatives Trading"
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+            
+            {/* Market Prices */}
+            <div className="lg:col-span-9">
+              <MarketPrices />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Image 3 - Before Why Choose Us */}
+      <section className="py-12 bg-muted/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
+          <div className="w-[200px] rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-900 transform hover:scale-105 transition-transform">
+            <img 
+              src="/attached_assets/1759495512620_100_1759499304236.PNG"
+              alt="Bybit Mobile Trading"
+              className="w-full h-auto"
+            />
+          </div>
         </div>
       </section>
 
@@ -279,6 +321,19 @@ export default function Landing() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Image 4 - Before Contact Us */}
+      <section className="py-12 bg-muted/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
+          <div className="w-[200px] rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-900 transform hover:scale-105 transition-transform">
+            <img 
+              src="/attached_assets/1759495369009_100_1759499337910.PNG"
+              alt="Bybit BTC Trading Chart"
+              className="w-full h-auto"
+            />
           </div>
         </div>
       </section>
