@@ -108,11 +108,11 @@ export default function Landing() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-center lg:text-left">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold leading-tight mb-6 antialiased" data-testid="hero-title">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold leading-tight mb-6 antialiased" data-testid="hero-title">
                 {t('heroTitle')}
                 <span className="gradient-text block">{t('heroSubtitle')}</span>
               </h1>
-              <p className="text-xl text-muted-foreground mb-8 leading-relaxed antialiased" data-testid="hero-description">
+              <p className="text-base text-muted-foreground mb-8 leading-relaxed antialiased" data-testid="hero-description">
                 {t('heroDescription')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -136,16 +136,16 @@ export default function Landing() {
               </div>
               <div className="mt-12 flex items-center justify-center lg:justify-start space-x-8">
                 <div className="text-center">
-                  <div className="text-2xl font-bold gradient-text" data-testid="stat-assets">$500M+</div>
-                  <div className="text-sm text-muted-foreground">Assets Managed</div>
+                  <div className="text-lg font-bold gradient-text" data-testid="stat-assets">$500M+</div>
+                  <div className="text-xs text-muted-foreground">Assets Managed</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold gradient-text" data-testid="stat-traders">10K+</div>
-                  <div className="text-sm text-muted-foreground">Active Traders</div>
+                  <div className="text-lg font-bold gradient-text" data-testid="stat-traders">10K+</div>
+                  <div className="text-xs text-muted-foreground">Active Traders</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold gradient-text" data-testid="stat-uptime">99.9%</div>
-                  <div className="text-sm text-muted-foreground">Uptime</div>
+                  <div className="text-lg font-bold gradient-text" data-testid="stat-uptime">99.9%</div>
+                  <div className="text-xs text-muted-foreground">Uptime</div>
                 </div>
               </div>
             </div>
@@ -242,8 +242,8 @@ export default function Landing() {
       <section id="features" className="py-20 bg-muted/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-serif font-bold gradient-text mb-4 antialiased" data-testid="features-title">{t('whyChooseUs')}</h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto antialiased" data-testid="features-description">
+            <h2 className="text-xl lg:text-2xl font-serif font-bold gradient-text mb-4 antialiased" data-testid="features-title">{t('whyChooseUs')}</h2>
+            <p className="text-sm text-muted-foreground max-w-3xl mx-auto antialiased" data-testid="features-description">
               {t('multiPlatformDesc')}
             </p>
           </div>
@@ -294,12 +294,12 @@ export default function Landing() {
               }
             ].map((feature, index) => (
               <Card key={index} className="premium-card text-center cursor-pointer hover:scale-105 transition-transform" data-testid={`feature-${feature.title.toLowerCase().replace(/\s+/g, '-')}`} onClick={feature.onClick}>
-                <CardContent className="p-8">
-                  <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <feature.icon className={`${feature.color} h-8 w-8`} />
+                <CardContent className="p-6">
+                  <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <feature.icon className={`${feature.color} h-6 w-6`} />
                   </div>
-                  <h3 className="text-xl font-semibold mb-4 hover:text-primary transition-colors">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
+                  <h3 className="text-base font-semibold mb-3 hover:text-primary transition-colors">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -343,10 +343,10 @@ export default function Landing() {
       {/* Contact Section */}
       <section id="contact" className="py-20 bg-muted/10">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl lg:text-4xl font-serif font-bold gradient-text mb-6 antialiased" data-testid="contact-title">
+          <h2 className="text-xl lg:text-2xl font-serif font-bold gradient-text mb-6 antialiased" data-testid="contact-title">
             {t('contactUs')}
           </h2>
-          <p className="text-xl text-muted-foreground mb-8 antialiased" data-testid="contact-description">
+          <p className="text-sm text-muted-foreground mb-8 antialiased" data-testid="contact-description">
             {t('getInTouch')}
           </p>
           <div className="flex justify-center">
@@ -367,10 +367,10 @@ export default function Landing() {
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10"></div>
         <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl lg:text-4xl font-serif font-bold gradient-text mb-6 antialiased" data-testid="cta-title">
+          <h2 className="text-xl lg:text-2xl font-serif font-bold gradient-text mb-6 antialiased" data-testid="cta-title">
             Ready to Elevate Your Trading?
           </h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto antialiased" data-testid="cta-description">
+          <p className="text-sm text-muted-foreground mb-8 max-w-2xl mx-auto antialiased" data-testid="cta-description">
             Join thousands of successful traders using our premium platform. Start earning today with our AI-powered copy trading system and lucrative referral program.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
