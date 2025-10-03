@@ -384,6 +384,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Copy trading control endpoints
+  app.post('/api/copy-trading/sync/:accountId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { accountId } = req.params;
+      const userId = req.user.claims.sub;
+      const { copyTradingScheduler } = await import('./copyTradingScheduler');
+      
+      await copyTradingScheduler.syncPositions();
+      res.json({ success: true, message: "Position sync initiated" });
+    } catch (error: any) {
+      console.error("Error syncing positions:", error);
+      res.status(500).json({ message: error.message || "Failed to sync positions" });
+    }
+  });
+
+  app.post('/api/copy-trading/profit-split', isAuthenticated, async (req: any, res) => {
+    try {
+      const { copyTradingScheduler } = await import('./copyTradingScheduler');
+      
+      await copyTradingScheduler.processWeeklyProfitSplits();
+      res.json({ success: true, message: "Profit split process initiated" });
+    } catch (error: any) {
+      console.error("Error processing profit splits:", error);
+      res.status(500).json({ message: error.message || "Failed to process profit splits" });
+    }
+  });
+
+  app.get('/api/action-logs', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const logs = await storage.getActionLogs(userId);
+      res.json(logs);
+    } catch (error: any) {
+      console.error("Error fetching action logs:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch action logs" });
+    }
+  });
+
+  app.get('/api/profit-transfers', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const transfers = await storage.getProfitTransfers(userId);
+      res.json(transfers);
+    } catch (error: any) {
+      console.error("Error fetching profit transfers:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch profit transfers" });
+    }
+  });
+
   // Admin settings routes
   app.get('/api/admin/settings/:key', isAuthenticated, async (req: any, res) => {
     try {

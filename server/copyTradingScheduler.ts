@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 import { db } from './db';
-import { tradingAccounts, adminSettings, profitTransfers, actionLogs } from '@shared/schema';
+import { tradingAccounts, adminSettings, profitTransfers, actionLog } from '@shared/schema';
 import { eq, and } from 'drizzle-orm';
 import { BybitService, CopyTradingEngine, ProfitSplitService } from './bybit';
 
@@ -20,7 +20,7 @@ export class CopyTradingScheduler {
       throw new Error('Master account not configured');
     }
 
-    const config = JSON.parse(masterConfig[0].settingValue);
+    const config = JSON.parse(masterConfig[0].settingValue || '{}');
     return {
       apiKey: config.api_key,
       apiSecret: config.api_secret,
@@ -39,7 +39,7 @@ export class CopyTradingScheduler {
       throw new Error('Platform transfer user ID not configured');
     }
 
-    return parseInt(setting[0].settingValue);
+    return parseInt(setting[0].settingValue || '0');
   }
 
   async getActiveCopiers() {
@@ -53,7 +53,7 @@ export class CopyTradingScheduler {
         )
       );
 
-    return copiers.filter(c => c.bybitApiKey && c.bybitApiSecret);
+    return copiers.filter(c => c.apiKeyEncrypted && c.apiSecretEncrypted);
   }
 
   async syncPositions() {
@@ -85,11 +85,11 @@ export class CopyTradingScheduler {
       for (const copier of activeCopiers) {
         try {
           const copierService = BybitService.createFromEncrypted(
-            copier.bybitApiKey!,
-            copier.bybitApiSecret!
+            copier.apiKeyEncrypted!,
+            copier.apiSecretEncrypted!
           );
 
-          const copierCapital = parseFloat(copier.balance);
+          const copierCapital = parseFloat(copier.balance || '0');
           const maxRisk = parseFloat(copier.maxRiskPercentage || '2.00');
 
           const results = await copyEngine.syncCopierPositions(
@@ -98,7 +98,7 @@ export class CopyTradingScheduler {
             maxRisk
           );
 
-          await db.insert(actionLogs).values({
+          await db.insert(actionLog).values({
             userId: copier.userId,
             action: 'COPY_TRADING_SYNC',
             description: `Synced positions: ${results.opened} opened, ${results.closed} closed. Errors: ${results.errors.length}`,
@@ -113,7 +113,7 @@ export class CopyTradingScheduler {
         } catch (error: any) {
           console.error(`Failed to sync copier ${copier.id}:`, error.message);
           
-          await db.insert(actionLogs).values({
+          await db.insert(actionLog).values({
             userId: copier.userId,
             action: 'COPY_TRADING_ERROR',
             description: `Failed to sync positions: ${error.message}`,
@@ -141,8 +141,8 @@ export class CopyTradingScheduler {
       for (const copier of activeCopiers) {
         try {
           const copierService = BybitService.createFromEncrypted(
-            copier.bybitApiKey!,
-            copier.bybitApiSecret!
+            copier.apiKeyEncrypted!,
+            copier.apiSecretEncrypted!
           );
 
           const performance = await copierService.getPerformanceStats();
@@ -154,17 +154,16 @@ export class CopyTradingScheduler {
 
           await db.insert(profitTransfers).values({
             userId: copier.userId,
-            accountId: copier.id,
+            tradingAccountId: copier.id,
             totalProfit: result.split.totalProfit.toString(),
             userShare: result.split.userShare.toString(),
             platformShare: result.split.platformShare.toString(),
             transferAmount: result.split.platformShare.toString(),
             transferType: 'weekly',
             transferStatus: result.transfer ? 'completed' : 'skipped',
-            transferDetails: JSON.stringify(result.transfer || { reason: 'No profit to split' }),
           });
 
-          await db.insert(actionLogs).values({
+          await db.insert(actionLog).values({
             userId: copier.userId,
             action: 'PROFIT_SPLIT',
             description: `Weekly profit split: $${result.split.platformShare.toFixed(2)} transferred`,
@@ -175,7 +174,7 @@ export class CopyTradingScheduler {
         } catch (error: any) {
           console.error(`Failed to process profit split for copier ${copier.id}:`, error.message);
           
-          await db.insert(actionLogs).values({
+          await db.insert(actionLog).values({
             userId: copier.userId,
             action: 'PROFIT_SPLIT_ERROR',
             description: `Failed to process profit split: ${error.message}`,
@@ -199,13 +198,13 @@ export class CopyTradingScheduler {
           .where(eq(tradingAccounts.id, copierId))
           .limit(1);
 
-        if (!copier.length || !copier[0].bybitApiKey || !copier[0].bybitApiSecret) {
+        if (!copier.length || !copier[0].apiKeyEncrypted || !copier[0].apiSecretEncrypted) {
           return;
         }
 
         const copierService = BybitService.createFromEncrypted(
-          copier[0].bybitApiKey,
-          copier[0].bybitApiSecret
+          copier[0].apiKeyEncrypted,
+          copier[0].apiSecretEncrypted
         );
 
         const masterAccount = await this.getMasterAccount();
@@ -236,18 +235,17 @@ export class CopyTradingScheduler {
         if (result.transfer) {
           await db.insert(profitTransfers).values({
             userId: copier[0].userId,
-            accountId: copier[0].id,
+            tradingAccountId: copier[0].id,
             totalProfit: result.split.totalProfit.toString(),
             userShare: result.split.userShare.toString(),
             platformShare: result.split.platformShare.toString(),
             transferAmount: result.split.platformShare.toString(),
             transferType: 'withdrawal',
             transferStatus: 'completed',
-            transferDetails: JSON.stringify(result.transfer),
           });
         }
 
-        await db.insert(actionLogs).values({
+        await db.insert(actionLog).values({
           userId: copier[0].userId,
           action: 'COPY_TRADING_DISABLED',
           description: `Copy trading disabled. All positions closed. Profit split: $${result.split.platformShare.toFixed(2)}`,
@@ -285,7 +283,7 @@ export class CopyTradingScheduler {
     };
   }
 
-  async stop(jobs: { positionSyncInterval: NodeJS.Timeout; profitSplitJob: cron.ScheduledTask }) {
+  async stop(jobs: { positionSyncInterval: NodeJS.Timeout; profitSplitJob: any }) {
     console.log('Stopping copy trading scheduler...');
     clearInterval(jobs.positionSyncInterval);
     jobs.profitSplitJob.stop();

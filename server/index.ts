@@ -86,8 +86,17 @@ app.use((req, res, next) => {
       host: "0.0.0.0",
       reusePort: true,
     },
-    () => {
+    async () => {
       log(`serving on port ${port}`);
+      
+      // Start copy trading scheduler
+      try {
+        const { copyTradingScheduler } = await import('./copyTradingScheduler');
+        copyTradingScheduler.start();
+        log('✓ Copy trading scheduler started');
+      } catch (error: any) {
+        console.error('Failed to start copy trading scheduler:', error.message);
+      }
     },
   );
 })();
