@@ -92,32 +92,61 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    // Check if user already exists
-    const existingUser = await this.getUser(userData.id);
-    
-    // Generate referral code if not provided
-    if (!userData.referralCode) {
-      userData.referralCode = this.generateReferralCode();
+    try {
+      // Check if user already exists by ID
+      const existingUser = await this.getUser(userData.id);
+      
+      // Generate referral code if not provided
+      if (!userData.referralCode) {
+        userData.referralCode = this.generateReferralCode();
+      }
+
+      const [user] = await db
+        .insert(users)
+        .values(userData)
+        .onConflictDoUpdate({
+          target: users.id,
+          set: {
+            ...userData,
+            updatedAt: new Date(),
+          },
+        })
+        .returning();
+
+      // Create default referral links only for new users
+      if (user && !existingUser) {
+        await this.createDefaultReferralLinks(user.id);
+      }
+
+      return user;
+    } catch (error: any) {
+      // Handle unique constraint violation on email
+      if (error.code === '23505' && error.constraint === 'users_email_unique') {
+        // Email already exists - check if we should update the existing user
+        const [existingUserByEmail] = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, userData.email || ''));
+        
+        if (existingUserByEmail) {
+          // Update the existing user with new data (email ownership might have transferred)
+          const [updatedUser] = await db
+            .update(users)
+            .set({
+              ...userData,
+              updatedAt: new Date(),
+            })
+            .where(eq(users.id, existingUserByEmail.id))
+            .returning();
+          
+          return updatedUser;
+        }
+      }
+      
+      // Re-throw other errors
+      console.error('Error upserting user:', error);
+      throw error;
     }
-
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-
-    // Create default referral links only for new users
-    if (user && !existingUser) {
-      await this.createDefaultReferralLinks(user.id);
-    }
-
-    return user;
   }
 
   // Trading account operations
