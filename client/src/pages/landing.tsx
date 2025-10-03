@@ -14,6 +14,7 @@ import tabletMarket from "@assets/1759495482418_100_1759499270310.png";
 import mobileDerivatives from "@assets/1759495444187_100_1759499291943.png";
 import iphoneTrading from "@assets/1759495512620_100_1759499304236.png";
 import mobileBtcChart from "@assets/1759495369009_100_1759499337910.png";
+import qrCode from "@assets/frame_1759515761162.png";
 
 export default function Landing() {
   const { t } = useTranslation();
@@ -160,49 +161,6 @@ export default function Landing() {
                 </div>
               </div>
 
-              {/* Mobile Phone - Top Left */}
-              <div className="absolute top-0 left-0 z-20 floating-animation" style={{ animationDelay: '0.5s' }}>
-                <div className="w-[140px] rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-900 transform hover:scale-110 transition-transform">
-                  <img 
-                    src="/attached_assets/1759495369009_100_1759497717869.PNG"
-                    alt="Bybit Mobile Trading Chart"
-                    className="w-full h-auto"
-                  />
-                </div>
-              </div>
-
-              {/* Mobile Phone - Top Right */}
-              <div className="absolute top-12 right-0 z-20 floating-animation" style={{ animationDelay: '1s' }}>
-                <div className="w-[140px] rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-900 transform hover:scale-110 transition-transform">
-                  <img 
-                    src="/attached_assets/1759495512620_100_1759497717871.PNG"
-                    alt="Bybit Mobile Chart Interface"
-                    className="w-full h-auto"
-                  />
-                </div>
-              </div>
-
-              {/* Mobile Phone - Bottom Left */}
-              <div className="absolute bottom-8 left-12 z-20 floating-animation" style={{ animationDelay: '1.5s' }}>
-                <div className="w-[140px] rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-900 transform hover:scale-110 transition-transform">
-                  <img 
-                    src="/attached_assets/1759495444187_100_1759497717870.PNG"
-                    alt="Bybit Markets List"
-                    className="w-full h-auto"
-                  />
-                </div>
-              </div>
-
-              {/* Tablet - Bottom Right */}
-              <div className="absolute bottom-0 right-8 z-15 floating-animation" style={{ animationDelay: '2s' }}>
-                <div className="w-[200px] rounded-2xl shadow-2xl overflow-hidden border-4 border-gray-800 transform hover:scale-105 transition-transform">
-                  <img 
-                    src="/attached_assets/1759495482418_100_1759497717871.PNG"
-                    alt="Bybit Market Data on Tablet"
-                    className="w-full h-auto"
-                  />
-                </div>
-              </div>
 
               {/* Glow Effects */}
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 blur-3xl -z-10"></div>
@@ -214,7 +172,7 @@ export default function Landing() {
       {/* Image 1 - Above Live Quotes */}
       <section className="py-8 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
-          <div className="w-[300px] rounded-2xl shadow-2xl overflow-hidden border-4 border-gray-800 transform hover:scale-105 transition-transform">
+          <div className="w-[500px] rounded-2xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform">
             <img 
               src={tabletMarket}
               alt="Bybit Market Sentiment and Data"
@@ -230,7 +188,7 @@ export default function Landing() {
           <div className="grid lg:grid-cols-12 gap-8 items-start">
             {/* Image 2 - Left side on same line as live quotes */}
             <div className="lg:col-span-3 flex justify-center">
-              <div className="w-[180px] rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-900 transform hover:scale-105 transition-transform">
+              <div className="w-[280px] rounded-3xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform">
                 <img 
                   src={mobileDerivatives}
                   alt="Bybit Derivatives Trading"
@@ -247,15 +205,35 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Image 3 - Before Why Choose Us */}
+      {/* Join on iPhone - Left Side */}
       <section className="py-12 bg-muted/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
-          <div className="w-[200px] rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-900 transform hover:scale-105 transition-transform">
-            <img 
-              src={iphoneTrading}
-              alt="Bybit Mobile Trading"
-              className="w-full h-auto"
-            />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-start items-center gap-6">
+            <a 
+              href="https://partner.bybit.com/b/119776"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cursor-pointer group"
+              data-testid="join-iphone-link"
+            >
+              <div className="flex items-center gap-6 bg-black p-6 rounded-3xl shadow-2xl transform group-hover:scale-105 transition-transform">
+                <div className="w-[320px] rounded-3xl shadow-2xl overflow-hidden">
+                  <img 
+                    src={iphoneTrading}
+                    alt="Bybit Mobile Trading on iPhone"
+                    className="w-full h-auto"
+                  />
+                </div>
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-white mb-4">Join on iPhone</h3>
+                  <img 
+                    src={qrCode}
+                    alt="QR Code to join"
+                    className="w-[150px] h-[150px] mx-auto"
+                  />
+                </div>
+              </div>
+            </a>
           </div>
         </div>
       </section>
@@ -329,15 +307,35 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Image 4 - Before Contact Us */}
+      {/* Join on Android - Right Side */}
       <section className="py-12 bg-muted/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
-          <div className="w-[200px] rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-900 transform hover:scale-105 transition-transform">
-            <img 
-              src={mobileBtcChart}
-              alt="Bybit BTC Trading Chart"
-              className="w-full h-auto"
-            />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-end items-center gap-6">
+            <a 
+              href="https://partner.bybit.com/b/119776"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cursor-pointer group"
+              data-testid="join-android-link"
+            >
+              <div className="flex items-center gap-6 bg-black p-6 rounded-3xl shadow-2xl transform group-hover:scale-105 transition-transform">
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-white mb-4">Join on Android</h3>
+                  <img 
+                    src={qrCode}
+                    alt="QR Code to join"
+                    className="w-[150px] h-[150px] mx-auto"
+                  />
+                </div>
+                <div className="w-[320px] rounded-3xl shadow-2xl overflow-hidden">
+                  <img 
+                    src={mobileBtcChart}
+                    alt="Bybit Mobile Trading on Android"
+                    className="w-full h-auto"
+                  />
+                </div>
+              </div>
+            </a>
           </div>
         </div>
       </section>
