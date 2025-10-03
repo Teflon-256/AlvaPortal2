@@ -275,17 +275,20 @@ export default function Home() {
             <div className="flex items-center space-x-4">
               <LanguageSelector />
               <ThemeToggle />
-              <Link href="/admin">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-border/50 text-foreground hover:bg-accent/50"
-                  data-testid="admin-link"
-                >
-                  <Settings className="h-4 w-4 mr-2" />
-                  Admin
-                </Button>
-              </Link>
+              {/* Only show Admin button for authorized admins */}
+              {user?.email && ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'].includes(user.email) && (
+                <Link href="/admin">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-border/50 text-foreground hover:bg-accent/50"
+                    data-testid="admin-link"
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Admin
+                  </Button>
+                </Link>
+              )}
               <div className="flex items-center space-x-2">
                 {user?.profileImageUrl && (
                   <img 
@@ -400,20 +403,12 @@ export default function Home() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-xl font-semibold">Trading Accounts</CardTitle>
-                  <Dialog open={connectDialogOpen} onOpenChange={setConnectDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="bg-primary hover:bg-primary/90" data-testid="connect-account-button">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Connect Account
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent data-testid="connect-account-dialog">
-                      <DialogHeader>
-                        <DialogTitle>{t('addAccount')}</DialogTitle>
-                      </DialogHeader>
-                      <TradingAccountForm onSuccess={() => setConnectDialogOpen(false)} />
-                    </DialogContent>
-                  </Dialog>
+                  <Link href="/bybit">
+                    <Button className="bg-primary hover:bg-primary/90" data-testid="connect-account-button">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Connect Bybit Account
+                    </Button>
+                  </Link>
                 </div>
               </CardHeader>
               <CardContent>
@@ -506,9 +501,9 @@ export default function Home() {
               <CardContent>
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground mb-4">
-                    Begin your trading journey with these trusted platforms.
+                    Begin your trading journey with Bybit.
                   </p>
-                  {dashboardData?.referralLinks?.map((link: any) => (
+                  {dashboardData?.referralLinks?.filter((link: any) => link.broker === 'bybit').map((link: any) => (
                     <Button
                       key={link.id}
                       variant="outline"
@@ -532,10 +527,10 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            {/* Master Copier */}
+            {/* Copier Settings */}
             <Card className="premium-card" data-testid="master-copier-card">
               <CardHeader>
-                <CardTitle className="text-xl font-semibold">Master Copier</CardTitle>
+                <CardTitle className="text-xl font-semibold">Copier Settings</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center mb-6">
@@ -548,12 +543,14 @@ export default function Home() {
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Status</span>
-                    <Badge className="bg-green-500/20 text-green-400" data-testid="copier-status">Active</Badge>
+                    <Badge className={dashboardData?.tradingAccounts?.some((acc: any) => acc.broker === 'bybit' && acc.copyStatus === 'active') ? "bg-green-500/20 text-green-400" : "bg-muted text-muted-foreground"} data-testid="copier-status">
+                      {dashboardData?.tradingAccounts?.some((acc: any) => acc.broker === 'bybit' && acc.copyStatus === 'active') ? 'Connected' : 'Disconnected'}
+                    </Badge>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Connected Accounts</span>
                     <span className="font-medium" data-testid="copier-accounts">
-                      {dashboardData?.tradingAccounts?.length || 0}
+                      {dashboardData?.tradingAccounts?.filter((acc: any) => acc.broker === 'bybit').length || 0}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -561,10 +558,12 @@ export default function Home() {
                     <span className="text-green-400 font-medium" data-testid="copier-performance">+15.2%</span>
                   </div>
                 </div>
-                <Button className="w-full bg-primary hover:bg-primary/90" data-testid="manage-copier">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Manage Settings
-                </Button>
+                <Link href="/bybit">
+                  <Button className="w-full bg-primary hover:bg-primary/90" data-testid="manage-copier">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Manage Settings
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 

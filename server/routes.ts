@@ -259,12 +259,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/bybit/connect', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { accountId, apiKey, apiSecret, tradingCapital, maxRiskPercentage } = req.body;
+      const { apiKey, apiSecret, tradingCapital, maxRiskPercentage } = req.body;
       
-      if (!accountId || !apiKey || !apiSecret) {
-        return res.status(400).json({ message: "Account ID, API key and secret are required" });
+      if (!apiKey || !apiSecret) {
+        return res.status(400).json({ message: "API key and secret are required" });
       }
 
+      // Test connection with Bybit API
       const bybitService = new BybitService({ apiKey, apiSecret });
       const isValid = await bybitService.testConnection();
       
@@ -272,24 +273,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid API credentials" });
       }
 
+      // Get wallet balance from Bybit
+      const balances = await bybitService.getWalletBalance('UNIFIED');
+      const totalBalance = balances.reduce((sum, balance) => {
+        return sum + parseFloat(balance.totalWalletBalance || '0');
+      }, 0);
+      
+      // Encrypt API credentials
       const apiKeyEncrypted = encrypt(apiKey);
       const apiSecretEncrypted = encrypt(apiSecret);
       
-      await storage.updateTradingAccountApiKeys(accountId, apiKeyEncrypted, apiSecretEncrypted);
+      // Create trading account
+      const tradingAccount = await storage.createTradingAccount({
+        userId,
+        broker: 'bybit',
+        accountId: `bybit_${Date.now()}`,
+        accountName: 'Bybit Account',
+        balance: totalBalance.toString(),
+        dailyPnL: '0',
+        apiKeyEncrypted,
+        apiSecretEncrypted,
+        tradingCapital: tradingCapital || totalBalance.toString(),
+        maxRiskPercentage: maxRiskPercentage || '2.00',
+        copyStatus: 'active'
+      });
+
+      // Auto-connect as copier to master account (sahabyoona@gmail.com)
+      // Query database to find master user by email
+      const { users } = await import ('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+      const { db } = await import('./db');
       
-      if (tradingCapital || maxRiskPercentage) {
-        await storage.updateTradingAccountSettings(accountId, tradingCapital, maxRiskPercentage);
+      const [masterUser] = await db.select().from(users).where(eq(users.email, 'sahabyoona@gmail.com')).limit(1);
+      
+      if (masterUser) {
+        const masterAccounts = await storage.getTradingAccounts(masterUser.id);
+        const masterBybitAccount = masterAccounts.find(acc => acc.broker === 'bybit');
+        
+        if (masterBybitAccount) {
+          // Create master-copier connection
+          await storage.createMasterCopierConnection({
+            masterAccountId: masterBybitAccount.id,
+            copierAccountId: tradingAccount.id,
+            copyRatio: '1.0',
+            isActive: true
+          });
+        }
       }
 
       await storage.createActionLog({
         userId,
         action: 'connect_bybit_account',
-        description: 'Connected Bybit account with API keys',
-        metadata: { accountId },
+        description: 'Connected Bybit account with API keys and auto-joined copy trading',
+        metadata: { accountId: tradingAccount.id },
         ipAddress: req.ip,
       });
 
-      res.json({ message: "Bybit account connected successfully" });
+      res.json({ 
+        message: "Bybit account connected successfully and joined copy trading",
+        accountId: tradingAccount.id 
+      });
     } catch (error: any) {
       console.error("Error connecting Bybit account:", error);
       res.status(500).json({ message: error.message || "Failed to connect Bybit account" });

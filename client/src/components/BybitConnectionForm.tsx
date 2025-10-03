@@ -12,7 +12,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Loader2, Key, DollarSign, AlertTriangle } from "lucide-react";
 
 const bybitConnectionSchema = z.object({
-  accountId: z.string().min(1, "Account ID is required"),
   apiKey: z.string().min(1, "API Key is required"),
   apiSecret: z.string().min(1, "API Secret is required"),
   tradingCapital: z.string().optional(),
@@ -22,18 +21,16 @@ const bybitConnectionSchema = z.object({
 type BybitConnectionForm = z.infer<typeof bybitConnectionSchema>;
 
 interface BybitConnectionFormProps {
-  accountId?: string;
   onSuccess?: () => void;
 }
 
-export function BybitConnectionForm({ accountId = "", onSuccess }: BybitConnectionFormProps) {
+export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
   const { toast } = useToast();
   const [showApiSecret, setShowApiSecret] = useState(false);
 
   const form = useForm<BybitConnectionForm>({
     resolver: zodResolver(bybitConnectionSchema),
     defaultValues: {
-      accountId,
       apiKey: "",
       apiSecret: "",
       tradingCapital: "",
@@ -83,11 +80,22 @@ export function BybitConnectionForm({ accountId = "", onSuccess }: BybitConnecti
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="mb-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+          <p className="font-semibold mb-2 text-blue-600 dark:text-blue-400">Whitelist IP Addresses in Bybit:</p>
+          <div className="space-y-1 text-sm">
+            <p className="text-muted-foreground">Before connecting, whitelist these IPs in your Bybit API settings:</p>
+            <div className="bg-background/50 p-2 rounded border border-border mt-2">
+              <p className="font-mono text-xs">0.0.0.0/0</p>
+              <p className="text-xs text-muted-foreground mt-1">Or use your server's specific IP for enhanced security</p>
+            </div>
+          </div>
+        </div>
+
         <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg flex items-start gap-2">
           <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5" />
           <div className="text-sm text-yellow-600 dark:text-yellow-400">
             <p className="font-semibold">Security Notice:</p>
-            <p>Your API keys are encrypted and stored securely. Make sure to enable IP whitelist and set appropriate permissions (Read-only for data, Trade for copy trading).</p>
+            <p>Your API keys are encrypted and stored securely. Set appropriate permissions: Read-only for data, Trade for copy trading.</p>
           </div>
         </div>
 
