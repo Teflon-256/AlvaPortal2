@@ -268,3 +268,217 @@ export class BybitService {
     }
   }
 }
+
+export interface CopierAccount {
+  id: string;
+  userId: string;
+  apiKey: string;
+  apiSecret: string;
+  tradingCapital: number;
+  maxRiskPercentage: number;
+  copyStatus: string;
+}
+
+export interface MasterPosition {
+  symbol: string;
+  side: string;
+  size: number;
+  entryPrice: number;
+  leverage: string;
+  positionValue: number;
+}
+
+export class CopyTradingEngine {
+  private masterService: BybitService;
+  private masterCapital: number;
+
+  constructor(masterService: BybitService, masterCapital: number) {
+    this.masterService = masterService;
+    this.masterCapital = masterCapital;
+  }
+
+  async getMasterPositions(): Promise<MasterPosition[]> {
+    const positions = await this.masterService.getPositions('linear');
+    return positions.map(pos => ({
+      symbol: pos.symbol,
+      side: pos.side,
+      size: parseFloat(pos.size),
+      entryPrice: parseFloat(pos.entryPrice),
+      leverage: pos.leverage,
+      positionValue: parseFloat(pos.positionValue),
+    }));
+  }
+
+  calculateCopierPositionSize(
+    masterPositionSize: number,
+    masterCapital: number,
+    copierCapital: number
+  ): number {
+    const ratio = copierCapital / masterCapital;
+    return masterPositionSize * ratio;
+  }
+
+  async replicatePosition(
+    copierService: BybitService,
+    masterPosition: MasterPosition,
+    copierCapital: number,
+    maxRiskPercentage: number
+  ): Promise<any> {
+    const copierSize = this.calculateCopierPositionSize(
+      masterPosition.size,
+      this.masterCapital,
+      copierCapital
+    );
+
+    const positionValue = copierSize * masterPosition.entryPrice;
+    const maxPositionValue = copierCapital * (maxRiskPercentage / 100);
+
+    if (positionValue > maxPositionValue) {
+      throw new Error(`Position exceeds max risk: ${positionValue} > ${maxPositionValue}`);
+    }
+
+    return await copierService.placeOrder({
+      category: 'linear',
+      symbol: masterPosition.symbol,
+      side: masterPosition.side as 'Buy' | 'Sell',
+      orderType: 'Market',
+      qty: copierSize.toFixed(3),
+    });
+  }
+
+  async closeAllCopierPositions(copierService: BybitService): Promise<void> {
+    const positions = await copierService.getPositions('linear');
+    
+    for (const position of positions) {
+      await copierService.closePosition(
+        'linear',
+        position.symbol,
+        position.side as 'Buy' | 'Sell'
+      );
+    }
+  }
+
+  async syncCopierPositions(
+    copierService: BybitService,
+    copierCapital: number,
+    maxRiskPercentage: number
+  ): Promise<{ opened: number; closed: number; errors: string[] }> {
+    const masterPositions = await this.getMasterPositions();
+    const copierPositions = await copierService.getPositions('linear');
+
+    const results = { opened: 0, closed: 0, errors: [] as string[] };
+
+    const masterSymbols = new Set(masterPositions.map(p => p.symbol));
+    const copierSymbols = new Set(copierPositions.map(p => p.symbol));
+
+    for (const masterPos of masterPositions) {
+      if (!copierSymbols.has(masterPos.symbol)) {
+        try {
+          await this.replicatePosition(
+            copierService,
+            masterPos,
+            copierCapital,
+            maxRiskPercentage
+          );
+          results.opened++;
+        } catch (error: any) {
+          results.errors.push(`Failed to open ${masterPos.symbol}: ${error.message}`);
+        }
+      }
+    }
+
+    for (const copierPos of copierPositions) {
+      if (!masterSymbols.has(copierPos.symbol)) {
+        try {
+          await copierService.closePosition(
+            'linear',
+            copierPos.symbol,
+            copierPos.side as 'Buy' | 'Sell'
+          );
+          results.closed++;
+        } catch (error: any) {
+          results.errors.push(`Failed to close ${copierPos.symbol}: ${error.message}`);
+        }
+      }
+    }
+
+    return results;
+  }
+}
+
+export interface ProfitSplit {
+  totalProfit: number;
+  userShare: number;
+  platformShare: number;
+}
+
+export class ProfitSplitService {
+  async calculateProfitSplit(
+    realizedPnl: number,
+    unrealizedPnl: number,
+    splitPercentage: number = 50
+  ): Promise<ProfitSplit> {
+    const totalProfit = realizedPnl + unrealizedPnl;
+    
+    if (totalProfit <= 0) {
+      return {
+        totalProfit: 0,
+        userShare: 0,
+        platformShare: 0,
+      };
+    }
+
+    const platformShare = (totalProfit * splitPercentage) / 100;
+    const userShare = totalProfit - platformShare;
+
+    return {
+      totalProfit,
+      userShare,
+      platformShare,
+    };
+  }
+
+  async executeProfitTransfer(
+    copierService: BybitService,
+    platformUserId: number,
+    amount: number,
+    coin: string = 'USDT'
+  ): Promise<any> {
+    const transferId = crypto.randomUUID();
+    
+    return await copierService.universalTransfer({
+      transferId,
+      coin,
+      amount: amount.toFixed(2),
+      fromMemberId: 0, 
+      toMemberId: platformUserId,
+      fromAccountType: 'UNIFIED',
+      toAccountType: 'UNIFIED',
+    });
+  }
+
+  async processWeeklyProfitSplit(
+    copierService: BybitService,
+    copierPerformance: BybitPerformance,
+    platformUserId: number
+  ): Promise<{ split: ProfitSplit; transfer?: any }> {
+    const split = await this.calculateProfitSplit(
+      parseFloat(copierPerformance.totalRealizedPnl),
+      parseFloat(copierPerformance.totalUnrealizedPnl),
+      50
+    );
+
+    if (split.platformShare > 0) {
+      const transfer = await this.executeProfitTransfer(
+        copierService,
+        platformUserId,
+        split.platformShare,
+        'USDT'
+      );
+      
+      return { split, transfer };
+    }
+
+    return { split };
+  }
+}
