@@ -8,9 +8,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { TradingAccountForm } from "@/components/TradingAccountForm";
 import { MarketPrices } from "@/components/MarketPrices";
-import futuristicWallStreet from "@assets/generated_images/Futuristic_Wall_Street_9156e3fe.png";
 import alvaCapitalLogo from "@assets/image_1759129583507.png";
-import laptopTrading from "@assets/Copilot_20251003_161134_1759497489507.png";
+import laptopTrading from "@assets/Copilot_20251003_161134_1759498837182.png";
 
 export default function Landing() {
   const { t } = useTranslation();
@@ -101,15 +100,6 @@ export default function Landing() {
 
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
-          style={{
-            backgroundImage: `url(${futuristicWallStreet})`,
-          }}
-        ></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-background/80 to-background/60"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,hsl(0_0%_98%/0.1)_0%,transparent_50%)]"></div>
-        
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-center lg:text-left">
