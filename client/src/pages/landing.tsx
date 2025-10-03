@@ -175,9 +175,7 @@ export default function Landing() {
                     </div>
                     <div className="space-y-3">
                       {[
-                        { name: "Exness", icon: "EX", balance: "$45,230.20", pnl: "+2.34%", color: "bg-orange-500" },
-                        { name: "Bybit", icon: "BY", balance: "$32,100.15", pnl: "+1.87%", color: "bg-yellow-500" },
-                        { name: "Binance", icon: "BN", balance: "$48,100.15", pnl: "+3.12%", color: "bg-yellow-400" }
+                        { name: "Bybit", icon: "BY", balance: "$125,430.50", pnl: "+7.33%", color: "bg-blue-600" }
                       ].map((broker, index) => (
                         <div key={broker.name} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg" data-testid={`preview-broker-${broker.name.toLowerCase()}`}>
                           <div className="flex items-center space-x-3">
@@ -218,16 +216,16 @@ export default function Landing() {
             {[
               {
                 icon: Link,
-                title: "Multi-Broker Integration",
-                description: "Connect your Exness, Bybit, and Binance accounts seamlessly for unified portfolio management and automated trading.",
+                title: "Bybit Integration",
+                description: "Connect your Bybit account seamlessly for unified portfolio management, automated trading, and real-time analytics.",
                 color: "text-primary",
                 onClick: handleMultiBrokerClick
               },
               {
                 icon: Bot,
                 title: "AI Copy Trading",
-                description: "Advanced copy trading system that mirrors our master traders' strategies across all your connected accounts.",
-                color: "text-green-400",
+                description: "Advanced copy trading system that mirrors our master traders' strategies on Bybit. Automated position replication with intelligent risk management.",
+                color: "text-blue-400",
                 onClick: handleCopyTradingClick
               },
               {
@@ -355,11 +353,11 @@ export default function Landing() {
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4">Brokers</h4>
+              <h4 className="font-semibold mb-4">Trading</h4>
               <ul className="space-y-2">
-                <li><a href="https://my.exness.com/pa/socialtrading/" target="_blank" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-exness">Exness</a></li>
-                <li><a href="https://finestel.com/app/copy-trading/U42AN0-S37396" target="_blank" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-bybit">Bybit</a></li>
-                <li><a href="https://finestel.com/app/copy-trading/SS98X3-S66396" target="_blank" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-binance">Binance</a></li>
+                <li><a href="https://finestel.com/app/copy-trading/U42AN0-S37396" target="_blank" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-bybit">Bybit Trading</a></li>
+                <li><a href="/api/login" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-copy-trading">Copy Trading</a></li>
+                <li><a href="/api/login" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-portfolio">Portfolio Management</a></li>
               </ul>
             </div>
             
@@ -387,59 +385,28 @@ export default function Landing() {
         </div>
       </footer>
 
-      {/* Multi-Broker Integration Popup */}
+      {/* Bybit Integration Popup */}
       <Dialog open={multiBrokerOpen} onOpenChange={setMultiBrokerOpen}>
         <DialogContent className="max-w-md" data-testid="multi-broker-dialog">
           <DialogHeader>
-            <DialogTitle>Multi-Broker Integration</DialogTitle>
+            <DialogTitle>Bybit Integration</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground mb-6">
-              Connect your trading accounts from trusted brokers and start copy trading with our master strategies.
+              Connect your Bybit trading account and start copy trading with our master strategies. Trade Forex, Indices, Commodities, Stocks, and Cryptocurrencies.
             </p>
             
-            {/* Exness */}
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <h4 className="font-semibold">Exness</h4>
-                <p className="text-sm text-muted-foreground">Forex, Indices, Commodities</p>
-              </div>
-              <Button 
-                onClick={() => handleStartTrading('exness')}
-                size="sm"
-                data-testid="start-trading-exness"
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Start Trading
-              </Button>
-            </div>
-
             {/* Bybit */}
-            <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div className="flex items-center justify-between p-4 border rounded-lg bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
               <div>
-                <h4 className="font-semibold">Bybit</h4>
-                <p className="text-sm text-muted-foreground">Forex, Indices, Commodities, Stocks, Crypto-currencies Spot and Futures</p>
+                <h4 className="font-semibold text-blue-600 dark:text-blue-400">Bybit</h4>
+                <p className="text-sm text-muted-foreground">Forex, Indices, Commodities, Stocks, Crypto Spot & Futures</p>
               </div>
               <Button 
                 onClick={() => handleStartTrading('bybit')}
                 size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
                 data-testid="start-trading-bybit"
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Start Trading
-              </Button>
-            </div>
-
-            {/* Binance */}
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <h4 className="font-semibold">Binance</h4>
-                <p className="text-sm text-muted-foreground">Crypto-currencies Spot and Futures</p>
-              </div>
-              <Button 
-                onClick={() => handleStartTrading('binance')}
-                size="sm"
-                data-testid="start-trading-binance"
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
                 Start Trading
