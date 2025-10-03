@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { TradingAccountForm } from "@/components/TradingAccountForm";
+import { MarketPrices } from "@/components/MarketPrices";
 import futuristicWallStreet from "@assets/generated_images/Futuristic_Wall_Street_9156e3fe.png";
 import alvaCapitalLogo from "@assets/image_1759129583507.png";
 
@@ -154,51 +155,102 @@ export default function Landing() {
             </div>
             <div className="relative">
               <div className="floating-animation">
-                <Card className="premium-card backdrop-blur-sm" data-testid="hero-dashboard-preview">
+                {/* Desktop/Laptop View */}
+                <Card className="premium-card backdrop-blur-sm border-2 border-blue-600/20 shadow-2xl" data-testid="hero-dashboard-preview">
+                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-2 rounded-t-lg flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                    </div>
+                    <div className="flex-1 text-center">
+                      <div className="bg-white/20 rounded px-3 py-0.5 inline-block">
+                        <span className="text-xs text-white font-medium">alvacapital.online</span>
+                      </div>
+                    </div>
+                  </div>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-lg font-semibold">Portfolio Overview</h3>
+                      <h3 className="text-lg font-semibold">Trading Dashboard</h3>
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                         <span className="text-sm text-muted-foreground">Live</span>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4 mb-6">
-                      <div className="bg-muted/50 rounded-lg p-4">
-                        <div className="text-sm text-muted-foreground">Total Balance</div>
+                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                        <div className="text-sm text-muted-foreground mb-1">Portfolio Value</div>
                         <div className="text-2xl font-bold gradient-text" data-testid="preview-total-balance">$125,430.50</div>
                       </div>
-                      <div className="bg-muted/50 rounded-lg p-4">
-                        <div className="text-sm text-muted-foreground">Today's P&L</div>
-                        <div className="text-2xl font-bold text-green-400" data-testid="preview-daily-pnl">+$2,345.67</div>
+                      <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/30 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                        <div className="text-sm text-muted-foreground mb-1">Today's P&L</div>
+                        <div className="text-2xl font-bold text-green-500" data-testid="preview-daily-pnl">+$2,345.67</div>
                       </div>
                     </div>
+                    
+                    {/* Chart Area */}
+                    <div className="bg-muted/30 rounded-lg p-4 mb-4 h-32 flex items-end justify-around gap-1">
+                      {[60, 45, 75, 55, 80, 65, 90, 70, 85, 95, 88, 92].map((height, i) => (
+                        <div key={i} className="flex-1 bg-gradient-to-t from-blue-600 to-blue-400 rounded-t" style={{ height: `${height}%` }}></div>
+                      ))}
+                    </div>
+                    
                     <div className="space-y-3">
-                      {[
-                        { name: "Bybit", icon: "BY", balance: "$125,430.50", pnl: "+7.33%", color: "bg-blue-600" }
-                      ].map((broker, index) => (
-                        <div key={broker.name} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg" data-testid={`preview-broker-${broker.name.toLowerCase()}`}>
-                          <div className="flex items-center space-x-3">
-                            <div className={`w-8 h-8 ${broker.color} rounded-full flex items-center justify-center`}>
-                              <span className={`text-xs font-bold ${broker.name === "Binance" ? "text-black" : "text-white"}`}>{broker.icon}</span>
-                            </div>
-                            <div>
-                              <div className="font-medium">{broker.name}</div>
-                              <div className="text-sm text-muted-foreground">Connected</div>
-                            </div>
+                      <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-transparent dark:from-blue-950/20 dark:to-transparent rounded-lg border border-blue-200 dark:border-blue-800" data-testid="preview-broker-bybit">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-lg">
+                            <span className="text-sm font-bold text-white">BY</span>
                           </div>
-                          <div className="text-right">
-                            <div className="font-semibold">{broker.balance}</div>
-                            <div className="text-sm text-green-400">{broker.pnl}</div>
+                          <div>
+                            <div className="font-semibold">Bybit Trading</div>
+                            <div className="text-xs text-muted-foreground flex items-center gap-2">
+                              <span className="flex items-center gap-1">
+                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                                Active
+                              </span>
+                              <span>• Copy Trading</span>
+                            </div>
                           </div>
                         </div>
-                      ))}
+                        <div className="text-right">
+                          <div className="font-bold text-lg">$125,430.50</div>
+                          <div className="text-sm text-green-500 font-medium">+7.33%</div>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               </div>
+              
+              {/* Mobile Device Preview */}
+              <div className="absolute -bottom-6 -left-6 hidden lg:block">
+                <div className="w-32 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-2 shadow-2xl border-4 border-gray-700">
+                  <div className="bg-white dark:bg-gray-950 rounded-xl overflow-hidden">
+                    <div className="bg-blue-600 p-2 text-white text-center">
+                      <div className="text-xs font-bold">AlvaCapital</div>
+                    </div>
+                    <div className="p-2 space-y-1">
+                      <div className="bg-gray-100 dark:bg-gray-800 rounded p-1">
+                        <div className="text-[6px] text-gray-500">Balance</div>
+                        <div className="text-[8px] font-bold">$125.4K</div>
+                      </div>
+                      <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded p-1 text-white">
+                        <div className="text-[6px]">Bybit</div>
+                        <div className="text-[7px] font-bold">Active</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Market Prices Section */}
+      <section className="py-16 bg-background border-y border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <MarketPrices />
         </div>
       </section>
 
