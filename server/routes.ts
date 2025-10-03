@@ -87,6 +87,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return sum + parseFloat(account.dailyPnL || '0');
       }, 0);
 
+      // Calculate total performance percentage
+      let totalPerformancePercentage = 0;
+      let accountsWithCapital = 0;
+      
+      accountsWithBalance.forEach(account => {
+        const currentBalance = parseFloat(account.balance || '0');
+        const initialCapital = parseFloat(account.tradingCapital || '0');
+        
+        if (initialCapital > 0) {
+          const performancePercent = ((currentBalance - initialCapital) / initialCapital) * 100;
+          totalPerformancePercentage += performancePercent;
+          accountsWithCapital++;
+        }
+      });
+      
+      const averagePerformance = accountsWithCapital > 0 
+        ? (totalPerformancePercentage / accountsWithCapital).toFixed(2)
+        : '0.00';
+
       res.json({
         totalBalance: totalBalance.toFixed(2),
         dailyPnL: dailyPnL.toFixed(2),
@@ -95,7 +114,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         tradingAccounts: accountsWithBalance,
         recentReferralEarnings: referralEarnings.slice(0, 5), // Latest 5 earnings
         masterCopierConnections,
-        referralLinks
+        referralLinks,
+        performancePercentage: averagePerformance
       });
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
