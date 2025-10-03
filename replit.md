@@ -105,6 +105,34 @@ Preferred communication style: Simple, everyday language.
   - Color-coded: green for positive returns, red for negative
   - Averaged across all accounts with trading capital set
 
+### Theme Redesign - Bybit-Inspired Design (October 3, 2025)
+- **Complete Color Overhaul**: Changed from orange brand color to Bybit's signature blue
+  - Primary color: `hsl(217, 91%, 60%)` (Bybit Blue)
+  - Light theme: Clean white background with black text
+  - Dark theme: Deep black background with white text
+  - All accent colors updated to blue gradient schemes
+- **Enhanced Landing Page**:
+  - Added device showcase section with laptop browser mockup and mobile phone preview
+  - Integrated live market prices section displaying 10 major instruments (Gold, Silver, BTC, ETH, XRP, EUR/USD, GBP/JPY, S&P 500, UK 100, Crude Oil)
+  - Browser chrome with traffic lights and address bar for realistic device preview
+  - Mini chart visualizations in dashboard preview
+  - Floating animation effects for engaging user experience
+- **Button Redesign**: Updated all CTAs with Bybit-style rounded buttons
+  - Gradient blue buttons with shadow effects
+  - Rounded corners (xl border radius)
+  - Hover scale and shadow animations
+  - Outline buttons with blue borders
+- **Market Prices Component**: Real-time market data display
+  - 10 instruments: Gold, Silver, Bitcoin, Ethereum, XRP, EUR/USD, GBP/JPY, S&P 500, UK 100, Crude Oil
+  - Color-coded price changes (green for positive, red for negative)
+  - Trending icons for visual direction indicators
+  - Grid layout responsive across all screen sizes
+- **CSS Variables**: Updated entire color system in `index.css`
+  - Foreground colors: From navy blue to pure black/white
+  - Border radius: Reduced from 0.75rem to 0.5rem for modern look
+  - Premium card gradients updated to black/white/blue scheme
+  - Shimmer effect now uses blue color
+
 ### Bug Fixes
 - **Authentication**: Fixed email unique constraint handling in user authentication
   - Added graceful error handling for duplicate email scenarios
