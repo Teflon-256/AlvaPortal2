@@ -79,6 +79,31 @@ Preferred communication style: Simple, everyday language.
   - `POST /api/copy-trading/profit-split` - Manual profit split execution
   - `GET /api/action-logs` - Fetch user action logs
   - `GET /api/profit-transfers` - Fetch user profit transfer history
+- **Dashboard Data**: GET `/api/dashboard` - Real-time balance, P&L, and performance metrics
+- **Bybit Connection**: POST `/api/bybit/connect` - Auto-connects users as copiers to master account
+
+### Bybit Integration Enhancements (October 3, 2025)
+- **IP Whitelist Display**: Connection form now prominently displays required IP whitelist (0.0.0.0/0) with setup instructions
+- **Auto-Copier Connection**: New Bybit accounts automatically connect as copiers to master account (sahabyoona@gmail.com)
+  - Eliminates manual copier setup for users
+  - Creates master-copier relationship with 1.0 copy ratio on connection
+  - Master account determined by sahabyoona@gmail.com's first Bybit trading account
+- **Simplified Connection Flow**: Removed accountId requirement - system generates it automatically
+- **Real-time Balance Sync**: Dashboard fetches live Bybit balances via API for connected accounts
+  - Portfolio Value shows aggregated real-time balance across all accounts
+  - Today's P&L displays actual daily profit/loss from Bybit performance stats
+  - Automatic fallback to stored values if API calls fail
+
+### User Interface Improvements (October 3, 2025)
+- **User Profile Dropdown**: Non-admin users now have profile dropdown menu replacing logout button
+  - Displays user avatar/icon with name and chevron indicator
+  - Menu includes "Profile Settings" and "Logout" options
+  - Improved user experience and navigation consistency
+- **Admin Access**: Admin button remains visible only for authorized users (sahabyoona@gmail.com, mihhaa2p@gmail.com)
+- **Performance Metrics**: Copier Settings section now shows real calculated performance percentage
+  - Formula: ((current_balance - initial_capital) / initial_capital) * 100
+  - Color-coded: green for positive returns, red for negative
+  - Averaged across all accounts with trading capital set
 
 ### Bug Fixes
 - **Authentication**: Fixed email unique constraint handling in user authentication
@@ -87,8 +112,10 @@ Preferred communication style: Simple, everyday language.
   - Maintains email uniqueness while supporting account updates
 
 ### Testing Status
-- ✅ End-to-end testing completed successfully
+- ✅ End-to-end testing completed successfully (October 3, 2025)
 - ✅ Admin interface verified (restricted to sahabyoona@gmail.com, mihhaa2p@gmail.com)
-- ✅ Bybit integration tested (connection form, API endpoints)
+- ✅ Bybit integration tested (connection form with IP whitelist, API endpoints, auto-copier connection)
+- ✅ User profile dropdown tested (non-admin users)
+- ✅ Real-time balance and performance metrics verified
 - ✅ Copy trading scheduler confirmed running
 - ✅ Action logs and profit transfers endpoints validated
