@@ -63,3 +63,32 @@ Preferred communication style: Simple, everyday language.
 - **Trading Brokers**: Support for Exness, Bybit, and Binance account connections
 - **Real-time Data**: Portfolio balance and P&L tracking capabilities
 - **Referral Analytics**: Click and conversion tracking for referral links
+
+## Recent Changes (October 2025)
+
+### Copy Trading Automation
+- **Scheduler Service**: Automated copy trading scheduler running on server startup
+  - Position monitoring every 30 seconds via `CopyTradingEngine`
+  - Weekly profit splits on Sundays at 00:00 UTC via `ProfitSplitService`
+  - Instant trade replication with ratio-based position sizing
+  - Automatic profit transfers (50/50 split) with USDT via Bybit API
+
+### API Endpoints
+- **Copy Trading Control**:
+  - `POST /api/copy-trading/sync/:accountId` - Manual position sync trigger
+  - `POST /api/copy-trading/profit-split` - Manual profit split execution
+  - `GET /api/action-logs` - Fetch user action logs
+  - `GET /api/profit-transfers` - Fetch user profit transfer history
+
+### Bug Fixes
+- **Authentication**: Fixed email unique constraint handling in user authentication
+  - Added graceful error handling for duplicate email scenarios
+  - Prevents server crashes during OIDC login conflicts
+  - Maintains email uniqueness while supporting account updates
+
+### Testing Status
+- ✅ End-to-end testing completed successfully
+- ✅ Admin interface verified (restricted to sahabyoona@gmail.com, mihhaa2p@gmail.com)
+- ✅ Bybit integration tested (connection form, API endpoints)
+- ✅ Copy trading scheduler confirmed running
+- ✅ Action logs and profit transfers endpoints validated
