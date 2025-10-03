@@ -46,13 +46,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         storage.getReferralLinks(userId)
       ]);
 
+      // Fetch real-time Bybit balances for connected accounts
+      const accountsWithBalance = await Promise.all(
+        tradingAccounts.map(async (account) => {
+          if (account.broker === 'bybit' && account.apiKeyEncrypted && account.apiSecretEncrypted) {
+            try {
+              const bybitService = BybitService.createFromEncrypted(
+                account.apiKeyEncrypted,
+                account.apiSecretEncrypted
+              );
+              const balances = await bybitService.getWalletBalance('UNIFIED');
+              const totalBalance = balances.reduce((sum, balance) => {
+                return sum + parseFloat(balance.totalWalletBalance || '0');
+              }, 0);
+              
+              // Get performance stats for P&L
+              const performance = await bybitService.getPerformanceStats();
+              
+              return {
+                ...account,
+                balance: totalBalance.toString(),
+                dailyPnL: performance.dailyPnL.toString()
+              };
+            } catch (error) {
+              console.error(`Error fetching Bybit balance for account ${account.id}:`, error);
+              return account; // Return account with stored balance if API call fails
+            }
+          }
+          return account;
+        })
+      );
+
       // Calculate total portfolio balance
-      const totalBalance = tradingAccounts.reduce((sum, account) => {
+      const totalBalance = accountsWithBalance.reduce((sum, account) => {
         return sum + parseFloat(account.balance || '0');
       }, 0);
 
       // Calculate today's P&L
-      const dailyPnL = tradingAccounts.reduce((sum, account) => {
+      const dailyPnL = accountsWithBalance.reduce((sum, account) => {
         return sum + parseFloat(account.dailyPnL || '0');
       }, 0);
 
@@ -61,7 +92,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dailyPnL: dailyPnL.toFixed(2),
         referralCount: referralCount.count,
         referralEarnings: totalEarnings.total,
-        tradingAccounts,
+        tradingAccounts: accountsWithBalance,
         recentReferralEarnings: referralEarnings.slice(0, 5), // Latest 5 earnings
         masterCopierConnections,
         referralLinks
