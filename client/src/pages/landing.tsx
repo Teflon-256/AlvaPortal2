@@ -25,8 +25,7 @@ export default function Landing() {
   const [multiBrokerOpen, setMultiBrokerOpen] = useState(false);
   const [copyTradingOpen, setCopyTradingOpen] = useState(false);
   
-  const topImage = theme === 'light' ? tabletLightMode : mobileDerivatives;
-  const bottomImage = theme === 'light' ? laptopLightMode : tabletMarket;
+  const topImage = theme === 'light' ? laptopLightMode : tabletMarket;
   
   const handleGetStarted = () => {
     window.location.href = "/api/login";
@@ -190,6 +189,13 @@ export default function Landing() {
       {/* Market Prices Section */}
       <section className="py-16 bg-background border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center mb-8">
+            <img 
+              src={theme === 'light' ? tabletLightMode : mobileDerivatives}
+              alt="Market Analysis"
+              className="w-full max-w-[500px] h-auto"
+            />
+          </div>
           <MarketPrices />
         </div>
       </section>
@@ -332,17 +338,6 @@ export default function Landing() {
               {t('whatsappSupport')}
             </Button>
           </div>
-        </div>
-      </section>
-
-      {/* Bottom Image - Theme Aware */}
-      <section className="py-8 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
-          <img 
-            src={bottomImage}
-            alt="Trading Platform Interface"
-            className="w-full max-w-[500px] h-auto"
-          />
         </div>
       </section>
 
