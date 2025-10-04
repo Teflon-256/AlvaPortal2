@@ -594,6 +594,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Market prices endpoint
+  app.get('/api/market-prices', async (req, res) => {
+    try {
+      const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ message: "API key not configured" });
+      }
+
+      const symbols = [
+        { symbol: 'XAUUSD', type: 'forex', from: 'XAU', to: 'USD', name: 'Gold' },
+        { symbol: 'XAGUSD', type: 'forex', from: 'XAG', to: 'USD', name: 'Silver' },
+        { symbol: 'BTCUSDT', type: 'crypto', from: 'BTC', to: 'USDT', name: 'Bitcoin' },
+        { symbol: 'ETHUSDT', type: 'crypto', from: 'ETH', to: 'USDT', name: 'Ethereum' },
+        { symbol: 'XRPUSDT', type: 'crypto', from: 'XRP', to: 'USDT', name: 'XRP' },
+        { symbol: 'EURUSD', type: 'forex', from: 'EUR', to: 'USD', name: 'EUR/USD' },
+        { symbol: 'GBPJPY', type: 'forex', from: 'GBP', to: 'JPY', name: 'GBP/JPY' },
+        { symbol: 'US500', type: 'index', ticker: 'SPY', name: 'S&P 500' },
+        { symbol: 'UK100', type: 'index', ticker: 'ISF.LON', name: 'UK 100' },
+        { symbol: 'USOIL', type: 'commodity', ticker: 'USO', name: 'Crude Oil' }
+      ];
+
+      const prices = await Promise.all(
+        symbols.map(async (item) => {
+          try {
+            let url = '';
+            if (item.type === 'crypto') {
+              url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${item.from}&to_currency=${item.to}&apikey=${apiKey}`;
+            } else if (item.type === 'forex') {
+              url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${item.from}&to_currency=${item.to}&apikey=${apiKey}`;
+            } else {
+              url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${item.ticker}&apikey=${apiKey}`;
+            }
+
+            const response = await fetch(url);
+            const data = await response.json();
+
+            let price = 0;
+            let change = 0;
+            let changePercent = 0;
+
+            if (item.type === 'crypto' || item.type === 'forex') {
+              const rate = data['Realtime Currency Exchange Rate'];
+              if (rate) {
+                price = parseFloat(rate['5. Exchange Rate']);
+                // For crypto/forex, calculate approximate change (Alpha Vantage free tier doesn't provide 24h change)
+                change = 0;
+                changePercent = 0;
+              }
+            } else {
+              const quote = data['Global Quote'];
+              if (quote) {
+                price = parseFloat(quote['05. price']);
+                change = parseFloat(quote['09. change']);
+                changePercent = parseFloat(quote['10. change percent'].replace('%', ''));
+              }
+            }
+
+            return {
+              symbol: item.symbol,
+              name: item.name,
+              price: price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+              change: change >= 0 ? `+${change.toFixed(2)}` : change.toFixed(2),
+              changePercent: changePercent >= 0 ? `+${changePercent.toFixed(2)}%` : `${changePercent.toFixed(2)}%`
+            };
+          } catch (error) {
+            console.error(`Error fetching price for ${item.symbol}:`, error);
+            return {
+              symbol: item.symbol,
+              name: item.name,
+              price: '0.00',
+              change: '+0.00',
+              changePercent: '+0.00%'
+            };
+          }
+        })
+      );
+
+      res.json(prices);
+    } catch (error) {
+      console.error("Error fetching market prices:", error);
+      res.status(500).json({ message: "Failed to fetch market prices" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
