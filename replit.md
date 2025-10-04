@@ -66,6 +66,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (October 2025)
 
+### Live Market Prices Implementation (October 4, 2025)
+- **Real-time Data Integration**: Integrated Alpha Vantage API for live market prices
+  - 10 instruments: Gold, Silver, Bitcoin, Ethereum, XRP, EUR/USD, GBP/JPY, S&P 500, UK 100, Crude Oil
+  - Auto-refresh every 5 minutes using React Query refetch interval
+  - Backend endpoint `/api/market-prices` fetches real-time data
+  - Free tier API key (500 calls/day) more than sufficient for 5-minute intervals
+- **Visual Refinements**:
+  - iPhone and Android images now equal sizes (200px) with QR codes also 200px
+  - Perfect vertical alignment of phone images and QR codes
+  - Static laptop image above CTA (no theme switching, always shows light mode image)
+
+## Recent Changes (October 2025)
+
 ### UI/UX Improvements (October 4, 2025)
 - **Extreme Theme Redesign** - Pure contrast for maximum visual impact:
   - **Dark Mode (Default)**: Pure black background (hsl(0,0%,0%)) with vivid colors (100% saturation)
@@ -191,3 +204,6 @@ Preferred communication style: Simple, everyday language.
 - ✅ Real-time balance and performance metrics verified
 - ✅ Copy trading scheduler confirmed running
 - ✅ Action logs and profit transfers endpoints validated
+- ✅ Live market prices with Alpha Vantage API integration (5-minute auto-refresh)
+- ✅ Equal phone/QR code sizing (200px) with perfect alignment
+- ✅ Static laptop image above CTA (no theme switching)
