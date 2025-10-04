@@ -159,7 +159,11 @@ export function BybitDashboard({ accountId }: BybitDashboardProps) {
                   <TableRow key={index} data-testid={`row-balance-${index}`}>
                     <TableCell className="font-medium">{balance.coin}</TableCell>
                     <TableCell>{parseFloat(balance.walletBalance).toFixed(8)}</TableCell>
-                    <TableCell>{parseFloat(balance.availableBalance).toFixed(8)}</TableCell>
+                    <TableCell>
+                      {balance.availableBalance && balance.availableBalance !== "" 
+                        ? parseFloat(balance.availableBalance).toFixed(8)
+                        : parseFloat(balance.walletBalance).toFixed(8)}
+                    </TableCell>
                     <TableCell className="text-right">
                       ${parseFloat(balance.usdValue).toFixed(2)}
                     </TableCell>
