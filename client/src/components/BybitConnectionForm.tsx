@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, Key, BookOpen, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Loader2, Key, BookOpen, ChevronLeft, ChevronRight, X, AlertCircle, Info } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const bybitConnectionSchema = z.object({
   apiKey: z.string().min(1, "API Key is required"),
@@ -87,6 +88,20 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <Alert className="mb-6 bg-yellow-500/10 border-yellow-500/30">
+            <Info className="h-4 w-4 text-yellow-500" />
+            <AlertDescription className="text-sm">
+              <div className="space-y-2">
+                <p className="font-semibold text-yellow-600 dark:text-yellow-400">⚠️ IP Whitelist Requirement</p>
+                <div className="space-y-1 text-muted-foreground">
+                  <p>• Bybit requires IP whitelisting for withdrawal features</p>
+                  <p>• Without a static IP, API keys will be deleted after 3 months</p>
+                  <p className="mt-2"><span className="font-medium text-foreground">Current temporary solution:</span> <code className="px-1 py-0.5 bg-muted rounded text-xs">0.0.0.0/0</code> (allows any IP - not recommended)</p>
+                  <p className="mt-2"><span className="font-medium text-foreground">Recommended:</span> Get a static/dedicated IP address from a proxy service (Fly.io, Render, Railway, DigitalOcean) and whitelist it in your Bybit API settings</p>
+                </div>
+              </div>
+            </AlertDescription>
+          </Alert>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
