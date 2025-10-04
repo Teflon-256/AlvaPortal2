@@ -1,5 +1,7 @@
 import { RestClientV5 } from 'bybit-api';
 import { decrypt } from './crypto';
+import { HttpProxyAgent } from 'http-proxy-agent';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 export interface BybitCredentials {
   apiKey: string;
@@ -45,10 +47,26 @@ export class BybitService {
   private client: RestClientV5;
   
   constructor(credentials: BybitCredentials) {
+    const proxyUrl = process.env.BYBIT_PROXY_URL;
+    
+    let requestOptions = {};
+    
+    if (proxyUrl) {
+      console.log(`Using proxy for Bybit API: ${proxyUrl}`);
+      const httpAgent = new HttpProxyAgent(proxyUrl);
+      const httpsAgent = new HttpsProxyAgent(proxyUrl);
+      
+      requestOptions = {
+        httpsAgent,
+        httpAgent,
+      };
+    }
+    
     this.client = new RestClientV5({
       key: credentials.apiKey,
       secret: credentials.apiSecret,
       testnet: false,
+      requestOptions,
     });
   }
 
