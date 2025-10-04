@@ -25,7 +25,7 @@ export default function Landing() {
   const [multiBrokerOpen, setMultiBrokerOpen] = useState(false);
   const [copyTradingOpen, setCopyTradingOpen] = useState(false);
   
-  const topImage = theme === 'light' ? laptopLightMode : tabletMarket;
+  const topImage = theme === 'light' ? laptopLightMode : mobileDerivatives;
   
   const handleGetStarted = () => {
     window.location.href = "/api/login";
@@ -160,7 +160,7 @@ export default function Landing() {
               <div className="relative z-10 floating-animation">
                 <div className="relative w-[500px] rounded-2xl shadow-2xl overflow-hidden border-4 border-gray-800">
                   <img 
-                    src={theme === 'light' ? tabletLightMode : mobileDerivatives}
+                    src={theme === 'light' ? tabletLightMode : tabletMarket}
                     alt="Market Analysis Dashboard"
                     className="w-full h-auto"
                   />
