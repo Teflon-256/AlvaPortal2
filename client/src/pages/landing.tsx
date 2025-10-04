@@ -194,26 +194,24 @@ export default function Landing() {
 
           <div className="flex flex-wrap lg:flex-nowrap gap-6 items-start justify-center">
             {/* iPhone Image */}
-            <div className="flex justify-center flex-shrink-0">
+            <div className="flex justify-center flex-shrink-0 w-[200px]">
               <a 
                 href="https://partner.bybit.com/b/119776"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="cursor-pointer group flex flex-col items-center gap-3"
+                className="cursor-pointer group flex flex-col items-center gap-3 w-full"
                 data-testid="join-iphone-link"
               >
-                <div className="h-[433px] flex items-center justify-center">
-                  <img 
-                    src={iphoneTrading}
-                    alt="Join on iPhone"
-                    className="w-[200px] h-auto max-h-full transform group-hover:scale-105 transition-transform"
-                  />
-                </div>
+                <img 
+                  src={iphoneTrading}
+                  alt="Join on iPhone"
+                  className="w-full h-auto transform group-hover:scale-105 transition-transform"
+                />
                 <p className="text-foreground text-sm font-semibold">Join on iPhone</p>
                 <img 
                   src={qrCode}
                   alt="QR Code"
-                  className="w-[100px] h-[100px]"
+                  className="w-full h-auto"
                 />
               </a>
             </div>
@@ -277,26 +275,24 @@ export default function Landing() {
             </div>
 
             {/* Android Image */}
-            <div className="flex justify-center flex-shrink-0">
+            <div className="flex justify-center flex-shrink-0 w-[200px]">
               <a 
                 href="https://partner.bybit.com/b/119776"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="cursor-pointer group flex flex-col items-center gap-3"
+                className="cursor-pointer group flex flex-col items-center gap-3 w-full"
                 data-testid="join-android-link"
               >
-                <div className="h-[433px] flex items-center justify-center">
-                  <img 
-                    src={mobileBtcChart}
-                    alt="Join on Android"
-                    className="w-[200px] h-auto max-h-full transform group-hover:scale-105 transition-transform"
-                  />
-                </div>
+                <img 
+                  src={mobileBtcChart}
+                  alt="Join on Android"
+                  className="w-full h-auto transform group-hover:scale-105 transition-transform"
+                />
                 <p className="text-foreground text-sm font-semibold">Join on Android</p>
                 <img 
                   src={qrCode}
                   alt="QR Code"
-                  className="w-[100px] h-[100px]"
+                  className="w-full h-auto"
                 />
               </a>
             </div>
