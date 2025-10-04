@@ -89,10 +89,10 @@ Preferred communication style: Simple, everyday language.
   - Perfect for OLED displays with extreme blacks
 
 - **Bybit Connection Form Updates**:
-  - Restored IP whitelist warning with clear explanation
-  - Yellow alert explains 0.0.0.0/0 is NOT a dedicated IP
-  - Warns about 3-month API key deletion without static IP
-  - Recommends proxy services (Fly.io, Render, Railway, DigitalOcean) for static IP
+  - **AWS Proxy Integration**: Implemented dedicated AWS EC2 proxy (13.61.122.170:8888)
+  - Blue informational alert displays static IP whitelisting instructions
+  - Direct link to Bybit API Management for easy IP configuration
+  - Clear benefits listed: Enables withdrawals, prevents API key deletion, secures account
   - Shows only API Key and API Secret inputs with show/hide toggle
   - "Guide" button with image carousel modal for setup instructions
 
@@ -126,8 +126,15 @@ Preferred communication style: Simple, everyday language.
 - **Dashboard Data**: GET `/api/dashboard` - Real-time balance, P&L, and performance metrics
 - **Bybit Connection**: POST `/api/bybit/connect` - Auto-connects users as copiers to master account
 
-### Bybit Integration Enhancements (October 3, 2025)
-- **IP Whitelist Display**: Connection form now prominently displays required IP whitelist (0.0.0.0/0) with setup instructions
+### Bybit Integration Enhancements (October 3-4, 2025)
+- **IP Whitelist Display** (Updated October 4): Connection form displays AWS static IP (13.61.122.170) whitelisting instructions
+  - Blue informational alert with clear setup steps
+  - Direct link to Bybit API Management page
+  - Lists benefits: withdrawal features, prevents key deletion, account security
+- **Proxy Infrastructure** (October 4): All Bybit API calls routed through AWS EC2 proxy
+  - Bypasses CloudFront geo-blocking restrictions
+  - Environment variable: BYBIT_PROXY_URL (http://13.61.122.170:8888)
+  - Uses http-proxy-agent for seamless integration
 - **Auto-Copier Connection**: New Bybit accounts automatically connect as copiers to master account (sahabyoona@gmail.com)
   - Eliminates manual copier setup for users
   - Creates master-copier relationship with 1.0 copy ratio on connection
@@ -185,18 +192,31 @@ Preferred communication style: Simple, everyday language.
   - Prevents server crashes during OIDC login conflicts
   - Maintains email uniqueness while supporting account updates
 
+### AWS Proxy Infrastructure (October 4, 2025)
+- **Dedicated Static IP**: Deployed AWS EC2 instance with TinyProxy
+  - **IP Address**: 13.61.122.170
+  - **Port**: 8888
+  - **Region**: EU (Frankfurt) - eu-north-1
+  - **Setup**: Ubuntu 22.04 LTS, TinyProxy configured for HTTP proxy
+  - **Environment Variable**: BYBIT_PROXY_URL configured in Replit
+  - **Purpose**: Bypasses Bybit CloudFront geo-blocking restrictions
+  - **Status**: ✅ Fully operational and tested
+- **User Configuration**: Users must whitelist 13.61.122.170 in Bybit API settings
+  - Enables withdrawal features
+  - Prevents 3-month API key deletion
+  - Secures account access to AlvaCapital servers only
+
 ### Known Issues & Limitations (October 4, 2025)
-- **Geo-blocking**: Bybit blocks API requests from Replit's server region (CloudFront restriction)
-  - User credentials are valid but blocked by geographic location
-  - Requires proxy service with static IP for full functionality
-  - Current workaround: 0.0.0.0/0 IP whitelist (temporary, limited features)
+- **Master Account Setup**: Copy trading requires master account configuration
   - Copy trading sync shows "Master account not configured" warning (non-blocking)
+  - Master account: sahabyoona@gmail.com's first Bybit trading account
 
 ### Testing Status
 - ✅ End-to-end testing completed successfully (October 4, 2025)
 - ✅ Extreme theme verified (pure black/white backgrounds, vivid blue headings)
 - ✅ Theme-aware image switching tested and working
-- ✅ IP whitelist warning displayed correctly
+- ✅ **AWS Proxy fully operational** - Static IP (13.61.122.170) configured and tested
+- ✅ **Bybit connection form updated** - Blue alert displays static IP whitelisting instructions
 - ✅ All images render without backgrounds/borders
 - ✅ Admin interface verified (restricted to sahabyoona@gmail.com, mihhaa2p@gmail.com)
 - ✅ Bybit integration tested (connection form, API endpoints, auto-copier connection)
