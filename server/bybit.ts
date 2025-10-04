@@ -259,12 +259,23 @@ export class BybitService {
     }
   }
 
-  async testConnection(): Promise<boolean> {
+  async testConnection(): Promise<{ success: boolean; error?: string }> {
     try {
-      await this.client.getWalletBalance({ accountType: 'UNIFIED' });
-      return true;
-    } catch (error) {
-      return false;
+      const response = await this.client.getWalletBalance({ accountType: 'UNIFIED' });
+      console.log('Bybit testConnection response:', JSON.stringify(response, null, 2));
+      return { success: true };
+    } catch (error: any) {
+      console.error('Bybit testConnection error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        body: error.body,
+        response: error.response
+      });
+      return { 
+        success: false, 
+        error: error.message || 'Connection failed'
+      };
     }
   }
 }

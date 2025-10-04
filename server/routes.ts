@@ -57,7 +57,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               );
               const balances = await bybitService.getWalletBalance('UNIFIED');
               const totalBalance = balances.reduce((sum, balance) => {
-                return sum + parseFloat(balance.totalWalletBalance || '0');
+                return sum + parseFloat(balance.usdValue || balance.walletBalance || '0');
               }, 0);
               
               // Get performance stats for P&L
@@ -66,7 +66,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return {
                 ...account,
                 balance: totalBalance.toString(),
-                dailyPnL: performance.dailyPnL.toString()
+                dailyPnL: performance.totalUnrealizedPnl
               };
             } catch (error) {
               console.error(`Error fetching Bybit balance for account ${account.id}:`, error);
@@ -318,16 +318,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Test connection with Bybit API
       const bybitService = new BybitService({ apiKey, apiSecret });
-      const isValid = await bybitService.testConnection();
+      const connectionTest = await bybitService.testConnection();
       
-      if (!isValid) {
-        return res.status(400).json({ message: "Invalid API credentials" });
+      if (!connectionTest.success) {
+        console.error('Bybit connection failed:', connectionTest.error);
+        return res.status(400).json({ 
+          message: `Invalid API credentials: ${connectionTest.error || 'Connection failed'}` 
+        });
       }
 
       // Get wallet balance from Bybit
       const balances = await bybitService.getWalletBalance('UNIFIED');
       const totalBalance = balances.reduce((sum, balance) => {
-        return sum + parseFloat(balance.totalWalletBalance || '0');
+        return sum + parseFloat(balance.usdValue || balance.walletBalance || '0');
       }, 0);
       
       // Encrypt API credentials
@@ -364,8 +367,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (masterBybitAccount) {
           // Create master-copier connection
           await storage.createMasterCopierConnection({
+            userId,
             masterAccountId: masterBybitAccount.id,
-            copierAccountId: tradingAccount.id,
+            tradingAccountId: tradingAccount.id,
             copyRatio: '1.0',
             isActive: true
           });
