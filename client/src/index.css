@@ -46,39 +46,39 @@
 }
 
 .dark {
-  /* Bybit-inspired Dark Theme (Black, White, Blue) */
-  --background: hsl(0, 0%, 7%);
-  --foreground: hsl(0, 0%, 98%);
-  --card: hsl(0, 0%, 10%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --popover: hsl(0, 0%, 7%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --primary: hsl(217, 91%, 60%);
+  /* Extreme Dark Theme with Vivid Colors */
+  --background: hsl(0, 0%, 0%);
+  --foreground: hsl(0, 0%, 100%);
+  --card: hsl(0, 0%, 0%);
+  --card-foreground: hsl(0, 0%, 100%);
+  --popover: hsl(0, 0%, 0%);
+  --popover-foreground: hsl(0, 0%, 100%);
+  --primary: hsl(217, 100%, 65%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(0, 0%, 15%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --muted: hsl(0, 0%, 15%);
-  --muted-foreground: hsl(0, 0%, 65%);
-  --accent: hsl(217, 91%, 60%);
+  --secondary: hsl(0, 0%, 8%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --muted: hsl(0, 0%, 8%);
+  --muted-foreground: hsl(0, 0%, 70%);
+  --accent: hsl(217, 100%, 65%);
   --accent-foreground: hsl(0, 0%, 100%);
-  --destructive: hsl(0, 84%, 60%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --border: hsl(0, 0%, 20%);
-  --input: hsl(0, 0%, 20%);
-  --ring: hsl(217, 91%, 60%);
-  --chart-1: hsl(217, 91%, 60%);
-  --chart-2: hsl(142, 76%, 36%);
-  --chart-3: hsl(45, 93%, 47%);
-  --chart-4: hsl(266, 85%, 58%);
-  --chart-5: hsl(0, 84%, 60%);
-  --sidebar: hsl(0, 0%, 10%);
-  --sidebar-foreground: hsl(0, 0%, 98%);
-  --sidebar-primary: hsl(217, 91%, 60%);
+  --destructive: hsl(0, 100%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(0, 0%, 15%);
+  --input: hsl(0, 0%, 15%);
+  --ring: hsl(217, 100%, 65%);
+  --chart-1: hsl(217, 100%, 65%);
+  --chart-2: hsl(142, 100%, 45%);
+  --chart-3: hsl(45, 100%, 55%);
+  --chart-4: hsl(266, 100%, 65%);
+  --chart-5: hsl(0, 100%, 60%);
+  --sidebar: hsl(0, 0%, 0%);
+  --sidebar-foreground: hsl(0, 0%, 100%);
+  --sidebar-primary: hsl(217, 100%, 65%);
   --sidebar-primary-foreground: hsl(0, 0%, 100%);
-  --sidebar-accent: hsl(0, 0%, 15%);
-  --sidebar-accent-foreground: hsl(0, 0%, 98%);
-  --sidebar-border: hsl(0, 0%, 25%);
-  --sidebar-ring: hsl(217, 91%, 60%);
+  --sidebar-accent: hsl(0, 0%, 8%);
+  --sidebar-accent-foreground: hsl(0, 0%, 100%);
+  --sidebar-border: hsl(0, 0%, 15%);
+  --sidebar-ring: hsl(217, 100%, 65%);
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-serif: 'Playfair Display', Georgia, serif;
   --font-luxury: 'Cinzel', serif;
@@ -111,9 +111,9 @@
   }
   
   .dark .premium-card {
-    background: linear-gradient(135deg, hsl(0, 0%, 10%) 0%, hsl(0, 0%, 12%) 50%, hsl(0, 0%, 14%) 100%);
-    border: 1px solid hsl(0, 0%, 20%);
-    box-shadow: 0 20px 25px -5px hsl(0, 0%, 0%, 0.4), 0 0 0 1px hsl(0, 0%, 20%, 0.5);
+    background: linear-gradient(135deg, hsl(0, 0%, 0%) 0%, hsl(0, 0%, 3%) 50%, hsl(0, 0%, 5%) 100%);
+    border: 1px solid hsl(0, 0%, 15%);
+    box-shadow: 0 20px 25px -5px hsl(0, 0%, 0%, 0.8), 0 0 0 1px hsl(0, 0%, 15%, 0.5);
   }
   
   .floating-animation {
@@ -126,7 +126,7 @@
   }
   
   .shimmer {
-    background: linear-gradient(90deg, transparent, hsl(217, 91%, 60%, 0.4), transparent);
+    background: linear-gradient(90deg, transparent, hsl(217, 100%, 65%, 0.5), transparent);
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
   }

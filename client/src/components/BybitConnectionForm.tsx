@@ -41,11 +41,8 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
 
   const connectMutation = useMutation({
     mutationFn: async (data: BybitConnectionForm) => {
-      return await apiRequest("/api/bybit/connect", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const response = await apiRequest("POST", "/api/bybit/connect", data);
+      return response.json();
     },
     onSuccess: () => {
       toast({
