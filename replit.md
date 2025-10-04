@@ -67,22 +67,34 @@ Preferred communication style: Simple, everyday language.
 ## Recent Changes (October 2025)
 
 ### UI/UX Improvements (October 4, 2025)
-- **Extreme Dark Mode Theme**: Updated to pure black backgrounds (hsl(0,0%,0%)) with vivid colors (100% saturation)
-  - Dark mode is now the default theme for all users
-  - All blacks are extremely dark for OLED displays
-  - Primary blue increased to hsl(217, 100%, 65%) for maximum vibrancy
+- **Extreme Theme Redesign** - Pure contrast for maximum visual impact:
+  - **Dark Mode (Default)**: Pure black background (hsl(0,0%,0%)) with vivid colors (100% saturation)
+  - **Light Mode**: Pure white background (hsl(0,0%,100%)) with pure black text
+  - All headings use vivid blue (hsl(217,100%,70%) dark / hsl(217,100%,55%) light)
+  - Primary color increased to 100% saturation for maximum vibrancy
   - Chart colors all set to 100% saturation for vivid appearance
-- **Simplified Bybit Connection Form**:
-  - Removed IP whitelist display, Trading Capital, and Max Risk Percentage fields
-  - Now shows only API Key and API Secret inputs with show/hide toggle
-  - Added "Guide" button with image carousel modal for setup instructions
-  - Modal includes left/right navigation, close button, and placeholder for future guide images
-- **Landing Page Layout Redesign**:
-  - Features section restructured with images and features on same horizontal line
-  - iPhone image (left) + 6 feature cards (center grid) + Android image (right)
-  - All elements perfectly aligned using flexbox layout
-  - Button sizes reduced across the page (hero buttons from lg to sm)
-  - Removed standalone iPhone/Android sections (now integrated into features)
+  - Perfect for OLED displays with extreme blacks
+
+- **Bybit Connection Form Updates**:
+  - Restored IP whitelist warning with clear explanation
+  - Yellow alert explains 0.0.0.0/0 is NOT a dedicated IP
+  - Warns about 3-month API key deletion without static IP
+  - Recommends proxy services (Fly.io, Render, Railway, DigitalOcean) for static IP
+  - Shows only API Key and API Secret inputs with show/hide toggle
+  - "Guide" button with image carousel modal for setup instructions
+
+- **Landing Page Image Overhaul** - Theme-aware imagery:
+  - **Top Image**: Mobile derivatives (dark) / Tablet dashboard (light)
+  - **Bottom Image** (new, above CTA): Tablet market data (dark) / Laptop trading (light)
+  - Images automatically switch when theme changes
+  - All backgrounds and borders removed from images and QR codes
+  - iPhone/Android sections now display cleanly without black containers
+  - Market Prices section simplified to full-width display
+
+- **Layout Refinements**:
+  - Features section: iPhone (left) + 6 feature cards (center) + Android (right)
+  - Button sizes reduced throughout (hero buttons from lg to sm)
+  - All elements horizontally aligned using flexbox
 
 ### Copy Trading Automation
 - **Scheduler Service**: Automated copy trading scheduler running on server startup
@@ -159,10 +171,21 @@ Preferred communication style: Simple, everyday language.
   - Prevents server crashes during OIDC login conflicts
   - Maintains email uniqueness while supporting account updates
 
+### Known Issues & Limitations (October 4, 2025)
+- **Geo-blocking**: Bybit blocks API requests from Replit's server region (CloudFront restriction)
+  - User credentials are valid but blocked by geographic location
+  - Requires proxy service with static IP for full functionality
+  - Current workaround: 0.0.0.0/0 IP whitelist (temporary, limited features)
+  - Copy trading sync shows "Master account not configured" warning (non-blocking)
+
 ### Testing Status
-- ✅ End-to-end testing completed successfully (October 3, 2025)
+- ✅ End-to-end testing completed successfully (October 4, 2025)
+- ✅ Extreme theme verified (pure black/white backgrounds, vivid blue headings)
+- ✅ Theme-aware image switching tested and working
+- ✅ IP whitelist warning displayed correctly
+- ✅ All images render without backgrounds/borders
 - ✅ Admin interface verified (restricted to sahabyoona@gmail.com, mihhaa2p@gmail.com)
-- ✅ Bybit integration tested (connection form with IP whitelist, API endpoints, auto-copier connection)
+- ✅ Bybit integration tested (connection form, API endpoints, auto-copier connection)
 - ✅ User profile dropdown tested (non-admin users)
 - ✅ Real-time balance and performance metrics verified
 - ✅ Copy trading scheduler confirmed running
