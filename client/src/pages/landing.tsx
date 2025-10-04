@@ -178,13 +178,6 @@ export default function Landing() {
       {/* Market Prices Section */}
       <section className="py-16 bg-background border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center mb-8">
-            <img 
-              src={theme === 'light' ? tabletLightMode : mobileDerivatives}
-              alt="Market Analysis"
-              className="w-full max-w-[500px] h-auto"
-            />
-          </div>
           <MarketPrices />
         </div>
       </section>
@@ -199,7 +192,7 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="flex flex-wrap lg:flex-nowrap gap-6 items-center justify-center">
+          <div className="flex flex-wrap lg:flex-nowrap gap-6 items-start justify-center">
             {/* iPhone Image */}
             <div className="flex justify-center flex-shrink-0">
               <a 
@@ -209,11 +202,13 @@ export default function Landing() {
                 className="cursor-pointer group flex flex-col items-center gap-3"
                 data-testid="join-iphone-link"
               >
-                <img 
-                  src={iphoneTrading}
-                  alt="Join on iPhone"
-                  className="w-[200px] h-auto transform group-hover:scale-105 transition-transform"
-                />
+                <div className="h-[433px] flex items-center justify-center">
+                  <img 
+                    src={iphoneTrading}
+                    alt="Join on iPhone"
+                    className="w-[200px] h-auto max-h-full transform group-hover:scale-105 transition-transform"
+                  />
+                </div>
                 <p className="text-foreground text-sm font-semibold">Join on iPhone</p>
                 <img 
                   src={qrCode}
@@ -290,11 +285,13 @@ export default function Landing() {
                 className="cursor-pointer group flex flex-col items-center gap-3"
                 data-testid="join-android-link"
               >
-                <img 
-                  src={mobileBtcChart}
-                  alt="Join on Android"
-                  className="w-[200px] h-auto transform group-hover:scale-105 transition-transform"
-                />
+                <div className="h-[433px] flex items-center justify-center">
+                  <img 
+                    src={mobileBtcChart}
+                    alt="Join on Android"
+                    className="w-[200px] h-auto max-h-full transform group-hover:scale-105 transition-transform"
+                  />
+                </div>
                 <p className="text-foreground text-sm font-semibold">Join on Android</p>
                 <img 
                   src={qrCode}
