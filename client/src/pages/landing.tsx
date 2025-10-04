@@ -156,12 +156,12 @@ export default function Landing() {
               </div>
             </div>
             <div className="relative h-[600px] flex items-center justify-center" data-testid="hero-dashboard-preview">
-              {/* Main Laptop Display - Center */}
+              {/* Main Display - Center */}
               <div className="relative z-10 floating-animation">
                 <div className="relative w-[500px] rounded-2xl shadow-2xl overflow-hidden border-4 border-gray-800">
                   <img 
-                    src={laptopTrading} 
-                    alt="Bybit Trading Platform on Laptop"
+                    src={theme === 'light' ? tabletLightMode : mobileDerivatives}
+                    alt="Market Analysis Dashboard"
                     className="w-full h-auto"
                   />
                 </div>
@@ -172,17 +172,6 @@ export default function Landing() {
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 blur-3xl -z-10"></div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Top Image - Theme Aware */}
-      <section className="py-8 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
-          <img 
-            src={topImage}
-            alt="Trading Interface"
-            className="w-full max-w-[500px] h-auto"
-          />
         </div>
       </section>
 
@@ -210,7 +199,7 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="flex flex-wrap lg:flex-nowrap gap-6 items-start justify-center">
+          <div className="flex flex-wrap lg:flex-nowrap gap-6 items-center justify-center">
             {/* iPhone Image */}
             <div className="flex justify-center flex-shrink-0">
               <a 
@@ -223,7 +212,7 @@ export default function Landing() {
                 <img 
                   src={iphoneTrading}
                   alt="Join on iPhone"
-                  className="w-[180px] h-auto transform group-hover:scale-105 transition-transform"
+                  className="w-[200px] h-auto transform group-hover:scale-105 transition-transform"
                 />
                 <p className="text-foreground text-sm font-semibold">Join on iPhone</p>
                 <img 
@@ -304,7 +293,7 @@ export default function Landing() {
                 <img 
                   src={mobileBtcChart}
                   alt="Join on Android"
-                  className="w-[180px] h-auto transform group-hover:scale-105 transition-transform"
+                  className="w-[200px] h-auto transform group-hover:scale-105 transition-transform"
                 />
                 <p className="text-foreground text-sm font-semibold">Join on Android</p>
                 <img 
@@ -338,6 +327,17 @@ export default function Landing() {
               {t('whatsappSupport')}
             </Button>
           </div>
+        </div>
+      </section>
+
+      {/* Image Before CTA - Theme Aware */}
+      <section className="py-8 bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
+          <img 
+            src={topImage}
+            alt="Trading Interface"
+            className="w-full max-w-[500px] h-auto"
+          />
         </div>
       </section>
 
