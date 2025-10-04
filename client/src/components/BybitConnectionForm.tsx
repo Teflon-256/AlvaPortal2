@@ -88,16 +88,26 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Alert className="mb-6 bg-yellow-500/10 border-yellow-500/30">
-            <Info className="h-4 w-4 text-yellow-500" />
+          <Alert className="mb-6 bg-blue-500/10 border-blue-500/30">
+            <Info className="h-4 w-4 text-blue-500" />
             <AlertDescription className="text-sm">
-              <div className="space-y-2">
-                <p className="font-semibold text-yellow-600 dark:text-yellow-400">⚠️ IP Whitelist Requirement</p>
-                <div className="space-y-1 text-muted-foreground">
-                  <p>• Bybit requires IP whitelisting for withdrawal features</p>
-                  <p>• Without a static IP, API keys will be deleted after 3 months</p>
-                  <p className="mt-2"><span className="font-medium text-foreground">Current temporary solution:</span> <code className="px-1 py-0.5 bg-muted rounded text-xs">0.0.0.0/0</code> (allows any IP - not recommended)</p>
-                  <p className="mt-2"><span className="font-medium text-foreground">Recommended:</span> Get a static/dedicated IP address from a proxy service (Fly.io, Render, Railway, DigitalOcean) and whitelist it in your Bybit API settings</p>
+              <div className="space-y-3">
+                <p className="font-semibold text-blue-600 dark:text-blue-400">📍 IP Whitelist Configuration</p>
+                <div className="space-y-2 text-muted-foreground">
+                  <p className="font-medium text-foreground">When creating or editing your Bybit API key:</p>
+                  <ol className="list-decimal list-inside space-y-1 ml-2">
+                    <li>Go to Bybit API Management: <a href="https://www.bybit.com/app/user/api-management" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">bybit.com/app/user/api-management</a></li>
+                    <li>Set <span className="font-medium text-foreground">IP Restrictions</span> to:</li>
+                  </ol>
+                  <div className="bg-muted/50 p-3 rounded-md border border-border mt-2">
+                    <code className="text-sm font-mono text-blue-600 dark:text-blue-400">13.61.122.170</code>
+                    <p className="text-xs mt-1 text-muted-foreground">This is AlvaCapital's dedicated AWS static IP</p>
+                  </div>
+                  <div className="mt-3 space-y-1">
+                    <p className="text-xs">✅ <span className="font-medium text-green-600 dark:text-green-400">Enables</span> withdrawal features</p>
+                    <p className="text-xs">✅ <span className="font-medium text-green-600 dark:text-green-400">Prevents</span> API key deletion after 3 months</p>
+                    <p className="text-xs">✅ <span className="font-medium text-green-600 dark:text-green-400">Secures</span> your account (only our servers can access)</p>
+                  </div>
                 </div>
               </div>
             </AlertDescription>
