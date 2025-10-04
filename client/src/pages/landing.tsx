@@ -215,9 +215,9 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+          <div className="flex flex-wrap lg:flex-nowrap gap-6 items-start justify-center">
             {/* iPhone Image */}
-            <div className="flex justify-center">
+            <div className="flex justify-center flex-shrink-0">
               <a 
                 href="https://partner.bybit.com/b/119776"
                 target="_blank"
@@ -245,7 +245,8 @@ export default function Landing() {
               </a>
             </div>
 
-            {/* Features */}
+            {/* Features - Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
             {[
               {
                 icon: Link,
@@ -300,9 +301,10 @@ export default function Landing() {
                 </CardContent>
               </Card>
             ))}
+            </div>
 
             {/* Android Image */}
-            <div className="flex justify-center">
+            <div className="flex justify-center flex-shrink-0">
               <a 
                 href="https://partner.bybit.com/b/119776"
                 target="_blank"

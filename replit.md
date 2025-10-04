@@ -66,6 +66,24 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (October 2025)
 
+### UI/UX Improvements (October 4, 2025)
+- **Extreme Dark Mode Theme**: Updated to pure black backgrounds (hsl(0,0%,0%)) with vivid colors (100% saturation)
+  - Dark mode is now the default theme for all users
+  - All blacks are extremely dark for OLED displays
+  - Primary blue increased to hsl(217, 100%, 65%) for maximum vibrancy
+  - Chart colors all set to 100% saturation for vivid appearance
+- **Simplified Bybit Connection Form**:
+  - Removed IP whitelist display, Trading Capital, and Max Risk Percentage fields
+  - Now shows only API Key and API Secret inputs with show/hide toggle
+  - Added "Guide" button with image carousel modal for setup instructions
+  - Modal includes left/right navigation, close button, and placeholder for future guide images
+- **Landing Page Layout Redesign**:
+  - Features section restructured with images and features on same horizontal line
+  - iPhone image (left) + 6 feature cards (center grid) + Android image (right)
+  - All elements perfectly aligned using flexbox layout
+  - Button sizes reduced across the page (hero buttons from lg to sm)
+  - Removed standalone iPhone/Android sections (now integrated into features)
+
 ### Copy Trading Automation
 - **Scheduler Service**: Automated copy trading scheduler running on server startup
   - Position monitoring every 30 seconds via `CopyTradingEngine`
