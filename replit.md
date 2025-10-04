@@ -84,12 +84,12 @@ Preferred communication style: Simple, everyday language.
   - "Guide" button with image carousel modal for setup instructions
 
 - **Landing Page Image Overhaul** - Theme-aware imagery:
-  - **Top Image**: Mobile derivatives (dark) / Tablet dashboard (light)
-  - **Bottom Image** (new, above CTA): Tablet market data (dark) / Laptop trading (light)
+  - **Top Image**: Tablet market data (dark) / Laptop trading (light)
+  - **Market Prices Image**: Mobile derivatives (dark) / Tablet dashboard (light) - displayed above market data
+  - **Bottom Image**: Removed entirely (was above CTA)
   - Images automatically switch when theme changes
   - All backgrounds and borders removed from images and QR codes
   - iPhone/Android sections now display cleanly without black containers
-  - Market Prices section simplified to full-width display
 
 - **Layout Refinements**:
   - Features section: iPhone (left) + 6 feature cards (center) + Android (right)
