@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ChartLine, Link, Bot, Users, Shield, Headphones, TrendingUp, Zap, DollarSign, MessageCircle, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "@/contexts/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { TradingAccountForm } from "@/components/TradingAccountForm";
@@ -15,11 +16,17 @@ import mobileDerivatives from "@assets/1759495444187_100_1759499291943.png";
 import iphoneTrading from "@assets/1759495512620_100_1759499304236.png";
 import mobileBtcChart from "@assets/1759495369009_100_1759499337910.png";
 import qrCode from "@assets/frame_1759515761162.png";
+import tabletLightMode from "@assets/1759548110246_100_1759548225385.png";
+import laptopLightMode from "@assets/Copilot_20251004_062042_1759548232579.png";
 
 export default function Landing() {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const [multiBrokerOpen, setMultiBrokerOpen] = useState(false);
   const [copyTradingOpen, setCopyTradingOpen] = useState(false);
+  
+  const topImage = theme === 'light' ? tabletLightMode : mobileDerivatives;
+  const bottomImage = theme === 'light' ? laptopLightMode : tabletMarket;
   
   const handleGetStarted = () => {
     window.location.href = "/api/login";
@@ -169,39 +176,21 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Image 1 - Above Live Quotes */}
+      {/* Top Image - Theme Aware */}
       <section className="py-8 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
-          <div className="w-[500px] rounded-2xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform">
-            <img 
-              src={tabletMarket}
-              alt="Bybit Market Sentiment and Data"
-              className="w-full h-auto"
-            />
-          </div>
+          <img 
+            src={topImage}
+            alt="Trading Interface"
+            className="w-full max-w-[500px] h-auto"
+          />
         </div>
       </section>
 
       {/* Market Prices Section */}
       <section className="py-16 bg-background border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-12 gap-8 items-start">
-            {/* Image 2 - Left side on same line as live quotes */}
-            <div className="lg:col-span-3 flex justify-center">
-              <div className="w-[280px] rounded-3xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform">
-                <img 
-                  src={mobileDerivatives}
-                  alt="Bybit Derivatives Trading"
-                  className="w-full h-auto"
-                />
-              </div>
-            </div>
-            
-            {/* Market Prices */}
-            <div className="lg:col-span-9">
-              <MarketPrices />
-            </div>
-          </div>
+          <MarketPrices />
         </div>
       </section>
 
@@ -222,26 +211,20 @@ export default function Landing() {
                 href="https://partner.bybit.com/b/119776"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="cursor-pointer group"
+                className="cursor-pointer group flex flex-col items-center gap-3"
                 data-testid="join-iphone-link"
               >
-                <div className="bg-black p-4 rounded-2xl shadow-xl transform group-hover:scale-105 transition-transform">
-                  <div className="w-[180px] rounded-xl shadow-lg overflow-hidden mb-3">
-                    <img 
-                      src={iphoneTrading}
-                      alt="Join on iPhone"
-                      className="w-full h-auto"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <p className="text-white text-sm font-semibold mb-2">Join on iPhone</p>
-                    <img 
-                      src={qrCode}
-                      alt="QR Code"
-                      className="w-[100px] h-[100px] mx-auto"
-                    />
-                  </div>
-                </div>
+                <img 
+                  src={iphoneTrading}
+                  alt="Join on iPhone"
+                  className="w-[180px] h-auto transform group-hover:scale-105 transition-transform"
+                />
+                <p className="text-foreground text-sm font-semibold">Join on iPhone</p>
+                <img 
+                  src={qrCode}
+                  alt="QR Code"
+                  className="w-[100px] h-[100px]"
+                />
               </a>
             </div>
 
@@ -309,26 +292,20 @@ export default function Landing() {
                 href="https://partner.bybit.com/b/119776"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="cursor-pointer group"
+                className="cursor-pointer group flex flex-col items-center gap-3"
                 data-testid="join-android-link"
               >
-                <div className="bg-black p-4 rounded-2xl shadow-xl transform group-hover:scale-105 transition-transform">
-                  <div className="w-[180px] rounded-xl shadow-lg overflow-hidden mb-3">
-                    <img 
-                      src={mobileBtcChart}
-                      alt="Join on Android"
-                      className="w-full h-auto"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <p className="text-white text-sm font-semibold mb-2">Join on Android</p>
-                    <img 
-                      src={qrCode}
-                      alt="QR Code"
-                      className="w-[100px] h-[100px] mx-auto"
-                    />
-                  </div>
-                </div>
+                <img 
+                  src={mobileBtcChart}
+                  alt="Join on Android"
+                  className="w-[180px] h-auto transform group-hover:scale-105 transition-transform"
+                />
+                <p className="text-foreground text-sm font-semibold">Join on Android</p>
+                <img 
+                  src={qrCode}
+                  alt="QR Code"
+                  className="w-[100px] h-[100px]"
+                />
               </a>
             </div>
           </div>
@@ -355,6 +332,17 @@ export default function Landing() {
               {t('whatsappSupport')}
             </Button>
           </div>
+        </div>
+      </section>
+
+      {/* Bottom Image - Theme Aware */}
+      <section className="py-8 bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
+          <img 
+            src={bottomImage}
+            alt="Trading Platform Interface"
+            className="w-full max-w-[500px] h-auto"
+          />
         </div>
       </section>
 
