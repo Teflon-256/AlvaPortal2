@@ -25,7 +25,7 @@ export default function Landing() {
   const [multiBrokerOpen, setMultiBrokerOpen] = useState(false);
   const [copyTradingOpen, setCopyTradingOpen] = useState(false);
   
-  const topImage = theme === 'light' ? laptopLightMode : mobileDerivatives;
+  const topImage = laptopLightMode; // Always use light mode image for both themes
   
   const handleGetStarted = () => {
     window.location.href = "/api/login";
