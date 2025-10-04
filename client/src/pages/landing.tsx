@@ -118,17 +118,17 @@ export default function Landing() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button 
                   onClick={handleGetStarted} 
-                  size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 text-lg font-semibold rounded-xl transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+                  size="sm"
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 text-sm font-semibold rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg"
                   data-testid="hero-start-trading"
                 >
                   {t('startTrading')}
                 </Button>
                 <Button 
                   variant="outline" 
-                  size="lg"
+                  size="sm"
                   onClick={() => window.open('http://www.youtube.com/@profitmaxing', '_blank')}
-                  className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/20 px-8 py-4 text-lg font-semibold rounded-xl transition-all transform hover:scale-105"
+                  className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/20 px-6 py-2 text-sm font-semibold rounded-lg transition-all transform hover:scale-105"
                   data-testid="hero-learn-more"
                 >
                   Learn More
@@ -205,39 +205,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Join on iPhone - Left Side */}
-      <section className="py-12 bg-muted/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-start items-center gap-6">
-            <a 
-              href="https://partner.bybit.com/b/119776"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="cursor-pointer group"
-              data-testid="join-iphone-link"
-            >
-              <div className="flex items-center gap-6 bg-black p-6 rounded-3xl shadow-2xl transform group-hover:scale-105 transition-transform">
-                <div className="w-[320px] rounded-3xl shadow-2xl overflow-hidden">
-                  <img 
-                    src={iphoneTrading}
-                    alt="Bybit Mobile Trading on iPhone"
-                    className="w-full h-auto"
-                  />
-                </div>
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-white mb-4">Join on iPhone</h3>
-                  <img 
-                    src={qrCode}
-                    alt="QR Code to join"
-                    className="w-[150px] h-[150px] mx-auto"
-                  />
-                </div>
-              </div>
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* Features Section */}
       <section id="features" className="py-20 bg-muted/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -248,7 +215,37 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+            {/* iPhone Image */}
+            <div className="flex justify-center">
+              <a 
+                href="https://partner.bybit.com/b/119776"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cursor-pointer group"
+                data-testid="join-iphone-link"
+              >
+                <div className="bg-black p-4 rounded-2xl shadow-xl transform group-hover:scale-105 transition-transform">
+                  <div className="w-[180px] rounded-xl shadow-lg overflow-hidden mb-3">
+                    <img 
+                      src={iphoneTrading}
+                      alt="Join on iPhone"
+                      className="w-full h-auto"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-white text-sm font-semibold mb-2">Join on iPhone</p>
+                    <img 
+                      src={qrCode}
+                      alt="QR Code"
+                      className="w-[100px] h-[100px] mx-auto"
+                    />
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            {/* Features */}
             {[
               {
                 icon: Link,
@@ -293,49 +290,45 @@ export default function Landing() {
                 onClick: () => window.open('https://wa.link/jtjivz', '_blank')
               }
             ].map((feature, index) => (
-              <Card key={index} className="premium-card text-center cursor-pointer hover:scale-105 transition-transform" data-testid={`feature-${feature.title.toLowerCase().replace(/\s+/g, '-')}`} onClick={feature.onClick}>
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <feature.icon className={`${feature.color} h-6 w-6`} />
+              <Card key={index} className="premium-card text-center cursor-pointer hover:scale-105 transition-transform h-full" data-testid={`feature-${feature.title.toLowerCase().replace(/\s+/g, '-')}`} onClick={feature.onClick}>
+                <CardContent className="p-4">
+                  <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <feature.icon className={`${feature.color} h-5 w-5`} />
                   </div>
-                  <h3 className="text-base font-semibold mb-3 hover:text-primary transition-colors">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">{feature.description}</p>
+                  <h3 className="text-sm font-semibold mb-2 hover:text-primary transition-colors">{feature.title}</h3>
+                  <p className="text-xs text-muted-foreground">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Join on Android - Right Side */}
-      <section className="py-12 bg-muted/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-end items-center gap-6">
-            <a 
-              href="https://partner.bybit.com/b/119776"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="cursor-pointer group"
-              data-testid="join-android-link"
-            >
-              <div className="flex items-center gap-6 bg-black p-6 rounded-3xl shadow-2xl transform group-hover:scale-105 transition-transform">
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-white mb-4">Join on Android</h3>
-                  <img 
-                    src={qrCode}
-                    alt="QR Code to join"
-                    className="w-[150px] h-[150px] mx-auto"
-                  />
+            {/* Android Image */}
+            <div className="flex justify-center">
+              <a 
+                href="https://partner.bybit.com/b/119776"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cursor-pointer group"
+                data-testid="join-android-link"
+              >
+                <div className="bg-black p-4 rounded-2xl shadow-xl transform group-hover:scale-105 transition-transform">
+                  <div className="w-[180px] rounded-xl shadow-lg overflow-hidden mb-3">
+                    <img 
+                      src={mobileBtcChart}
+                      alt="Join on Android"
+                      className="w-full h-auto"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-white text-sm font-semibold mb-2">Join on Android</p>
+                    <img 
+                      src={qrCode}
+                      alt="QR Code"
+                      className="w-[100px] h-[100px] mx-auto"
+                    />
+                  </div>
                 </div>
-                <div className="w-[320px] rounded-3xl shadow-2xl overflow-hidden">
-                  <img 
-                    src={mobileBtcChart}
-                    alt="Bybit Mobile Trading on Android"
-                    className="w-full h-auto"
-                  />
-                </div>
-              </div>
-            </a>
+              </a>
+            </div>
           </div>
         </div>
       </section>
