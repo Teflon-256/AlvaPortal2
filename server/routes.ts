@@ -7,6 +7,7 @@ import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { encrypt, decrypt } from "./crypto";
 import { BybitService } from "./bybit";
+import { eq, sql, desc } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -591,6 +592,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching action logs:", error);
       res.status(500).json({ message: "Failed to fetch action logs" });
+    }
+  });
+
+  // Admin routes - Stats dashboard
+  app.get('/api/admin/stats', isAuthenticated, async (req: any, res) => {
+    try {
+      const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
+      if (!adminEmails.includes(req.user.claims.email)) {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+
+      const { db } = await import('./db');
+      const { users, tradingAccounts, actionLog, withdrawalRequests } = await import('@shared/schema');
+
+      const [clientsResult, accountsResult, actionsResult, withdrawalsResult] = await Promise.all([
+        db.select().from(users),
+        db.select().from(tradingAccounts),
+        db.select().from(actionLog).orderBy(desc(actionLog.createdAt)).limit(10),
+        db.select().from(withdrawalRequests).where(eq(withdrawalRequests.status, 'pending'))
+      ]);
+
+      const totalClients = clientsResult.length;
+      const totalAUM = accountsResult.reduce((sum: number, acc: any) => sum + parseFloat(acc.balance || '0'), 0);
+      const todayPnL = accountsResult.reduce((sum: number, acc: any) => sum + parseFloat(acc.dailyPnL || '0'), 0);
+      const pendingActions = withdrawalsResult.length;
+
+      res.json({
+        totalClients,
+        totalAUM: Math.round(totalAUM),
+        todayPnL: Math.round(todayPnL),
+        pendingActions,
+        recentActivity: actionsResult
+      });
+    } catch (error) {
+      console.error('Error fetching admin stats:', error);
+      res.status(500).json({ message: 'Failed to fetch admin stats' });
+    }
+  });
+
+  // Admin routes - All clients
+  app.get('/api/admin/clients', isAuthenticated, async (req: any, res) => {
+    try {
+      const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
+      if (!adminEmails.includes(req.user.claims.email)) {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+
+      const { db } = await import('./db');
+      const { users, tradingAccounts } = await import('@shared/schema');
+
+      const clientsWithAccounts = await db
+        .select({
+          id: users.id,
+          email: users.email,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          accountCount: sql<number>`count(${tradingAccounts.id})`,
+          totalBalance: sql<number>`COALESCE(sum(${tradingAccounts.balance}), 0)`,
+          totalPnL: sql<number>`COALESCE(sum(${tradingAccounts.dailyPnL}), 0)`
+        })
+        .from(users)
+        .leftJoin(tradingAccounts, eq(users.id, tradingAccounts.userId))
+        .groupBy(users.id);
+
+      res.json(clientsWithAccounts);
+    } catch (error) {
+      console.error('Error fetching admin clients:', error);
+      res.status(500).json({ message: 'Failed to fetch admin clients' });
+    }
+  });
+
+  // Admin routes - Withdrawal requests
+  app.get('/api/admin/withdrawals', isAuthenticated, async (req: any, res) => {
+    try {
+      const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
+      if (!adminEmails.includes(req.user.claims.email)) {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+
+      const { db } = await import('./db');
+      const { withdrawalRequests, users } = await import('@shared/schema');
+
+      const withdrawals = await db
+        .select({
+          id: withdrawalRequests.id,
+          userId: withdrawalRequests.userId,
+          userEmail: users.email,
+          amount: withdrawalRequests.amount,
+          currency: withdrawalRequests.currency,
+          status: withdrawalRequests.status,
+          requestNotes: withdrawalRequests.requestNotes,
+          adminNotes: withdrawalRequests.adminNotes,
+          createdAt: withdrawalRequests.createdAt
+        })
+        .from(withdrawalRequests)
+        .leftJoin(users, eq(withdrawalRequests.userId, users.id))
+        .orderBy(desc(withdrawalRequests.createdAt));
+
+      res.json(withdrawals);
+    } catch (error) {
+      console.error('Error fetching withdrawal requests:', error);
+      res.status(500).json({ message: 'Failed to fetch withdrawal requests' });
+    }
+  });
+
+  // Admin routes - Update withdrawal request
+  app.patch('/api/admin/withdrawals/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
+      if (!adminEmails.includes(req.user.claims.email)) {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+
+      const { id } = req.params;
+      const { status, adminNotes } = req.body;
+
+      const { db } = await import('./db');
+      const { withdrawalRequests } = await import('@shared/schema');
+
+      await db
+        .update(withdrawalRequests)
+        .set({
+          status,
+          adminNotes: adminNotes || null,
+          processedBy: req.user.claims.sub,
+          processedAt: sql`NOW()`
+        })
+        .where(eq(withdrawalRequests.id, id));
+
+      res.json({ success: true, message: 'Withdrawal request updated successfully' });
+    } catch (error) {
+      console.error('Error updating withdrawal request:', error);
+      res.status(500).json({ message: 'Failed to update withdrawal request' });
     }
   });
 

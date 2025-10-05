@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { 
   Select,
   SelectContent,
@@ -20,12 +21,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Edit, ExternalLink, Clock, CheckCircle, XCircle, Shield, FileText, Key, Users } from 'lucide-react';
+import { 
+  Edit, ExternalLink, Clock, CheckCircle, XCircle, Shield, FileText, Key, Users, 
+  TrendingUp, DollarSign, Activity, BarChart3, Wallet, AlertCircle, Download 
+} from 'lucide-react';
 import { useState } from 'react';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import type { BrokerRequest } from '@shared/schema';
+import type { BrokerRequest, WithdrawalRequest, TradingAccount } from '@shared/schema';
 import { MasterAccountConfig } from '@/components/MasterAccountConfig';
 import { CopierManagement } from '@/components/CopierManagement';
 
@@ -43,7 +47,22 @@ export default function AdminPage() {
 
   const { data: brokerRequests = [], isLoading } = useQuery({
     queryKey: ['/api/broker-requests'],
-    enabled: isAuthorizedAdmin, // Only fetch data if user is authorized
+    enabled: isAuthorizedAdmin,
+  });
+
+  const { data: withdrawalRequests = [] } = useQuery({
+    queryKey: ['/api/admin/withdrawals'],
+    enabled: isAuthorizedAdmin,
+  });
+
+  const { data: allClients = [] } = useQuery({
+    queryKey: ['/api/admin/clients'],
+    enabled: isAuthorizedAdmin,
+  });
+
+  const { data: systemStats = {} } = useQuery({
+    queryKey: ['/api/admin/stats'],
+    enabled: isAuthorizedAdmin,
   });
 
   const updateRequestMutation = useMutation({
@@ -69,6 +88,30 @@ export default function AdminPage() {
       toast({
         title: "Error",
         description: "Failed to update broker request",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateWithdrawalMutation = useMutation({
+    mutationFn: async ({ id, status, adminNotes }: { 
+      id: string; 
+      status: string; 
+      adminNotes?: string; 
+    }) => {
+      return await apiRequest('PATCH', `/api/admin/withdrawals/${id}`, { status, adminNotes });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/withdrawals'] });
+      toast({
+        title: "Success",
+        description: "Withdrawal request updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update withdrawal request",
         variant: "destructive",
       });
     },
@@ -156,22 +199,253 @@ export default function AdminPage() {
     <div className="container mx-auto p-6 space-y-6">
       <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
-      <Tabs defaultValue="broker-requests" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="overview" className="flex items-center gap-2" data-testid="tab-overview">
+            <BarChart3 className="w-4 h-4" />
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="clients" className="flex items-center gap-2" data-testid="tab-clients">
+            <Users className="w-4 h-4" />
+            Clients
+            <Badge variant="secondary" className="ml-1">{(allClients as any[]).length}</Badge>
+          </TabsTrigger>
+          <TabsTrigger value="withdrawals" className="flex items-center gap-2" data-testid="tab-withdrawals">
+            <Wallet className="w-4 h-4" />
+            Withdrawals
+            <Badge variant="secondary" className="ml-1">{(withdrawalRequests as any[]).filter((r: any) => r.status === 'pending').length}</Badge>
+          </TabsTrigger>
           <TabsTrigger value="broker-requests" className="flex items-center gap-2" data-testid="tab-broker-requests">
             <FileText className="w-4 h-4" />
-            Broker Requests
-            <Badge variant="secondary" className="ml-1">{(brokerRequests as BrokerRequest[]).length}</Badge>
+            Brokers
           </TabsTrigger>
           <TabsTrigger value="master-account" className="flex items-center gap-2" data-testid="tab-master-account">
             <Key className="w-4 h-4" />
-            Master Account
+            Master
           </TabsTrigger>
           <TabsTrigger value="copiers" className="flex items-center gap-2" data-testid="tab-copiers">
-            <Users className="w-4 h-4" />
-            Copier Management
+            <Activity className="w-4 h-4" />
+            Copy Trading
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="overview" className="mt-6 space-y-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Clients</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold" data-testid="stat-total-clients">{systemStats.totalClients || 0}</div>
+                <p className="text-xs text-muted-foreground">Active trading accounts</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total AUM</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold" data-testid="stat-total-aum">${systemStats.totalAUM?.toLocaleString() || '0'}</div>
+                <p className="text-xs text-muted-foreground">Assets under management</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Today's P&L</CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className={`text-2xl font-bold ${(systemStats.todayPnL || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`} data-testid="stat-today-pnl">
+                  ${systemStats.todayPnL?.toLocaleString() || '0'}
+                </div>
+                <p className="text-xs text-muted-foreground">Across all accounts</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pending Actions</CardTitle>
+                <AlertCircle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold" data-testid="stat-pending-actions">{systemStats.pendingActions || 0}</div>
+                <p className="text-xs text-muted-foreground">Requires attention</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Activity</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {systemStats.recentActivity?.slice(0, 5).map((activity: any, idx: number) => (
+                    <div key={idx} className="flex items-center">
+                      <div className="ml-4 space-y-1">
+                        <p className="text-sm font-medium leading-none">{activity.description}</p>
+                        <p className="text-sm text-muted-foreground">{new Date(activity.createdAt).toLocaleString()}</p>
+                      </div>
+                    </div>
+                  )) || <p className="text-sm text-muted-foreground">No recent activity</p>}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>System Health</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Bybit Connection</span>
+                    <Badge variant="outline" className="text-green-600">
+                      <CheckCircle className="w-3 h-3 mr-1" />Active
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Copy Trading Engine</span>
+                    <Badge variant="outline" className="text-green-600">
+                      <CheckCircle className="w-3 h-3 mr-1" />Running
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Database</span>
+                    <Badge variant="outline" className="text-green-600">
+                      <CheckCircle className="w-3 h-3 mr-1" />Healthy
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="clients" className="mt-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>All Clients</CardTitle>
+                <Button variant="outline" size="sm">
+                  <Download className="w-4 h-4 mr-2" />
+                  Export CSV
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Accounts</TableHead>
+                    <TableHead>Total Balance</TableHead>
+                    <TableHead>P&L</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(allClients as any[]).map((client: any) => (
+                    <TableRow key={client.id}>
+                      <TableCell className="font-medium">{client.email}</TableCell>
+                      <TableCell>{client.firstName} {client.lastName}</TableCell>
+                      <TableCell>{client.accountCount || 0}</TableCell>
+                      <TableCell>${client.totalBalance?.toLocaleString() || '0'}</TableCell>
+                      <TableCell className={`${(client.totalPnL || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        ${client.totalPnL?.toLocaleString() || '0'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-green-600">Active</Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="withdrawals" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Withdrawal Requests</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Client</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Currency</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(withdrawalRequests as any[]).map((request: any) => (
+                    <TableRow key={request.id}>
+                      <TableCell>{new Date(request.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell>{request.userEmail}</TableCell>
+                      <TableCell className="font-medium">${request.amount}</TableCell>
+                      <TableCell>{request.currency}</TableCell>
+                      <TableCell>
+                        {request.status === 'pending' && (
+                          <Badge variant="outline" className="text-yellow-600">
+                            <Clock className="w-3 h-3 mr-1" />Pending
+                          </Badge>
+                        )}
+                        {request.status === 'approved' && (
+                          <Badge variant="outline" className="text-green-600">
+                            <CheckCircle className="w-3 h-3 mr-1" />Approved
+                          </Badge>
+                        )}
+                        {request.status === 'rejected' && (
+                          <Badge variant="outline" className="text-red-600">
+                            <XCircle className="w-3 h-3 mr-1" />Rejected
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {request.status === 'pending' && (
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="text-green-600"
+                              onClick={() => updateWithdrawalMutation.mutate({ 
+                                id: request.id, 
+                                status: 'approved' 
+                              })}
+                              data-testid={`approve-withdrawal-${request.id}`}
+                            >
+                              Approve
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="text-red-600"
+                              onClick={() => updateWithdrawalMutation.mutate({ 
+                                id: request.id, 
+                                status: 'rejected' 
+                              })}
+                              data-testid={`reject-withdrawal-${request.id}`}
+                            >
+                              Reject
+                            </Button>
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="broker-requests" className="mt-6">
           <div className="grid gap-6">
