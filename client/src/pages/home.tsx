@@ -100,11 +100,13 @@ export default function Home() {
     }
   }, [isAuthenticated, authLoading, toast]);
 
-  // Dashboard data query
+  // Dashboard data query with auto-refresh every 30 seconds
   const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError } = useQuery<DashboardData>({
     queryKey: ["/api/dashboard"],
     enabled: isAuthenticated,
     retry: false,
+    refetchInterval: 30000, // Auto-refresh every 30 seconds for real-time balance sync
+    refetchIntervalInBackground: true,
   });
 
   // Handle dashboard query errors
