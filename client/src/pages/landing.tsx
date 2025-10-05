@@ -1,470 +1,480 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ChartLine, Link, Bot, Users, Shield, Headphones, TrendingUp, Zap, DollarSign, MessageCircle, ExternalLink } from "lucide-react";
+import { ChartLine, Zap, Shield, TrendingUp, Cpu, Globe, Lock } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "@/contexts/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { TradingAccountForm } from "@/components/TradingAccountForm";
-import { MarketPrices } from "@/components/MarketPrices";
 import alvaCapitalLogo from "@assets/image_1759129583507.png";
-import laptopTrading from "@assets/Copilot_20251003_161134_1759498837182.png";
-import tabletMarket from "@assets/1759495482418_100_1759499270310.png";
-import mobileDerivatives from "@assets/1759495444187_100_1759499291943.png";
-import iphoneTrading from "@assets/1759495512620_100_1759499304236.png";
-import mobileBtcChart from "@assets/1759495369009_100_1759499337910.png";
-import qrCode from "@assets/frame_1759515761162.png";
-import tabletLightMode from "@assets/1759548110246_100_1759548225385.png";
-import laptopLightMode from "@assets/Copilot_20251004_062042_1759548232579.png";
 
 export default function Landing() {
   const { t } = useTranslation();
-  const { theme } = useTheme();
-  const [multiBrokerOpen, setMultiBrokerOpen] = useState(false);
-  const [copyTradingOpen, setCopyTradingOpen] = useState(false);
-  
-  const topImage = laptopLightMode; // Always use light mode image for both themes
-  
+  const [loading, setLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [liveUsers, setLiveUsers] = useState(28);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLoadingProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setTimeout(() => setLoading(false), 500);
+          return 100;
+        }
+        return prev + 2;
+      });
+    }, 30);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const userInterval = setInterval(() => {
+      setLiveUsers((prev) => prev + Math.floor(Math.random() * 3) - 1);
+    }, 5000);
+
+    return () => clearInterval(userInterval);
+  }, []);
+
   const handleGetStarted = () => {
     window.location.href = "/api/login";
   };
 
-  const handleLogoClick = () => {
-    window.location.href = "/";
-  };
-
-  const handleMultiBrokerClick = () => {
-    setMultiBrokerOpen(true);
-  };
-
-  const handleCopyTradingClick = () => {
-    setCopyTradingOpen(true);
-  };
-
-  const handleRealTimeAnalyticsClick = () => {
-    window.location.href = "/api/login";
-  };
-
-  const handleReferralProgramClick = () => {
-    window.location.href = "/api/login";
-  };
-
-  // Copy trading links
-  const copyTradingLinks = {
-    exness: "https://my.exness.com/pa/socialtrading/",
-    bybit: "https://finestel.com/app/copy-trading/U42AN0-S37396",
-    binance: "https://finestel.com/app/copy-trading/SS98X3-S66396"
-  };
-
-  const handleStartTrading = (broker: string) => {
-    const link = copyTradingLinks[broker as keyof typeof copyTradingLinks];
-    if (link) {
-      window.open(link, '_blank');
-      setMultiBrokerOpen(false);
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-50">
+        <div className="relative mb-8">
+          <svg 
+            className="w-24 h-24 animate-spin" 
+            viewBox="0 0 100 100" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="50" cy="50" r="40" stroke="hsl(217,100%,70%)" strokeWidth="3" fill="none" opacity="0.2" />
+            <path 
+              d="M 50 10 A 40 40 0 0 1 90 50" 
+              stroke="hsl(217,100%,70%)" 
+              strokeWidth="3" 
+              fill="none"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
+        
+        <div className="text-4xl font-mono font-bold mb-4 glitch-text" data-text={`LOADING - ${loadingProgress}%`}>
+          LOADING - {loadingProgress}%
+        </div>
+        
+        <div className="w-64 h-1 bg-zinc-900 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 transition-all duration-300"
+            style={{ width: `${loadingProgress}%` }}
+          />
+        </div>
+
+        <style>{`
+          .glitch-text {
+            color: hsl(217,100%,70%);
+            position: relative;
+            animation: glitch 1s infinite;
+          }
+          
+          .glitch-text::before,
+          .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+          }
+          
+          .glitch-text::before {
+            left: 2px;
+            text-shadow: -2px 0 hsl(180,100%,50%);
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+          }
+          
+          .glitch-text::after {
+            left: -2px;
+            text-shadow: -2px 0 hsl(300,100%,50%);
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim-2 2s infinite linear alternate-reverse;
+          }
+          
+          @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+          }
+          
+          @keyframes glitch-anim-1 {
+            0% { clip: rect(61px, 9999px, 91px, 0) }
+            25% { clip: rect(12px, 9999px, 45px, 0) }
+            50% { clip: rect(88px, 9999px, 13px, 0) }
+            75% { clip: rect(35px, 9999px, 77px, 0) }
+            100% { clip: rect(29px, 9999px, 66px, 0) }
+          }
+          
+          @keyframes glitch-anim-2 {
+            0% { clip: rect(35px, 9999px, 88px, 0) }
+            25% { clip: rect(77px, 9999px, 23px, 0) }
+            50% { clip: rect(19px, 9999px, 68px, 0) }
+            75% { clip: rect(92px, 9999px, 41px, 0) }
+            100% { clip: rect(53px, 9999px, 15px, 0) }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+      {/* Animated background grid */}
+      <div className="fixed inset-0 opacity-20 pointer-events-none">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `
+            linear-gradient(hsl(217,100%,70%) 1px, transparent 1px),
+            linear-gradient(90deg, hsl(217,100%,70%) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
+          animation: 'grid-move 20s linear infinite'
+        }} />
+      </div>
+
+      {/* Sound enable CTA */}
+      {!soundEnabled && (
+        <div 
+          className="fixed bottom-8 right-8 z-50 cursor-pointer"
+          onClick={() => setSoundEnabled(true)}
+        >
+          <div className="relative">
+            <div className="absolute inset-0 rounded-full bg-cyan-500 animate-ping opacity-75" />
+            <div className="relative bg-black border-2 border-cyan-500 rounded-full px-6 py-3 hover:bg-cyan-500/10 transition-colors">
+              <div className="flex items-center gap-2">
+                <Zap className="w-5 h-5 text-cyan-500" />
+                <span className="text-cyan-500 font-mono text-sm">Enable Sound</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Navigation */}
-      <nav className="bg-background/95 backdrop-blur-sm border-b border-border sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2 cursor-pointer" onClick={handleLogoClick}>
-              <img 
-                src={alvaCapitalLogo} 
-                alt="AlvaCapital Logo" 
-                className="w-10 h-10 object-contain"
-                data-testid="logo-image"
-              />
-              <span className="text-xl font-serif font-bold gradient-text" data-testid="logo-text">AlvaCapital</span>
+      <nav className="fixed top-0 w-full bg-black/80 backdrop-blur-md border-b border-cyan-500/30 z-40">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center space-x-4 cursor-pointer group" onClick={() => window.location.href = '/'}>
+              <div className="relative">
+                <div className="absolute inset-0 bg-cyan-500 blur-xl opacity-50 group-hover:opacity-100 transition-opacity" />
+                <img 
+                  src={alvaCapitalLogo} 
+                  alt="AlvaCapital" 
+                  className="w-12 h-12 relative z-10"
+                />
+              </div>
+              <span className="text-2xl font-mono font-bold text-cyan-400 glitch-text-subtle">ALVA CAPITAL</span>
             </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-muted-foreground hover:text-primary transition-colors" data-testid="nav-features">Features</a>
-              <a href="#about" className="text-muted-foreground hover:text-primary transition-colors" data-testid="nav-about">About</a>
-              <a href="#contact" className="text-muted-foreground hover:text-primary transition-colors" data-testid="nav-contact">{t('contactUs')}</a>
+            
+            <div className="hidden md:flex items-center space-x-8 font-mono text-sm">
+              <button onClick={() => scrollToSection('protocol')} className="text-cyan-400 hover:text-cyan-300 transition-colors tracking-wider">PROTOCOL</button>
+              <button onClick={() => scrollToSection('features')} className="text-cyan-400 hover:text-cyan-300 transition-colors tracking-wider">FEATURES</button>
+              <button onClick={() => scrollToSection('stats')} className="text-cyan-400 hover:text-cyan-300 transition-colors tracking-wider">STATS</button>
             </div>
+            
             <div className="flex items-center space-x-4">
               <LanguageSelector />
               <ThemeToggle />
               <Button 
-                variant="ghost" 
-                onClick={handleGetStarted} 
-                className="text-muted-foreground hover:text-primary"
-                data-testid="nav-signin"
+                onClick={handleGetStarted}
+                className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-mono font-bold tracking-wider px-6"
               >
-                {t('signIn')}
-              </Button>
-              <Button 
-                onClick={handleGetStarted} 
-                className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                data-testid="nav-get-started"
-              >
-                {t('getStarted')}
+                SIGN IN
               </Button>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative py-20 lg:py-32 overflow-hidden">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-center lg:text-left">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold leading-tight mb-6 antialiased" data-testid="hero-title">
-                {t('heroTitle')}
-                <span className="gradient-text block">{t('heroSubtitle')}</span>
+      {/* Live Status Bar */}
+      <div className="fixed top-20 w-full bg-zinc-900/90 backdrop-blur-sm border-b border-cyan-500/30 z-30 py-2">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-center justify-between font-mono text-xs">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <span className="text-green-400">{liveUsers} TRADERS LIVE</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Lock className="w-3 h-3 text-cyan-400" />
+                <span className="text-cyan-400">ENCRYPTED PROTOCOL</span>
+              </div>
+              <div className="text-zinc-500">
+                VP22-{Math.floor(Math.random() * 90000000) + 10000000}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Globe className="w-3 h-3 text-cyan-400" />
+              <span className="text-cyan-400">MAINNET</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <main className="pt-32">
+        {/* Hero Section */}
+        <section className="relative min-h-screen flex items-center justify-center px-6">
+          <div className="max-w-7xl mx-auto text-center">
+            <div className="mb-8">
+              <h1 className="text-7xl md:text-9xl font-mono font-bold mb-4">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 glitch-text-hero" data-text="DISCOVER">
+                  DISCOVER
+                </span>
               </h1>
-              <p className="text-base text-muted-foreground mb-8 leading-relaxed antialiased" data-testid="hero-description">
-                {t('heroDescription')}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Button 
-                  onClick={handleGetStarted} 
-                  size="sm"
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 text-sm font-semibold rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg"
-                  data-testid="hero-start-trading"
-                >
-                  {t('startTrading')}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => window.open('http://www.youtube.com/@profitmaxing', '_blank')}
-                  className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/20 px-6 py-2 text-sm font-semibold rounded-lg transition-all transform hover:scale-105"
-                  data-testid="hero-learn-more"
-                >
-                  Learn More
-                </Button>
-              </div>
-              <div className="mt-12 flex items-center justify-center lg:justify-start space-x-8">
-                <div className="text-center">
-                  <div className="text-lg font-bold gradient-text" data-testid="stat-assets">$500M+</div>
-                  <div className="text-xs text-muted-foreground">Assets Managed</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-bold gradient-text" data-testid="stat-traders">10K+</div>
-                  <div className="text-xs text-muted-foreground">Active Traders</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-bold gradient-text" data-testid="stat-uptime">99.9%</div>
-                  <div className="text-xs text-muted-foreground">Uptime</div>
-                </div>
+              <div className="text-2xl md:text-4xl font-mono text-cyan-400 tracking-widest">
+                THE FUTURE OF TRADING
               </div>
             </div>
-            <div className="relative h-[600px] flex items-center justify-center" data-testid="hero-dashboard-preview">
-              {/* Main Display - Center */}
-              <div className="relative z-10 floating-animation">
-                <div className="relative w-[500px] rounded-2xl shadow-2xl overflow-hidden border-4 border-gray-800">
-                  <img 
-                    src={theme === 'light' ? tabletLightMode : tabletMarket}
-                    alt="Market Analysis Dashboard"
-                    className="w-full h-auto"
-                  />
-                </div>
-              </div>
-
-
-              {/* Glow Effects */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 blur-3xl -z-10"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Market Prices Section */}
-      <section className="py-16 bg-background border-y border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <MarketPrices />
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-20 bg-muted/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-xl lg:text-2xl font-serif font-bold gradient-text mb-4 antialiased" data-testid="features-title">{t('whyChooseUs')}</h2>
-            <p className="text-sm text-muted-foreground max-w-3xl mx-auto antialiased" data-testid="features-description">
-              {t('multiPlatformDesc')}
+            
+            <p className="text-lg md:text-xl text-zinc-400 max-w-3xl mx-auto mb-12 leading-relaxed">
+              Multi-broker portfolio management with real-time copy trading, automated strategies, 
+              and institutional-grade risk management. Welcome to the next generation of digital asset trading.
             </p>
-          </div>
 
-          <div className="flex flex-wrap lg:flex-nowrap gap-6 items-start justify-center">
-            {/* iPhone Image */}
-            <div className="flex justify-center flex-shrink-0 w-[200px]">
-              <a 
-                href="https://partner.bybit.com/b/119776"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="cursor-pointer group flex flex-col items-center gap-3 w-full"
-                data-testid="join-iphone-link"
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <Button 
+                onClick={handleGetStarted}
+                size="lg"
+                className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-mono font-bold text-lg px-12 py-6 tracking-wider relative overflow-hidden group"
               >
-                <img 
-                  src={iphoneTrading}
-                  alt="Join on iPhone"
-                  className="w-full h-auto transform group-hover:scale-105 transition-transform"
-                />
-                <p className="text-foreground text-sm font-semibold">Join on iPhone</p>
-                <img 
-                  src={qrCode}
-                  alt="QR Code"
-                  className="w-full h-auto"
-                />
-              </a>
+                <span className="relative z-10">ENTER PROTOCOL</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </Button>
+              
+              <button 
+                onClick={() => scrollToSection('features')}
+                className="border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono font-bold text-lg px-12 py-6 tracking-wider transition-all"
+              >
+                EXPLORE FEATURES
+              </button>
             </div>
 
-            {/* Features - Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
-            {[
-              {
-                icon: Link,
-                title: "Bybit Integration",
-                description: "Connect your Bybit account seamlessly for unified portfolio management, automated trading, and real-time analytics.",
-                color: "text-primary",
-                onClick: handleMultiBrokerClick
-              },
-              {
-                icon: Bot,
-                title: "AI Copy Trading",
-                description: "Advanced copy trading system that mirrors our master traders' strategies on Bybit. Automated position replication with intelligent risk management.",
-                color: "text-blue-400",
-                onClick: handleCopyTradingClick
-              },
-              {
-                icon: TrendingUp,
-                title: "Real-time Analytics",
-                description: "Get instant portfolio updates, performance metrics, and detailed analytics across all your trading accounts.",
-                color: "text-blue-400",
-                onClick: handleRealTimeAnalyticsClick
-              },
-              {
-                icon: Users,
-                title: "Referral Program",
-                description: "Earn 10% commission on fees from investors you refer. Build your network and grow your passive income.",
-                color: "text-purple-400",
-                onClick: handleReferralProgramClick
-              },
-              {
-                icon: Shield,
-                title: "Bank-Level Security",
-                description: "Military-grade encryption, secure API connections, and advanced authentication to protect your investments.",
-                color: "text-orange-400",
-                onClick: () => window.location.href = '/api/login'
-              },
-              {
-                icon: Headphones,
-                title: "24/7 Support",
-                description: "Premium support from our expert team, available around the clock to assist with your trading needs.",
-                color: "text-red-400",
-                onClick: () => window.open('https://wa.link/jtjivz', '_blank')
-              }
-            ].map((feature, index) => (
-              <Card key={index} className="premium-card text-center cursor-pointer hover:scale-105 transition-transform h-full" data-testid={`feature-${feature.title.toLowerCase().replace(/\s+/g, '-')}`} onClick={feature.onClick}>
-                <CardContent className="p-4">
-                  <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <feature.icon className={`${feature.color} h-5 w-5`} />
+            {/* Scroll indicator */}
+            <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 animate-bounce">
+              <div className="w-6 h-10 border-2 border-cyan-500 rounded-full flex items-start justify-center p-2">
+                <div className="w-1 h-3 bg-cyan-500 rounded-full animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Protocol Section */}
+        <section id="protocol" className="relative py-32 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-20">
+              <h2 className="text-5xl md:text-7xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-4">
+                PROTOCOL
+              </h2>
+              <div className="text-cyan-400 font-mono text-lg tracking-widest">MULTI-BROKER TRADING INFRASTRUCTURE</div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: Globe,
+                  title: "BYBIT",
+                  subtitle: "Crypto Futures",
+                  description: "Real-time perpetual futures trading with instant execution and deep liquidity",
+                  stats: "24/7 Trading"
+                },
+                {
+                  icon: TrendingUp,
+                  title: "EXNESS MT5",
+                  subtitle: "Forex & Indices",
+                  description: "Professional forex and commodities trading with institutional spreads",
+                  stats: "50+ Pairs"
+                },
+                {
+                  icon: ChartLine,
+                  title: "INTERACTIVE BROKERS",
+                  subtitle: "Stocks & Bonds",
+                  description: "Access to global equities, options, and fixed income securities",
+                  stats: "150+ Markets"
+                }
+              ].map((broker, idx) => (
+                <Card key={idx} className="bg-zinc-900/50 border-2 border-cyan-500/30 hover:border-cyan-500 transition-all duration-300 group backdrop-blur-sm">
+                  <CardContent className="p-8">
+                    <div className="mb-6">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <broker.icon className="w-8 h-8 text-black" />
+                      </div>
+                      <h3 className="text-2xl font-mono font-bold text-cyan-400 mb-1">{broker.title}</h3>
+                      <div className="text-sm font-mono text-zinc-500 tracking-wider">{broker.subtitle}</div>
+                    </div>
+                    <p className="text-zinc-400 mb-4 leading-relaxed">{broker.description}</p>
+                    <div className="flex items-center gap-2 text-cyan-400 font-mono text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                      {broker.stats}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section id="features" className="relative py-32 px-6 bg-gradient-to-b from-black via-zinc-900 to-black">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-20">
+              <h2 className="text-5xl md:text-7xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500 mb-4">
+                FEATURES
+              </h2>
+              <div className="text-cyan-400 font-mono text-lg tracking-widest">ADVANCED TRADING CAPABILITIES</div>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { icon: Cpu, title: "Copy Trading", description: "Mirror top traders with instant position replication and automated profit sharing" },
+                { icon: Shield, title: "Risk Management", description: "Progressive risk limits with max drawdown protection from 0.2% to 50%" },
+                { icon: TrendingUp, title: "Real-Time Analytics", description: "Live P&L tracking, performance metrics, and comprehensive reporting" },
+                { icon: Zap, title: "Instant Execution", description: "Sub-second order execution across all connected brokers" },
+                { icon: Lock, title: "Secure API", description: "Bank-level encryption for all API keys and trading credentials" },
+                { icon: ChartLine, title: "Multi-Asset", description: "Trade crypto, forex, stocks, and commodities from one platform" }
+              ].map((feature, idx) => (
+                <div 
+                  key={idx}
+                  className="border border-cyan-500/30 hover:border-cyan-500 bg-black/50 backdrop-blur-sm p-8 transition-all duration-300 hover:transform hover:scale-105 group"
+                >
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center mb-4 group-hover:rotate-12 transition-transform">
+                    <feature.icon className="w-6 h-6 text-black" />
                   </div>
-                  <h3 className="text-sm font-semibold mb-2 hover:text-primary transition-colors">{feature.title}</h3>
-                  <p className="text-xs text-muted-foreground">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-            </div>
-
-            {/* Android Image */}
-            <div className="flex justify-center flex-shrink-0 w-[200px]">
-              <a 
-                href="https://partner.bybit.com/b/119776"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="cursor-pointer group flex flex-col items-center gap-3 w-full"
-                data-testid="join-android-link"
-              >
-                <img 
-                  src={mobileBtcChart}
-                  alt="Join on Android"
-                  className="w-full h-auto transform group-hover:scale-105 transition-transform"
-                />
-                <p className="text-foreground text-sm font-semibold">Join on Android</p>
-                <img 
-                  src={qrCode}
-                  alt="QR Code"
-                  className="w-full h-auto"
-                />
-              </a>
+                  <h3 className="text-xl font-mono font-bold text-cyan-400 mb-3">{feature.title}</h3>
+                  <p className="text-zinc-400 leading-relaxed">{feature.description}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-20 bg-muted/10">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-xl lg:text-2xl font-serif font-bold gradient-text mb-6 antialiased" data-testid="contact-title">
-            {t('contactUs')}
-          </h2>
-          <p className="text-sm text-muted-foreground mb-8 antialiased" data-testid="contact-description">
-            {t('getInTouch')}
-          </p>
-          <div className="flex justify-center">
+        {/* Stats Section */}
+        <section id="stats" className="relative py-32 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid md:grid-cols-4 gap-8 text-center">
+              {[
+                { value: "50M+", label: "DAILY VOLUME" },
+                { value: "10K+", label: "ACTIVE TRADERS" },
+                { value: "99.9%", label: "UPTIME" },
+                { value: "24/7", label: "SUPPORT" }
+              ].map((stat, idx) => (
+                <div key={idx} className="border border-cyan-500/30 bg-zinc-900/50 backdrop-blur-sm p-8">
+                  <div className="text-5xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
+                    {stat.value}
+                  </div>
+                  <div className="text-cyan-400 font-mono text-sm tracking-widest">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="relative py-32 px-6">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-5xl md:text-7xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 mb-8">
+              START TRADING
+            </h2>
+            <p className="text-xl text-zinc-400 mb-12 leading-relaxed">
+              Join thousands of traders who have already entered the protocol. 
+              Your journey to automated trading excellence starts here.
+            </p>
             <Button 
-              onClick={() => window.open('https://wa.link/jtjivz', '_blank')}
+              onClick={handleGetStarted}
               size="lg"
-              className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg font-semibold transition-all transform hover:scale-105"
-              data-testid="whatsapp-contact"
+              className="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 hover:from-cyan-400 hover:via-blue-400 hover:to-purple-400 text-black font-mono font-bold text-xl px-16 py-8 tracking-wider relative overflow-hidden group"
             >
-              <MessageCircle className="h-5 w-5 mr-2" />
-              {t('whatsappSupport')}
+              <span className="relative z-10">ENTER PROTOCOL NOW</span>
             </Button>
           </div>
-        </div>
-      </section>
-
-      {/* Image Before CTA - Theme Aware */}
-      <section className="py-8 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
-          <img 
-            src={topImage}
-            alt="Trading Interface"
-            className="w-full max-w-[500px] h-auto"
-          />
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10"></div>
-        <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-xl lg:text-2xl font-serif font-bold gradient-text mb-6 antialiased" data-testid="cta-title">
-            Ready to Elevate Your Trading?
-          </h2>
-          <p className="text-sm text-muted-foreground mb-8 max-w-2xl mx-auto antialiased" data-testid="cta-description">
-            Join thousands of successful traders using our premium platform. Start earning today with our AI-powered copy trading system and lucrative referral program.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              onClick={handleGetStarted} 
-              size="lg"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg font-semibold transition-all transform hover:scale-105"
-              data-testid="cta-start-trading"
-            >
-              {t('startTrading')} Now
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="border-border hover:border-primary text-foreground px-8 py-4 text-lg font-semibold"
-              data-testid="cta-book-demo"
-            >
-              Book a Demo
-            </Button>
-          </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
       {/* Footer */}
-      <footer className="bg-muted/10 border-t border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center space-x-2 mb-4 cursor-pointer" onClick={handleLogoClick}>
-                <img 
-                  src={alvaCapitalLogo} 
-                  alt="AlvaCapital Logo" 
-                  className="w-8 h-8 object-contain"
-                />
-                <span className="text-xl font-serif font-bold gradient-text">AlvaCapital</span>
-              </div>
-              <p className="text-muted-foreground mb-4">Premium trading platform for professional investors and traders worldwide.</p>
-              <div className="flex space-x-4">
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-twitter">
-                  <i className="fab fa-twitter text-xl"></i>
-                </a>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-linkedin">
-                  <i className="fab fa-linkedin text-xl"></i>
-                </a>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-telegram">
-                  <i className="fab fa-telegram text-xl"></i>
-                </a>
-              </div>
+      <footer className="border-t border-cyan-500/30 bg-black/80 backdrop-blur-sm py-12 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-4">
+              <img src={alvaCapitalLogo} alt="AlvaCapital" className="w-10 h-10" />
+              <span className="font-mono text-cyan-400">© 2025 ALVA CAPITAL</span>
             </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4">Trading</h4>
-              <ul className="space-y-2">
-                <li><a href="https://finestel.com/app/copy-trading/U42AN0-S37396" target="_blank" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-bybit">Bybit Trading</a></li>
-                <li><a href="/api/login" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-copy-trading">Copy Trading</a></li>
-                <li><a href="/api/login" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-portfolio">Portfolio Management</a></li>
-              </ul>
+            <div className="flex items-center gap-6 font-mono text-sm text-zinc-500">
+              <a href="#" className="hover:text-cyan-400 transition-colors">TERMS</a>
+              <a href="#" className="hover:text-cyan-400 transition-colors">PRIVACY</a>
+              <a href="#" className="hover:text-cyan-400 transition-colors">SUPPORT</a>
             </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2">
-                <li><a href="/faq" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-help">Help Center</a></li>
-                <li><a href="https://wa.link/jtjivz" target="_blank" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-contact">Contact</a></li>
-                <li><a href="https://t.me/profitmaxingsignals" target="_blank" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-community">Community</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2">
-                <li><a href="/privacy" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-privacy">Privacy</a></li>
-                <li><a href="/terms" className="text-muted-foreground hover:text-primary transition-colors" data-testid="footer-terms">Terms</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
-            <p data-testid="footer-copyright">&copy; 2025 AlvaCapital. All rights reserved. | Trading involves risk and may not be suitable for all investors.</p>
           </div>
         </div>
       </footer>
 
-      {/* Bybit Integration Popup */}
-      <Dialog open={multiBrokerOpen} onOpenChange={setMultiBrokerOpen}>
-        <DialogContent className="max-w-md" data-testid="multi-broker-dialog">
-          <DialogHeader>
-            <DialogTitle>Bybit Integration</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground mb-6">
-              Connect your Bybit trading account and start copy trading with our master strategies. Trade Forex, Indices, Commodities, Stocks, and Cryptocurrencies.
-            </p>
-            
-            {/* Bybit */}
-            <div className="flex items-center justify-between p-4 border rounded-lg bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
-              <div>
-                <h4 className="font-semibold text-blue-600 dark:text-blue-400">Bybit</h4>
-                <p className="text-sm text-muted-foreground">Forex, Indices, Commodities, Stocks, Crypto Spot & Futures</p>
-              </div>
-              <Button 
-                onClick={() => handleStartTrading('bybit')}
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-                data-testid="start-trading-bybit"
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Start Trading
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <style>{`
+        @keyframes grid-move {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(50px); }
+        }
 
-      {/* AI Copy Trading Popup */}
-      <Dialog open={copyTradingOpen} onOpenChange={setCopyTradingOpen}>
-        <DialogContent data-testid="copy-trading-dialog">
-          <DialogHeader>
-            <DialogTitle>AI Copy Trading</DialogTitle>
-          </DialogHeader>
-          <TradingAccountForm onSuccess={() => setCopyTradingOpen(false)} />
-        </DialogContent>
-      </Dialog>
+        .glitch-text-subtle {
+          animation: glitch-subtle 3s infinite;
+        }
+
+        @keyframes glitch-subtle {
+          0%, 100% { transform: translate(0) }
+          25% { transform: translate(-1px, 1px) }
+          50% { transform: translate(1px, -1px) }
+          75% { transform: translate(1px, 1px) }
+        }
+
+        .glitch-text-hero {
+          position: relative;
+          display: inline-block;
+        }
+
+        .glitch-text-hero::before,
+        .glitch-text-hero::after {
+          content: attr(data-text);
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: inherit;
+          -webkit-background-clip: text;
+          background-clip: text;
+        }
+
+        .glitch-text-hero::before {
+          left: 2px;
+          text-shadow: -2px 0 hsl(180,100%,50%);
+          animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
+        }
+
+        .glitch-text-hero::after {
+          left: -2px;
+          text-shadow: 2px 0 hsl(300,100%,50%);
+          animation: glitch-anim-2 2.5s infinite linear alternate-reverse;
+        }
+      `}</style>
     </div>
   );
 }
