@@ -1,229 +1,71 @@
 # AlvaCapital Trading Platform
 
 ## Overview
-
-AlvaCapital is a comprehensive trading platform that provides portfolio management, referral tracking, and copy trading capabilities. The platform allows users to connect multiple trading accounts from different brokers (Exness, Bybit, Binance), track their performance, manage referrals, and participate in copy trading through master-copier relationships. Built as a full-stack web application with a modern React frontend and Express.js backend, it emphasizes real-time data management and user-friendly interfaces for financial trading operations.
+AlvaCapital is a comprehensive trading platform designed for portfolio management, referral tracking, and copy trading. It enables users to connect multiple trading accounts from various brokers (Exness, Bybit, Binance), monitor performance, manage referrals, and engage in master-copier copy trading relationships. The platform is a full-stack web application with a React frontend and an Express.js backend, focusing on real-time data and a user-friendly interface for financial operations.
 
 ## User Preferences
-
 Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-### Frontend Architecture
-- **Framework**: React 18 with TypeScript using Vite as the build tool
-- **Routing**: Wouter for lightweight client-side routing
-- **State Management**: TanStack Query (React Query) for server state management and caching
-- **UI Framework**: Shadcn/ui components built on Radix UI primitives with Tailwind CSS styling
-- **Form Management**: React Hook Form with Zod validation for type-safe form handling
-- **Design System**: Dark theme with custom CSS variables, Inter and Playfair Display fonts
+### UI/UX Decisions
+- **Design System**: Default dark theme with pure black background and vivid, 100% saturated colors, optimized for OLED displays. Light mode uses pure white background with black text.
+- **Theming**: Theme-aware imagery and dynamic switching for UI elements based on light/dark mode.
+- **Components**: Shadcn/ui components built on Radix UI primitives, styled with Tailwind CSS.
+- **Fonts**: Inter and Playfair Display.
+- **Imagery**: Authentic Bybit trading interface screenshots integrated across multiple device mockups for credibility.
+- **Layout**: Responsive grid and flexbox layouts for consistent horizontal alignment and adaptability across screen sizes.
+- **Button Redesign**: Bybit-style rounded buttons with gradient blue colors, hover effects, and shadow animations.
 
-### Backend Architecture
-- **Framework**: Express.js with TypeScript running on Node.js
-- **Database ORM**: Drizzle ORM for type-safe database operations
-- **Authentication**: Replit Auth integration with OpenID Connect and session management
-- **API Design**: RESTful endpoints with centralized error handling and request logging
-- **Session Storage**: PostgreSQL-based session store using connect-pg-simple
+### Technical Implementations
+- **Frontend**: React 18 with TypeScript, Vite, Wouter for routing, TanStack Query for state management, React Hook Form with Zod for form validation.
+- **Backend**: Express.js with TypeScript on Node.js.
+- **Database ORM**: Drizzle ORM for type-safe database operations.
+- **Authentication**: Replit Auth with OpenID Connect and PostgreSQL-based session management (`connect-pg-simple`).
+- **API Design**: RESTful endpoints with centralized error handling and request logging.
+- **Multi-Broker Integration**: Connectors for Bybit (wallet, positions, orders, profit split), MT5 (Exness via Expert Advisor for real-time monitoring and orders), and Interactive Brokers (TWS API for portfolio, positions, orders across asset classes).
+- **Copy Trading Engine**: Automated scheduler for position monitoring (every 30s), weekly profit splits, instant trade replication with ratio-based sizing, and automatic profit transfers (50/50 USDT).
+- **Admin Portal**: Comprehensive interface for system statistics, client management (balance, P&L, account count, CSV export), withdrawal request management, broker requests, master account configuration, and copier management.
+- **Real-time Data**: Integration with Alpha Vantage API for live market prices (10 instruments, 5-minute auto-refresh).
+- **Security**: AWS EC2 proxy (static IP: 13.61.122.170:8888) for Bybit API calls to bypass geo-restrictions and enable secure features like withdrawals.
 
-### Database Schema
-- **Users Table**: Stores user profiles with referral codes and hierarchical referral relationships
-- **Trading Accounts**: Multi-broker account connections with balance and P&L tracking
-- **Referral System**: Earnings tracking and referral link management with click/conversion analytics
-- **Master-Copier Connections**: Copy trading relationships with status management
-- **Sessions Table**: Secure session storage for authentication persistence
+### Feature Specifications
+- **Portfolio Management**: Multi-broker account connection, real-time balance and P&L tracking.
+- **Referral System**: Tracking, earnings management, click/conversion analytics.
+- **Copy Trading**: Master-copier relationships, automated trade replication, profit splitting.
+- **Trading Algorithms**: Support for algorithm configurations, signals, and risk management parameters.
+- **User Management**: User profiles, referral codes, hierarchical referral relationships.
+- **Withdrawal Management**: Workflow for client withdrawal requests with admin approval/rejection.
 
-### Authentication & Authorization
-- **Provider**: Replit Auth with OIDC for secure authentication
-- **Session Management**: Server-side sessions with PostgreSQL storage and configurable TTL
-- **Route Protection**: Middleware-based authentication checks for protected endpoints
-- **User Context**: Centralized user state management through React Query
+### System Design Choices
+- **Database Schema**: Comprehensive schema including users, trading accounts, referral system, master-copier connections, sessions, algorithms, signals, trades, positions, risk parameters, broker configurations, withdrawal requests, and performance analytics.
+- **Modularity**: Consistent interface design for all broker connectors.
+- **Scalability**: Utilizes serverless PostgreSQL (Neon Database) with connection pooling.
 
 ## External Dependencies
 
 ### Database & Infrastructure
-- **Neon Database**: Serverless PostgreSQL database with connection pooling
-- **Drizzle Kit**: Database migration and schema management tools
+- **Neon Database**: Serverless PostgreSQL.
+- **Drizzle Kit**: Database migration and schema management.
+- **AWS EC2**: For static IP proxy (TinyProxy).
 
 ### Authentication Services
-- **Replit Auth**: OIDC-based authentication service
-- **OpenID Client**: Standards-compliant authentication flow implementation
+- **Replit Auth**: OIDC-based authentication.
+- **OpenID Client**: OIDC protocol implementation.
 
-### UI & Styling
-- **Radix UI**: Headless component primitives for accessibility and functionality
-- **Tailwind CSS**: Utility-first CSS framework with custom design tokens
-- **Lucide React**: Icon library for consistent iconography
+### UI & Styling Libraries
+- **Radix UI**: Headless UI components.
+- **Tailwind CSS**: Utility-first CSS framework.
+- **Lucide React**: Icon library.
 
 ### Development Tools
-- **Vite**: Fast build tool with hot module replacement
-- **TypeScript**: Type safety across frontend and backend
-- **ESBuild**: Fast JavaScript bundler for production builds
-- **PostCSS**: CSS processing with Tailwind and Autoprefixer
+- **Vite**: Fast build tool.
+- **TypeScript**: For type safety.
+- **ESBuild**: JavaScript bundler.
+- **PostCSS**: CSS processing.
 
 ### External Integrations
-- **Trading Brokers**: Support for Exness, Bybit, and Binance account connections
-- **Real-time Data**: Portfolio balance and P&L tracking capabilities
-- **Referral Analytics**: Click and conversion tracking for referral links
-
-## Recent Changes (October 2025)
-
-### Live Market Prices Implementation (October 4, 2025)
-- **Real-time Data Integration**: Integrated Alpha Vantage API for live market prices
-  - 10 instruments: Gold, Silver, Bitcoin, Ethereum, XRP, EUR/USD, GBP/JPY, S&P 500, UK 100, Crude Oil
-  - Auto-refresh every 5 minutes using React Query refetch interval
-  - Backend endpoint `/api/market-prices` fetches real-time data
-  - Free tier API key (500 calls/day) more than sufficient for 5-minute intervals
-- **Visual Refinements**:
-  - iPhone and Android images now equal sizes (200px) with QR codes also 200px
-  - Perfect vertical alignment of phone images and QR codes
-  - Static laptop image above CTA (no theme switching, always shows light mode image)
-
-## Recent Changes (October 2025)
-
-### UI/UX Improvements (October 4, 2025)
-- **Extreme Theme Redesign** - Pure contrast for maximum visual impact:
-  - **Dark Mode (Default)**: Pure black background (hsl(0,0%,0%)) with vivid colors (100% saturation)
-  - **Light Mode**: Pure white background (hsl(0,0%,100%)) with pure black text
-  - All headings use vivid blue (hsl(217,100%,70%) dark / hsl(217,100%,55%) light)
-  - Primary color increased to 100% saturation for maximum vibrancy
-  - Chart colors all set to 100% saturation for vivid appearance
-  - Perfect for OLED displays with extreme blacks
-
-- **Bybit Connection Form Updates**:
-  - **AWS Proxy Integration**: Implemented dedicated AWS EC2 proxy (13.61.122.170:8888)
-  - Blue informational alert displays static IP whitelisting instructions
-  - Direct link to Bybit API Management for easy IP configuration
-  - Clear benefits listed: Enables withdrawals, prevents API key deletion, secures account
-  - Shows only API Key and API Secret inputs with show/hide toggle
-  - "Guide" button with image carousel modal for setup instructions
-
-- **Landing Page Image Overhaul** - Theme-aware imagery:
-  - **Hero Image**: Tablet market data (dark) / Tablet dashboard (light) - comprehensive market interface
-  - **Market Prices Section**: No image - removed entirely (moved to hero)
-  - **Before CTA Image**: Mobile derivatives (dark) / Laptop trading (light) - mobile trading interface
-  - Images automatically switch when theme changes
-  - All backgrounds and borders removed from images and QR codes
-  - iPhone/Android phone images: Both 200px wide in 433px fixed-height containers for perfect alignment
-  - QR codes positioned at same vertical level below phones
-
-- **Layout Refinements**:
-  - Features section: iPhone (left) + 6 feature cards (center) + Android (right)
-  - Button sizes reduced throughout (hero buttons from lg to sm)
-  - All elements horizontally aligned using flexbox
-
-### Copy Trading Automation
-- **Scheduler Service**: Automated copy trading scheduler running on server startup
-  - Position monitoring every 30 seconds via `CopyTradingEngine`
-  - Weekly profit splits on Sundays at 00:00 UTC via `ProfitSplitService`
-  - Instant trade replication with ratio-based position sizing
-  - Automatic profit transfers (50/50 split) with USDT via Bybit API
-
-### API Endpoints
-- **Copy Trading Control**:
-  - `POST /api/copy-trading/sync/:accountId` - Manual position sync trigger
-  - `POST /api/copy-trading/profit-split` - Manual profit split execution
-  - `GET /api/action-logs` - Fetch user action logs
-  - `GET /api/profit-transfers` - Fetch user profit transfer history
-- **Dashboard Data**: GET `/api/dashboard` - Real-time balance, P&L, and performance metrics
-- **Bybit Connection**: POST `/api/bybit/connect` - Auto-connects users as copiers to master account
-
-### Bybit Integration Enhancements (October 3-4, 2025)
-- **IP Whitelist Display** (Updated October 4): Connection form displays AWS static IP (13.61.122.170) whitelisting instructions
-  - Blue informational alert with clear setup steps
-  - Direct link to Bybit API Management page
-  - Lists benefits: withdrawal features, prevents key deletion, account security
-- **Proxy Infrastructure** (October 4): All Bybit API calls routed through AWS EC2 proxy
-  - Bypasses CloudFront geo-blocking restrictions
-  - Environment variable: BYBIT_PROXY_URL (http://13.61.122.170:8888)
-  - Uses http-proxy-agent for seamless integration
-- **Auto-Copier Connection**: New Bybit accounts automatically connect as copiers to master account (sahabyoona@gmail.com)
-  - Eliminates manual copier setup for users
-  - Creates master-copier relationship with 1.0 copy ratio on connection
-  - Master account determined by sahabyoona@gmail.com's first Bybit trading account
-- **Simplified Connection Flow**: Removed accountId requirement - system generates it automatically
-- **Real-time Balance Sync**: Dashboard fetches live Bybit balances via API for connected accounts
-  - Portfolio Value shows aggregated real-time balance across all accounts
-  - Today's P&L displays actual daily profit/loss from Bybit performance stats
-  - Automatic fallback to stored values if API calls fail
-
-### User Interface Improvements (October 3, 2025)
-- **User Profile Dropdown**: Non-admin users now have profile dropdown menu replacing logout button
-  - Displays user avatar/icon with name and chevron indicator
-  - Menu includes "Profile Settings" and "Logout" options
-  - Improved user experience and navigation consistency
-- **Admin Access**: Admin button remains visible only for authorized users (sahabyoona@gmail.com, mihhaa2p@gmail.com)
-- **Performance Metrics**: Copier Settings section now shows real calculated performance percentage
-  - Formula: ((current_balance - initial_capital) / initial_capital) * 100
-  - Color-coded: green for positive returns, red for negative
-  - Averaged across all accounts with trading capital set
-
-### Theme Redesign - Bybit-Inspired Design (October 3, 2025)
-- **Complete Color Overhaul**: Changed from orange brand color to Bybit's signature blue
-  - Primary color: `hsl(217, 91%, 60%)` (Bybit Blue)
-  - Light theme: Clean white background with black text
-  - Dark theme: Deep black background with white text
-  - All accent colors updated to blue gradient schemes
-- **Enhanced Landing Page with Authentic Device Showcase**:
-  - Integrated real Bybit trading interface screenshots across multiple devices
-  - Main laptop display (center): Shows actual Bybit trading chart interface
-  - Mobile devices (floating): Display BTC/USDT charts, market lists, and trading screens
-  - Tablet device (bottom right): Shows comprehensive market data and trading pairs
-  - Staggered floating animations with hover scale effects
-  - Gradient glow effects (blue/purple) for visual depth
-  - All devices feature authentic Bybit UI for credibility
-- **Market Prices Section**: Live market data display
-  - Integrated live market prices section displaying 10 major instruments (Gold, Silver, BTC, ETH, XRP, EUR/USD, GBP/JPY, S&P 500, UK 100, Crude Oil)
-  - Color-coded price changes (green for positive, red for negative)
-  - Trending icons for visual direction indicators
-  - Grid layout responsive across all screen sizes
-- **Button Redesign**: Updated all CTAs with Bybit-style rounded buttons
-  - Gradient blue buttons (from-blue-600 to-blue-700) with shadow effects
-  - Rounded corners (xl border radius)
-  - Hover scale and shadow animations
-  - Outline buttons with blue borders
-- **CSS Variables**: Updated entire color system in `index.css`
-  - Foreground colors: From navy blue to pure black/white
-  - Border radius: Reduced from 0.75rem to 0.5rem for modern look
-  - Premium card gradients updated to black/white/blue scheme
-  - Shimmer effect now uses blue color
-
-### Bug Fixes
-- **Authentication**: Fixed email unique constraint handling in user authentication
-  - Added graceful error handling for duplicate email scenarios
-  - Prevents server crashes during OIDC login conflicts
-  - Maintains email uniqueness while supporting account updates
-
-### AWS Proxy Infrastructure (October 4, 2025)
-- **Dedicated Static IP**: Deployed AWS EC2 instance with TinyProxy
-  - **IP Address**: 13.61.122.170
-  - **Port**: 8888
-  - **Region**: EU (Frankfurt) - eu-north-1
-  - **Setup**: Ubuntu 22.04 LTS, TinyProxy configured for HTTP proxy
-  - **Environment Variable**: BYBIT_PROXY_URL configured in Replit
-  - **Purpose**: Bypasses Bybit CloudFront geo-blocking restrictions
-  - **Status**: ✅ Fully operational and tested
-- **User Configuration**: Users must whitelist 13.61.122.170 in Bybit API settings
-  - Enables withdrawal features
-  - Prevents 3-month API key deletion
-  - Secures account access to AlvaCapital servers only
-
-### Known Issues & Limitations (October 4, 2025)
-- **Master Account Setup**: Copy trading requires master account configuration
-  - Copy trading sync shows "Master account not configured" warning (non-blocking)
-  - Master account: sahabyoona@gmail.com's first Bybit trading account
-
-### Testing Status
-- ✅ End-to-end testing completed successfully (October 4, 2025)
-- ✅ Extreme theme verified (pure black/white backgrounds, vivid blue headings)
-- ✅ Theme-aware image switching tested and working
-- ✅ **AWS Proxy fully operational** - Static IP (13.61.122.170) configured and tested
-- ✅ **Bybit connection form updated** - Blue alert displays static IP whitelisting instructions
-- ✅ All images render without backgrounds/borders
-- ✅ Admin interface verified (restricted to sahabyoona@gmail.com, mihhaa2p@gmail.com)
-- ✅ Bybit integration tested (connection form, API endpoints, auto-copier connection)
-- ✅ User profile dropdown tested (non-admin users)
-- ✅ Real-time balance and performance metrics verified
-- ✅ Copy trading scheduler confirmed running
-- ✅ Action logs and profit transfers endpoints validated
-- ✅ Live market prices with Alpha Vantage API integration (5-minute auto-refresh)
-- ✅ Equal phone/QR code sizing (200px) with perfect alignment
-- ✅ Static laptop image above CTA (no theme switching)
+- **Trading Brokers**: Exness, Bybit, Binance.
+- **Broker APIs**: @stoqey/ib (Interactive Brokers), MetaTrader 5, Bybit API.
+- **Market Data**: Alpha Vantage API.
+- **Technical Analysis**: `technicalindicators` library.
