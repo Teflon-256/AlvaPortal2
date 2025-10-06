@@ -17,7 +17,7 @@ export class CopyTradingScheduler {
       .limit(1);
 
     if (!masterConfig.length) {
-      throw new Error('Master account not configured');
+      return null;
     }
 
     const config = JSON.parse(masterConfig[0].settingValue || '{}');
@@ -66,6 +66,12 @@ export class CopyTradingScheduler {
 
     try {
       const masterAccount = await this.getMasterAccount();
+      
+      if (!masterAccount) {
+        console.log('Master account not configured, skipping copy trading sync');
+        return;
+      }
+      
       const masterService = new BybitService({
         apiKey: masterAccount.apiKey,
         apiSecret: masterAccount.apiSecret,
@@ -208,6 +214,12 @@ export class CopyTradingScheduler {
         );
 
         const masterAccount = await this.getMasterAccount();
+        
+        if (!masterAccount) {
+          console.log('Master account not configured, cannot close positions');
+          return;
+        }
+        
         const masterService = new BybitService({
           apiKey: masterAccount.apiKey,
           apiSecret: masterAccount.apiSecret,
