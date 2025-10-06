@@ -290,27 +290,20 @@ export default function Landing() {
               <div className="text-cyan-400 font-mono text-lg tracking-widest">MULTI-BROKER TRADING INFRASTRUCTURE</div>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 gap-8">
               {[
                 {
                   icon: Globe,
                   title: "BYBIT",
-                  subtitle: "Crypto Futures",
-                  description: "Real-time perpetual futures trading with instant execution and deep liquidity",
+                  subtitle: "Crypto Trading",
+                  description: "Real-time cryptocurrency trading with instant execution and deep liquidity across spot and perpetual futures",
                   stats: "24/7 Trading"
                 },
                 {
                   icon: TrendingUp,
-                  title: "EXNESS MT5",
-                  subtitle: "Forex & Indices",
-                  description: "Professional forex and commodities trading with institutional spreads",
-                  stats: "50+ Pairs"
-                },
-                {
-                  icon: ChartLine,
-                  title: "INTERACTIVE BROKERS",
-                  subtitle: "Stocks & Bonds",
-                  description: "Access to global equities, options, and fixed income securities",
+                  title: "TRADEF",
+                  subtitle: "Forex, CFDs, Indices & Stocks",
+                  description: "Professional multi-asset trading platform with institutional spreads across forex, commodities, indices and global equities",
                   stats: "150+ Markets"
                 }
               ].map((broker, idx) => (
