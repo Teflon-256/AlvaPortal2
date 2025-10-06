@@ -300,7 +300,7 @@ export default function AdminPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-mono font-bold text-white" data-testid="stat-total-clients">{systemStats.totalClients || 0}</div>
+                  <div className="text-3xl font-mono font-bold text-white" data-testid="stat-total-clients">{(systemStats as any).totalClients || 0}</div>
                   <p className="text-xs text-zinc-500 font-mono tracking-wider">ACTIVE TRADING ACCOUNTS</p>
                 </CardContent>
               </Card>
@@ -313,7 +313,7 @@ export default function AdminPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-mono font-bold text-white" data-testid="stat-total-aum">${systemStats.totalAUM?.toLocaleString() || '0'}</div>
+                  <div className="text-3xl font-mono font-bold text-white" data-testid="stat-total-aum">${(systemStats as any).totalAUM?.toLocaleString() || '0'}</div>
                   <p className="text-xs text-zinc-500 font-mono tracking-wider">ASSETS UNDER MANAGEMENT</p>
                 </CardContent>
               </Card>
@@ -326,8 +326,8 @@ export default function AdminPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className={`text-3xl font-mono font-bold ${(systemStats.todayPnL || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`} data-testid="stat-today-pnl">
-                    ${systemStats.todayPnL?.toLocaleString() || '0'}
+                  <div className={`text-3xl font-mono font-bold ${((systemStats as any).todayPnL || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`} data-testid="stat-today-pnl">
+                    ${(systemStats as any).todayPnL?.toLocaleString() || '0'}
                   </div>
                   <p className="text-xs text-zinc-500 font-mono tracking-wider">ACROSS ALL ACCOUNTS</p>
                 </CardContent>
@@ -341,7 +341,7 @@ export default function AdminPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-mono font-bold text-white" data-testid="stat-pending-actions">{systemStats.pendingActions || 0}</div>
+                  <div className="text-3xl font-mono font-bold text-white" data-testid="stat-pending-actions">{(systemStats as any).pendingActions || 0}</div>
                   <p className="text-xs text-zinc-500 font-mono tracking-wider">REQUIRES ATTENTION</p>
                 </CardContent>
               </Card>
@@ -354,7 +354,7 @@ export default function AdminPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {systemStats.recentActivity?.slice(0, 5).map((activity: any, idx: number) => (
+                    {(systemStats as any).recentActivity?.slice(0, 5).map((activity: any, idx: number) => (
                       <div key={idx} className="flex items-center border-l-2 border-cyan-500 pl-4">
                         <div className="space-y-1">
                           <p className="text-sm font-mono text-white leading-none">{activity.description}</p>
