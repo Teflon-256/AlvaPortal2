@@ -221,10 +221,26 @@ export default function Home() {
 
   if (authLoading || dashboardLoading) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading your dashboard...</p>
+          <div className="relative mb-8">
+            <svg 
+              className="w-16 h-16 animate-spin mx-auto" 
+              viewBox="0 0 100 100" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle cx="50" cy="50" r="40" stroke="hsl(217,100%,70%)" strokeWidth="3" fill="none" opacity="0.2" />
+              <path 
+                d="M 50 10 A 40 40 0 0 1 90 50" 
+                stroke="hsl(217,100%,70%)" 
+                strokeWidth="3" 
+                fill="none"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
+          <div className="text-2xl font-mono text-cyan-400">LOADING DASHBOARD...</div>
         </div>
       </div>
     );
@@ -261,17 +277,19 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative">
-      {/* Futuristic Background */}
-      <div 
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-5 z-0"
-        style={{
-          backgroundImage: `url(${futuristicExchange})`,
-        }}
-      ></div>
-      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/90 to-background/95 z-0"></div>
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+      <div className="fixed inset-0 opacity-20 pointer-events-none">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `
+            linear-gradient(hsl(217,100%,70%) 1px, transparent 1px),
+            linear-gradient(90deg, hsl(217,100%,70%) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
+          animation: 'grid-move 20s linear infinite'
+        }} />
+      </div>
       {/* Navigation */}
-      <nav className="bg-background/95 backdrop-blur-sm border-b border-border sticky top-0 z-50 relative">
+      <nav className="bg-black/80 backdrop-blur-md border-b border-cyan-500/30 sticky top-0 z-50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/">
@@ -282,23 +300,21 @@ export default function Home() {
                   className="w-10 h-10 object-contain"
                   data-testid="logo-image"
                 />
-                <span className="text-xl font-serif font-bold gradient-text" data-testid="nav-logo">AlvaCapital</span>
+                <span className="text-2xl font-mono font-bold text-cyan-400" data-testid="nav-logo">ALVA CAPITAL</span>
               </div>
             </Link>
             <div className="flex items-center space-x-4">
-              <LanguageSelector />
-              <ThemeToggle />
               {/* Only show Admin button for authorized admins */}
               {user?.email && ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'].includes(user.email) ? (
                 <Link href="/admin">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-border/50 text-foreground hover:bg-accent/50"
+                    className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono"
                     data-testid="admin-link"
                   >
                     <Settings className="h-4 w-4 mr-2" />
-                    Admin
+                    ADMIN
                   </Button>
                 </Link>
               ) : (
@@ -307,7 +323,7 @@ export default function Home() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-border/50 text-foreground hover:bg-accent/50"
+                      className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono"
                       data-testid="user-profile-dropdown"
                     >
                       <div className="flex items-center space-x-2">
@@ -648,6 +664,13 @@ export default function Home() {
           </div>
         </div>
       </div>
+      
+      <style>{`
+        @keyframes grid-move {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(50px); }
+        }
+      `}</style>
     </div>
   );
 }

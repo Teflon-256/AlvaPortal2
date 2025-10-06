@@ -30,9 +30,20 @@ export default function BybitPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+      <div className="fixed inset-0 opacity-20 pointer-events-none">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `
+            linear-gradient(hsl(217,100%,70%) 1px, transparent 1px),
+            linear-gradient(90deg, hsl(217,100%,70%) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
+          animation: 'grid-move 20s linear infinite'
+        }} />
+      </div>
+      
       {/* Navigation */}
-      <nav className="bg-background/95 backdrop-blur-sm border-b border-border sticky top-0 z-50">
+      <nav className="bg-black/80 backdrop-blur-md border-b border-cyan-500/30 sticky top-0 z-50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/">
@@ -43,12 +54,10 @@ export default function BybitPage() {
                   className="w-10 h-10 object-contain"
                   data-testid="logo-image"
                 />
-                <span className="text-xl font-serif font-bold gradient-text" data-testid="nav-logo">AlvaCapital</span>
+                <span className="text-2xl font-mono font-bold text-cyan-400" data-testid="nav-logo">ALVA CAPITAL</span>
               </div>
             </Link>
             <div className="flex items-center space-x-4">
-              <LanguageSelector />
-              <ThemeToggle />
               <div className="flex items-center space-x-2">
                 {user?.profileImageUrl && (
                   <img 
@@ -63,11 +72,11 @@ export default function BybitPage() {
                 </span>
               </div>
               <Button 
-                variant="outline" 
+                className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-mono font-bold"
                 onClick={handleLogout}
                 data-testid="logout-button"
               >
-                Logout
+                LOGOUT
               </Button>
             </div>
           </div>
@@ -101,31 +110,31 @@ export default function BybitPage() {
         </div>
 
         {!bybitAccount ? (
-          <Card>
+          <Card className="bg-zinc-900/50 border-2 border-cyan-500/30 backdrop-blur-sm relative z-10">
             <CardHeader>
-              <CardTitle>Connect Bybit Account</CardTitle>
+              <CardTitle className="font-mono text-cyan-400">CONNECT BYBIT ACCOUNT</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-zinc-400 mb-6 font-mono">
                 Connect your Bybit account to start copy trading and track your performance.
               </p>
               <BybitConnectionForm />
             </CardContent>
           </Card>
         ) : (
-          <Tabs defaultValue="dashboard" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
-              <TabsTrigger value="dashboard" className="flex items-center gap-2" data-testid="tab-dashboard">
+          <Tabs defaultValue="dashboard" className="w-full relative z-10">
+            <TabsList className="grid w-full grid-cols-3 mb-6 bg-zinc-900/50 border-2 border-cyan-500/30 p-1">
+              <TabsTrigger value="dashboard" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-dashboard">
                 <Wallet className="w-4 h-4" />
-                Dashboard
+                DASHBOARD
               </TabsTrigger>
-              <TabsTrigger value="settings" className="flex items-center gap-2" data-testid="tab-settings">
+              <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-settings">
                 <SettingsIcon className="w-4 h-4" />
-                Copy Trading Settings
+                SETTINGS
               </TabsTrigger>
-              <TabsTrigger value="performance" className="flex items-center gap-2" data-testid="tab-performance">
+              <TabsTrigger value="performance" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-performance">
                 <Activity className="w-4 h-4" />
-                Performance
+                PERFORMANCE
               </TabsTrigger>
             </TabsList>
 
@@ -157,6 +166,13 @@ export default function BybitPage() {
           </Tabs>
         )}
       </div>
+      
+      <style>{`
+        @keyframes grid-move {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(50px); }
+        }
+      `}</style>
     </div>
   );
 }
