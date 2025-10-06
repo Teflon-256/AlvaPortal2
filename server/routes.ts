@@ -149,10 +149,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const { accountId } = req.params;
       
+      if (!accountId) {
+        return res.status(400).json({ message: "Account ID is required" });
+      }
+      
+      console.log(`[Delete Account] User ${userId} attempting to delete account ${accountId}`);
+      
       await storage.deleteTradingAccount(accountId, userId);
+      
+      console.log(`[Delete Account] Successfully deleted account ${accountId} for user ${userId}`);
       res.json({ message: "Trading account disconnected successfully" });
     } catch (error) {
-      console.error("Error deleting trading account:", error);
+      console.error(`[Delete Account] Error deleting account ${req.params.accountId} for user ${req.user?.claims?.sub}:`, error);
       res.status(500).json({ message: "Failed to disconnect trading account" });
     }
   });
