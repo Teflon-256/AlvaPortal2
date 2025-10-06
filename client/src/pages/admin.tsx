@@ -41,7 +41,6 @@ export default function AdminPage() {
   const [newStatus, setNewStatus] = useState('');
   const [adminNotes, setAdminNotes] = useState('');
 
-  // Check if user is authorized to access admin panel
   const authorizedAdminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
   const isAuthorizedAdmin = Boolean(user?.email && authorizedAdminEmails.includes(user.email));
 
@@ -120,13 +119,13 @@ export default function AdminPage() {
   const getStatusBadge = (status: string | null) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="outline" className="text-yellow-600"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
+        return <Badge variant="outline" className="border-yellow-500 text-yellow-400 bg-yellow-500/10"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
       case 'approved':
-        return <Badge variant="outline" className="text-green-600"><CheckCircle className="w-3 h-3 mr-1" />Approved</Badge>;
+        return <Badge variant="outline" className="border-green-500 text-green-400 bg-green-500/10"><CheckCircle className="w-3 h-3 mr-1" />Approved</Badge>;
       case 'rejected':
-        return <Badge variant="outline" className="text-red-600"><XCircle className="w-3 h-3 mr-1" />Rejected</Badge>;
+        return <Badge variant="outline" className="border-red-500 text-red-400 bg-red-500/10"><XCircle className="w-3 h-3 mr-1" />Rejected</Badge>;
       default:
-        return <Badge variant="outline">{status || 'pending'}</Badge>;
+        return <Badge variant="outline" className="border-cyan-500 text-cyan-400">{status || 'pending'}</Badge>;
     }
   };
 
@@ -149,9 +148,26 @@ export default function AdminPage() {
 
   if (authLoading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-lg">Loading admin dashboard...</div>
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative mb-8">
+            <svg 
+              className="w-16 h-16 animate-spin mx-auto" 
+              viewBox="0 0 100 100" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle cx="50" cy="50" r="40" stroke="hsl(217,100%,70%)" strokeWidth="3" fill="none" opacity="0.2" />
+              <path 
+                d="M 50 10 A 40 40 0 0 1 90 50" 
+                stroke="hsl(217,100%,70%)" 
+                strokeWidth="3" 
+                fill="none"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
+          <div className="text-2xl font-mono text-cyan-400">LOADING ADMIN PORTAL...</div>
         </div>
       </div>
     );
@@ -159,433 +175,501 @@ export default function AdminPage() {
 
   if (!isAuthorizedAdmin) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
-          <Card className="max-w-md">
-            <CardContent className="p-8 text-center">
-              <Shield className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-2xl font-semibold mb-2">Access Restricted</h2>
-              <p className="text-muted-foreground mb-4">
-                This admin panel is only accessible to authorized administrators.
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Contact support if you believe you should have access.
-              </p>
-              <Button 
-                onClick={() => window.location.href = '/'}
-                className="mt-4"
-                data-testid="return-home"
-              >
-                Return to Home
-              </Button>
-            </CardContent>
-          </Card>
+      <div className="min-h-screen bg-black text-white flex items-center justify-center relative overflow-hidden">
+        <div className="fixed inset-0 opacity-20 pointer-events-none">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `
+              linear-gradient(hsl(217,100%,70%) 1px, transparent 1px),
+              linear-gradient(90deg, hsl(217,100%,70%) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+            animation: 'grid-move 20s linear infinite'
+          }} />
         </div>
+        
+        <Card className="max-w-md bg-zinc-900/50 border-2 border-cyan-500/30 backdrop-blur-sm relative z-10">
+          <CardContent className="p-8 text-center">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center mx-auto mb-4">
+              <Shield className="h-8 w-8 text-black" />
+            </div>
+            <h2 className="text-2xl font-mono font-bold text-cyan-400 mb-2">ACCESS RESTRICTED</h2>
+            <p className="text-zinc-400 mb-4">
+              This admin panel is only accessible to authorized administrators.
+            </p>
+            <p className="text-sm text-zinc-500 mb-6">
+              Contact support if you believe you should have access.
+            </p>
+            <Button 
+              onClick={() => window.location.href = '/'}
+              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-mono font-bold"
+              data-testid="return-home"
+            >
+              RETURN TO HOME
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-lg">Loading admin dashboard...</div>
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative mb-8">
+            <svg 
+              className="w-16 h-16 animate-spin mx-auto" 
+              viewBox="0 0 100 100" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle cx="50" cy="50" r="40" stroke="hsl(217,100%,70%)" strokeWidth="3" fill="none" opacity="0.2" />
+              <path 
+                d="M 50 10 A 40 40 0 0 1 90 50" 
+                stroke="hsl(217,100%,70%)" 
+                strokeWidth="3" 
+                fill="none"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
+          <div className="text-2xl font-mono text-cyan-400">LOADING DATA...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+      <div className="fixed inset-0 opacity-20 pointer-events-none">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `
+            linear-gradient(hsl(217,100%,70%) 1px, transparent 1px),
+            linear-gradient(90deg, hsl(217,100%,70%) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
+          animation: 'grid-move 20s linear infinite'
+        }} />
+      </div>
 
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="overview" className="flex items-center gap-2" data-testid="tab-overview">
-            <BarChart3 className="w-4 h-4" />
-            Overview
-          </TabsTrigger>
-          <TabsTrigger value="clients" className="flex items-center gap-2" data-testid="tab-clients">
-            <Users className="w-4 h-4" />
-            Clients
-            <Badge variant="secondary" className="ml-1">{(allClients as any[]).length}</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="withdrawals" className="flex items-center gap-2" data-testid="tab-withdrawals">
-            <Wallet className="w-4 h-4" />
-            Withdrawals
-            <Badge variant="secondary" className="ml-1">{(withdrawalRequests as any[]).filter((r: any) => r.status === 'pending').length}</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="broker-requests" className="flex items-center gap-2" data-testid="tab-broker-requests">
-            <FileText className="w-4 h-4" />
-            Brokers
-          </TabsTrigger>
-          <TabsTrigger value="master-account" className="flex items-center gap-2" data-testid="tab-master-account">
-            <Key className="w-4 h-4" />
-            Master
-          </TabsTrigger>
-          <TabsTrigger value="copiers" className="flex items-center gap-2" data-testid="tab-copiers">
-            <Activity className="w-4 h-4" />
-            Copy Trading
-          </TabsTrigger>
-        </TabsList>
+      <div className="container mx-auto p-6 space-y-6 relative z-10">
+        <div className="mb-8">
+          <h1 className="text-5xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+            ADMIN DASHBOARD
+          </h1>
+          <div className="text-cyan-400 font-mono text-sm tracking-widest mt-2">SYSTEM CONTROL PANEL</div>
+        </div>
 
-        <TabsContent value="overview" className="mt-6 space-y-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Clients</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold" data-testid="stat-total-clients">{systemStats.totalClients || 0}</div>
-                <p className="text-xs text-muted-foreground">Active trading accounts</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total AUM</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold" data-testid="stat-total-aum">${systemStats.totalAUM?.toLocaleString() || '0'}</div>
-                <p className="text-xs text-muted-foreground">Assets under management</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Today's P&L</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className={`text-2xl font-bold ${(systemStats.todayPnL || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`} data-testid="stat-today-pnl">
-                  ${systemStats.todayPnL?.toLocaleString() || '0'}
-                </div>
-                <p className="text-xs text-muted-foreground">Across all accounts</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending Actions</CardTitle>
-                <AlertCircle className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold" data-testid="stat-pending-actions">{systemStats.pendingActions || 0}</div>
-                <p className="text-xs text-muted-foreground">Requires attention</p>
-              </CardContent>
-            </Card>
-          </div>
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-6 bg-zinc-900/50 border-2 border-cyan-500/30 p-1">
+            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-overview">
+              <BarChart3 className="w-4 h-4" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="clients" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-clients">
+              <Users className="w-4 h-4" />
+              Clients
+              <Badge variant="secondary" className="ml-1 bg-cyan-500 text-black">{(allClients as any[]).length}</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="withdrawals" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-withdrawals">
+              <Wallet className="w-4 h-4" />
+              Withdrawals
+              <Badge variant="secondary" className="ml-1 bg-cyan-500 text-black">{(withdrawalRequests as any[]).filter((r: any) => r.status === 'pending').length}</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="broker-requests" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-broker-requests">
+              <FileText className="w-4 h-4" />
+              Brokers
+            </TabsTrigger>
+            <TabsTrigger value="master-account" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-master-account">
+              <Key className="w-4 h-4" />
+              Master
+            </TabsTrigger>
+            <TabsTrigger value="copiers" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-copiers">
+              <Activity className="w-4 h-4" />
+              Copy Trading
+            </TabsTrigger>
+          </TabsList>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {systemStats.recentActivity?.slice(0, 5).map((activity: any, idx: number) => (
-                    <div key={idx} className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">{activity.description}</p>
-                        <p className="text-sm text-muted-foreground">{new Date(activity.createdAt).toLocaleString()}</p>
+          <TabsContent value="overview" className="mt-6 space-y-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card className="bg-zinc-900/50 border-2 border-cyan-500/30 hover:border-cyan-500 transition-all backdrop-blur-sm">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-mono text-cyan-400">Total Clients</CardTitle>
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                    <Users className="h-5 w-5 text-black" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-mono font-bold text-white" data-testid="stat-total-clients">{systemStats.totalClients || 0}</div>
+                  <p className="text-xs text-zinc-500 font-mono tracking-wider">ACTIVE TRADING ACCOUNTS</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-zinc-900/50 border-2 border-cyan-500/30 hover:border-cyan-500 transition-all backdrop-blur-sm">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-mono text-cyan-400">Total AUM</CardTitle>
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                    <DollarSign className="h-5 w-5 text-black" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-mono font-bold text-white" data-testid="stat-total-aum">${systemStats.totalAUM?.toLocaleString() || '0'}</div>
+                  <p className="text-xs text-zinc-500 font-mono tracking-wider">ASSETS UNDER MANAGEMENT</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-zinc-900/50 border-2 border-cyan-500/30 hover:border-cyan-500 transition-all backdrop-blur-sm">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-mono text-cyan-400">Today's P&L</CardTitle>
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                    <TrendingUp className="h-5 w-5 text-black" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className={`text-3xl font-mono font-bold ${(systemStats.todayPnL || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`} data-testid="stat-today-pnl">
+                    ${systemStats.todayPnL?.toLocaleString() || '0'}
+                  </div>
+                  <p className="text-xs text-zinc-500 font-mono tracking-wider">ACROSS ALL ACCOUNTS</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-zinc-900/50 border-2 border-cyan-500/30 hover:border-cyan-500 transition-all backdrop-blur-sm">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-mono text-cyan-400">Pending Actions</CardTitle>
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                    <AlertCircle className="h-5 w-5 text-black" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-mono font-bold text-white" data-testid="stat-pending-actions">{systemStats.pendingActions || 0}</div>
+                  <p className="text-xs text-zinc-500 font-mono tracking-wider">REQUIRES ATTENTION</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card className="bg-zinc-900/50 border-2 border-cyan-500/30 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="font-mono text-cyan-400">RECENT ACTIVITY</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {systemStats.recentActivity?.slice(0, 5).map((activity: any, idx: number) => (
+                      <div key={idx} className="flex items-center border-l-2 border-cyan-500 pl-4">
+                        <div className="space-y-1">
+                          <p className="text-sm font-mono text-white leading-none">{activity.description}</p>
+                          <p className="text-xs text-zinc-500 font-mono">{new Date(activity.createdAt).toLocaleString()}</p>
+                        </div>
                       </div>
+                    )) || <p className="text-sm text-zinc-500 font-mono">NO RECENT ACTIVITY</p>}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-zinc-900/50 border-2 border-cyan-500/30 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="font-mono text-cyan-400">SYSTEM HEALTH</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-mono text-white">Bybit Connection</span>
+                      <Badge variant="outline" className="border-green-500 text-green-400 bg-green-500/10 font-mono">
+                        <CheckCircle className="w-3 h-3 mr-1" />ACTIVE
+                      </Badge>
                     </div>
-                  )) || <p className="text-sm text-muted-foreground">No recent activity</p>}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>System Health</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Bybit Connection</span>
-                    <Badge variant="outline" className="text-green-600">
-                      <CheckCircle className="w-3 h-3 mr-1" />Active
-                    </Badge>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-mono text-white">Copy Trading Engine</span>
+                      <Badge variant="outline" className="border-green-500 text-green-400 bg-green-500/10 font-mono">
+                        <CheckCircle className="w-3 h-3 mr-1" />RUNNING
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-mono text-white">Database</span>
+                      <Badge variant="outline" className="border-green-500 text-green-400 bg-green-500/10 font-mono">
+                        <CheckCircle className="w-3 h-3 mr-1" />HEALTHY
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Copy Trading Engine</span>
-                    <Badge variant="outline" className="text-green-600">
-                      <CheckCircle className="w-3 h-3 mr-1" />Running
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Database</span>
-                    <Badge variant="outline" className="text-green-600">
-                      <CheckCircle className="w-3 h-3 mr-1" />Healthy
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
-        <TabsContent value="clients" className="mt-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>All Clients</CardTitle>
-                <Button variant="outline" size="sm">
-                  <Download className="w-4 h-4 mr-2" />
-                  Export CSV
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Accounts</TableHead>
-                    <TableHead>Total Balance</TableHead>
-                    <TableHead>P&L</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(allClients as any[]).map((client: any) => (
-                    <TableRow key={client.id}>
-                      <TableCell className="font-medium">{client.email}</TableCell>
-                      <TableCell>{client.firstName} {client.lastName}</TableCell>
-                      <TableCell>{client.accountCount || 0}</TableCell>
-                      <TableCell>${client.totalBalance?.toLocaleString() || '0'}</TableCell>
-                      <TableCell className={`${(client.totalPnL || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        ${client.totalPnL?.toLocaleString() || '0'}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-green-600">Active</Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="withdrawals" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Withdrawal Requests</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Client</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Currency</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(withdrawalRequests as any[]).map((request: any) => (
-                    <TableRow key={request.id}>
-                      <TableCell>{new Date(request.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell>{request.userEmail}</TableCell>
-                      <TableCell className="font-medium">${request.amount}</TableCell>
-                      <TableCell>{request.currency}</TableCell>
-                      <TableCell>
-                        {request.status === 'pending' && (
-                          <Badge variant="outline" className="text-yellow-600">
-                            <Clock className="w-3 h-3 mr-1" />Pending
-                          </Badge>
-                        )}
-                        {request.status === 'approved' && (
-                          <Badge variant="outline" className="text-green-600">
-                            <CheckCircle className="w-3 h-3 mr-1" />Approved
-                          </Badge>
-                        )}
-                        {request.status === 'rejected' && (
-                          <Badge variant="outline" className="text-red-600">
-                            <XCircle className="w-3 h-3 mr-1" />Rejected
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {request.status === 'pending' && (
-                          <div className="flex gap-2">
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="text-green-600"
-                              onClick={() => updateWithdrawalMutation.mutate({ 
-                                id: request.id, 
-                                status: 'approved' 
-                              })}
-                              data-testid={`approve-withdrawal-${request.id}`}
-                            >
-                              Approve
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="text-red-600"
-                              onClick={() => updateWithdrawalMutation.mutate({ 
-                                id: request.id, 
-                                status: 'rejected' 
-                              })}
-                              data-testid={`reject-withdrawal-${request.id}`}
-                            >
-                              Reject
-                            </Button>
-                          </div>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="broker-requests" className="mt-6">
-          <div className="grid gap-6">
-        {(brokerRequests as BrokerRequest[]).length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <div className="text-muted-foreground">No broker requests found</div>
-            </CardContent>
-          </Card>
-        ) : (
-          (brokerRequests as BrokerRequest[]).map((request: BrokerRequest) => (
-            <Card key={request.id} className="transition-shadow hover:shadow-md">
+          <TabsContent value="clients" className="mt-6">
+            <Card className="bg-zinc-900/50 border-2 border-cyan-500/30 backdrop-blur-sm">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <span>Broker Request - {request.brokerName}</span>
-                    {getStatusBadge(request.status)}
-                  </CardTitle>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleUpdateRequest(request)}
-                    data-testid={`edit-request-${request.id}`}
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Update
+                  <CardTitle className="font-mono text-cyan-400">ALL CLIENTS</CardTitle>
+                  <Button variant="outline" size="sm" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono">
+                    <Download className="w-4 h-4 mr-2" />
+                    EXPORT CSV
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="font-semibold">User ID</Label>
-                    <div className="text-sm text-muted-foreground" data-testid={`user-id-${request.id}`}>
-                      {request.userId}
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="font-semibold">Submitted</Label>
-                    <div className="text-sm text-muted-foreground">
-                      {new Date(request.createdAt!).toLocaleDateString()} at{' '}
-                      {new Date(request.createdAt!).toLocaleTimeString()}
-                    </div>
-                  </div>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-cyan-500/30">
+                      <TableHead className="text-cyan-400 font-mono">EMAIL</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">NAME</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">ACCOUNTS</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">TOTAL BALANCE</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">P&L</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">STATUS</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(allClients as any[]).map((client: any) => (
+                      <TableRow key={client.id} className="border-cyan-500/30 hover:bg-cyan-500/5">
+                        <TableCell className="font-mono text-white">{client.email}</TableCell>
+                        <TableCell className="font-mono text-white">{client.firstName} {client.lastName}</TableCell>
+                        <TableCell className="font-mono text-white">{client.accountCount || 0}</TableCell>
+                        <TableCell className="font-mono text-white">${client.totalBalance?.toLocaleString() || '0'}</TableCell>
+                        <TableCell className={`font-mono ${(client.totalPnL || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          ${client.totalPnL?.toLocaleString() || '0'}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="border-green-500 text-green-400 bg-green-500/10 font-mono">ACTIVE</Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="withdrawals" className="mt-6">
+            <Card className="bg-zinc-900/50 border-2 border-cyan-500/30 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="font-mono text-cyan-400">WITHDRAWAL REQUESTS</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-cyan-500/30">
+                      <TableHead className="text-cyan-400 font-mono">DATE</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">CLIENT</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">AMOUNT</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">CURRENCY</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">STATUS</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">ACTIONS</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(withdrawalRequests as any[]).map((request: any) => (
+                      <TableRow key={request.id} className="border-cyan-500/30 hover:bg-cyan-500/5">
+                        <TableCell className="font-mono text-white">{new Date(request.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell className="font-mono text-white">{request.userEmail}</TableCell>
+                        <TableCell className="font-mono text-white">${request.amount}</TableCell>
+                        <TableCell className="font-mono text-white">{request.currency}</TableCell>
+                        <TableCell>
+                          {request.status === 'pending' && (
+                            <Badge variant="outline" className="border-yellow-500 text-yellow-400 bg-yellow-500/10 font-mono">
+                              <Clock className="w-3 h-3 mr-1" />PENDING
+                            </Badge>
+                          )}
+                          {request.status === 'approved' && (
+                            <Badge variant="outline" className="border-green-500 text-green-400 bg-green-500/10 font-mono">
+                              <CheckCircle className="w-3 h-3 mr-1" />APPROVED
+                            </Badge>
+                          )}
+                          {request.status === 'rejected' && (
+                            <Badge variant="outline" className="border-red-500 text-red-400 bg-red-500/10 font-mono">
+                              <XCircle className="w-3 h-3 mr-1" />REJECTED
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {request.status === 'pending' && (
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="border-green-500 text-green-400 hover:bg-green-500/10 font-mono"
+                                onClick={() => updateWithdrawalMutation.mutate({ 
+                                  id: request.id, 
+                                  status: 'approved' 
+                                })}
+                                data-testid={`approve-withdrawal-${request.id}`}
+                              >
+                                APPROVE
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="border-red-500 text-red-400 hover:bg-red-500/10 font-mono"
+                                onClick={() => updateWithdrawalMutation.mutate({ 
+                                  id: request.id, 
+                                  status: 'rejected' 
+                                })}
+                                data-testid={`reject-withdrawal-${request.id}`}
+                              >
+                                REJECT
+                              </Button>
+                            </div>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="broker-requests" className="mt-6">
+            <div className="grid gap-6">
+              {(brokerRequests as BrokerRequest[]).length === 0 ? (
+                <Card className="bg-zinc-900/50 border-2 border-cyan-500/30 backdrop-blur-sm">
+                  <CardContent className="p-8 text-center">
+                    <div className="text-zinc-500 font-mono">NO BROKER REQUESTS FOUND</div>
+                  </CardContent>
+                </Card>
+              ) : (
+                (brokerRequests as BrokerRequest[]).map((request: BrokerRequest) => (
+                  <Card key={request.id} className="bg-zinc-900/50 border-2 border-cyan-500/30 hover:border-cyan-500 transition-all backdrop-blur-sm">
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center gap-2 font-mono text-cyan-400">
+                          <span>BROKER REQUEST - {request.brokerName}</span>
+                          {getStatusBadge(request.status)}
+                        </CardTitle>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleUpdateRequest(request)}
+                          className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono"
+                          data-testid={`edit-request-${request.id}`}
+                        >
+                          <Edit className="w-4 h-4 mr-2" />
+                          UPDATE
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="font-mono text-cyan-400">USER ID</Label>
+                          <div className="text-sm text-white font-mono" data-testid={`user-id-${request.id}`}>
+                            {request.userId}
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="font-mono text-cyan-400">SUBMITTED</Label>
+                          <div className="text-sm text-white font-mono">
+                            {new Date(request.createdAt!).toLocaleDateString()} at{' '}
+                            {new Date(request.createdAt!).toLocaleTimeString()}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label className="font-mono text-cyan-400">BROKER NAME</Label>
+                        <div className="text-sm text-white font-mono" data-testid={`broker-name-${request.id}`}>
+                          {request.brokerName}
+                        </div>
+                      </div>
+
+                      {request.adminNotes && (
+                        <div>
+                          <Label className="font-mono text-cyan-400">ADMIN NOTES</Label>
+                          <div className="text-sm whitespace-pre-wrap p-3 bg-black/50 border border-cyan-500/30 rounded-md text-white font-mono" data-testid={`admin-notes-${request.id}`}>
+                            {request.adminNotes}
+                          </div>
+                        </div>
+                      )}
+
+                      {request.updatedAt && request.updatedAt !== request.createdAt && (
+                        <div>
+                          <Label className="font-mono text-cyan-400">LAST UPDATED</Label>
+                          <div className="text-sm text-white font-mono">
+                            {new Date(request.updatedAt).toLocaleDateString()} at{' '}
+                            {new Date(request.updatedAt).toLocaleTimeString()}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="master-account" className="mt-6">
+            <MasterAccountConfig />
+          </TabsContent>
+
+          <TabsContent value="copiers" className="mt-6">
+            <CopierManagement />
+          </TabsContent>
+        </Tabs>
+
+        <Dialog open={updateDialogOpen} onOpenChange={setUpdateDialogOpen}>
+          <DialogContent className="bg-zinc-900 border-2 border-cyan-500/30" data-testid="update-request-dialog">
+            <DialogHeader>
+              <DialogTitle className="font-mono text-cyan-400">UPDATE BROKER REQUEST</DialogTitle>
+            </DialogHeader>
+            {selectedRequest && (
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="status" className="font-mono text-cyan-400">STATUS</Label>
+                  <Select value={newStatus} onValueChange={setNewStatus}>
+                    <SelectTrigger className="bg-black border-cyan-500/30 text-white font-mono" data-testid="status-select">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-zinc-900 border-cyan-500/30">
+                      <SelectItem value="pending" className="font-mono">Pending</SelectItem>
+                      <SelectItem value="approved" className="font-mono">Approved</SelectItem>
+                      <SelectItem value="rejected" className="font-mono">Rejected</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div>
-                  <Label className="font-semibold">Broker Name</Label>
-                  <div className="text-sm" data-testid={`broker-name-${request.id}`}>
-                    {request.brokerName}
-                  </div>
+                  <Label htmlFor="adminNotes" className="font-mono text-cyan-400">ADMIN NOTES</Label>
+                  <Textarea
+                    id="adminNotes"
+                    value={adminNotes}
+                    onChange={(e) => setAdminNotes(e.target.value)}
+                    placeholder="Add notes for this request..."
+                    className="bg-black border-cyan-500/30 text-white font-mono"
+                    rows={4}
+                    data-testid="admin-notes-input"
+                  />
                 </div>
-
-                {request.adminNotes && (
-                  <div>
-                    <Label className="font-semibold">Admin Notes</Label>
-                    <div className="text-sm whitespace-pre-wrap p-3 bg-muted rounded-md" data-testid={`admin-notes-${request.id}`}>
-                      {request.adminNotes}
-                    </div>
-                  </div>
-                )}
-
-                {request.updatedAt && request.updatedAt !== request.createdAt && (
-                  <div>
-                    <Label className="font-semibold">Last Updated</Label>
-                    <div className="text-sm text-muted-foreground">
-                      {new Date(request.updatedAt).toLocaleDateString()} at{' '}
-                      {new Date(request.updatedAt).toLocaleTimeString()}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))
-        )}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="master-account" className="mt-6">
-          <MasterAccountConfig />
-        </TabsContent>
-
-        <TabsContent value="copiers" className="mt-6">
-          <CopierManagement />
-        </TabsContent>
-      </Tabs>
-
-      <Dialog open={updateDialogOpen} onOpenChange={setUpdateDialogOpen}>
-        <DialogContent data-testid="update-request-dialog">
-          <DialogHeader>
-            <DialogTitle>Update Broker Request</DialogTitle>
-          </DialogHeader>
-          {selectedRequest && (
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="status">Status</Label>
-                <Select value={newStatus} onValueChange={setNewStatus}>
-                  <SelectTrigger data-testid="status-select">
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="approved">Approved</SelectItem>
-                    <SelectItem value="rejected">Rejected</SelectItem>
-                  </SelectContent>
-                </Select>
+                
+                <div className="flex gap-3 justify-end">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setUpdateDialogOpen(false)}
+                    className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono"
+                    data-testid="cancel-update"
+                  >
+                    CANCEL
+                  </Button>
+                  <Button 
+                    onClick={handleSubmitUpdate}
+                    disabled={updateRequestMutation.isPending}
+                    className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-mono font-bold"
+                    data-testid="submit-update"
+                  >
+                    {updateRequestMutation.isPending ? 'UPDATING...' : 'UPDATE REQUEST'}
+                  </Button>
+                </div>
               </div>
-              
-              <div>
-                <Label htmlFor="adminNotes">Admin Notes</Label>
-                <Textarea
-                  id="adminNotes"
-                  placeholder="Add notes about this request..."
-                  value={adminNotes}
-                  onChange={(e) => setAdminNotes(e.target.value)}
-                  className="min-h-24"
-                  data-testid="admin-notes-input"
-                />
-              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
 
-              <div className="flex justify-end space-x-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setUpdateDialogOpen(false)}
-                  data-testid="cancel-update"
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  onClick={handleSubmitUpdate}
-                  disabled={updateRequestMutation.isPending || !newStatus}
-                  data-testid="submit-update"
-                >
-                  {updateRequestMutation.isPending ? "Updating..." : "Update Request"}
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <style>{`
+        @keyframes grid-move {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(50px); }
+        }
+      `}</style>
     </div>
   );
 }
