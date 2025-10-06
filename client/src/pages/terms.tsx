@@ -5,9 +5,9 @@ import alvaCapitalLogo from "@assets/image_1759129583507.png";
 
 export default function Terms() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
       {/* Navigation */}
-      <nav className="bg-background/95 backdrop-blur-sm border-b border-border sticky top-0 z-50">
+      <nav className="bg-black/80 backdrop-blur-md border-b border-cyan-500/30 relative sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="/" className="flex items-center space-x-2">
@@ -17,14 +17,14 @@ export default function Terms() {
                 className="w-10 h-10 object-contain"
                 data-testid="logo-image"
               />
-              <span className="text-xl font-serif font-bold gradient-text">AlvaCapital</span>
+              <span className="text-xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">AlvaCapital</span>
             </a>
             <div className="flex items-center space-x-4">
               <LanguageSelector />
               <ThemeToggle />
               <a 
                 href="/api/login"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-mono font-bold px-4 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Sign In
               </a>
@@ -36,7 +36,7 @@ export default function Terms() {
       {/* Terms of Service Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-serif font-bold gradient-text mb-4">
+          <h1 className="text-4xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-4">
             Terms of Service
           </h1>
           <p className="text-xl text-muted-foreground">
@@ -44,7 +44,7 @@ export default function Terms() {
           </p>
         </div>
 
-        <Card className="premium-card">
+        <Card className="bg-zinc-900/50 border-2 border-cyan-500/30 backdrop-blur-sm">
           <CardContent className="p-8 space-y-8">
             <section>
               <h2 className="text-2xl font-semibold mb-4">Acceptance of Terms</h2>
