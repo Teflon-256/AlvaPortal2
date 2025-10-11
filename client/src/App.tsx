@@ -13,10 +13,11 @@ import Bybit from "@/pages/bybit";
 import FAQ from "@/pages/faq";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
+import ProfileSetup from "@/pages/profile-setup";
 import "@/i18n";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   return (
     <Switch>
@@ -31,6 +32,10 @@ function Router() {
         <Route path="/" component={Landing} />
       ) : (
         <>
+          {/* Profile setup route for users without country */}
+          <Route path="/profile-setup" component={ProfileSetup} />
+          
+          {/* Main app routes */}
           <Route path="/" component={Home} />
           <Route path="/bybit" component={Bybit} />
         </>
