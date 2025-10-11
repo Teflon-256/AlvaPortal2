@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, Key, BookOpen, ChevronLeft, ChevronRight, X, AlertCircle, Info } from "lucide-react";
+import { Loader2, Key, BookOpen, ChevronLeft, ChevronRight, X, AlertCircle, Info, Copy, Check } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const bybitConnectionSchema = z.object({
@@ -29,8 +29,33 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
   const [showApiSecret, setShowApiSecret] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [copiedIP, setCopiedIP] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   const guideImages: string[] = [];
+  
+  const STATIC_IP = "13.61.122.170";
+  const BYBIT_API_LINK = "https://www.bybit.com/app/user/api-management";
+
+  const handleCopyIP = () => {
+    navigator.clipboard.writeText(STATIC_IP);
+    setCopiedIP(true);
+    setTimeout(() => setCopiedIP(false), 2000);
+    toast({
+      title: "Copied!",
+      description: "IP address copied to clipboard",
+    });
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(BYBIT_API_LINK);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+    toast({
+      title: "Copied!",
+      description: "Bybit API link copied to clipboard",
+    });
+  };
 
   const form = useForm<BybitConnectionForm>({
     resolver: zodResolver(bybitConnectionSchema),
@@ -96,17 +121,46 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
                 <div className="space-y-2 text-muted-foreground">
                   <p className="font-medium text-foreground">When creating or editing your Bybit API key:</p>
                   <ol className="list-decimal list-inside space-y-1 ml-2">
-                    <li>Go to Bybit API Management: <a href="https://www.bybit.com/app/user/api-management" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">bybit.com/app/user/api-management</a></li>
-                    <li>Set <span className="font-medium text-foreground">IP Restrictions</span> to:</li>
+                    <li className="flex items-center gap-2">
+                      <span>Go to Bybit API Management:</span>
+                      <a href={BYBIT_API_LINK} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center gap-1">
+                        bybit.com/app/user/api-management
+                      </a>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2"
+                        onClick={handleCopyLink}
+                        data-testid="button-copy-api-link"
+                      >
+                        {copiedLink ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+                      </Button>
+                    </li>
+                    <li>IP with permissions granted to access the BybitAPI:</li>
                   </ol>
-                  <div className="bg-muted/50 p-3 rounded-md border border-border mt-2">
-                    <code className="text-sm font-mono text-blue-600 dark:text-blue-400">13.61.122.170</code>
-                    <p className="text-xs mt-1 text-muted-foreground">This is AlvaCapital's dedicated AWS static IP</p>
-                  </div>
-                  <div className="mt-3 space-y-1">
-                    <p className="text-xs">✅ <span className="font-medium text-green-600 dark:text-green-400">Enables</span> withdrawal features</p>
-                    <p className="text-xs">✅ <span className="font-medium text-green-600 dark:text-green-400">Prevents</span> API key deletion after 3 months</p>
-                    <p className="text-xs">✅ <span className="font-medium text-green-600 dark:text-green-400">Secures</span> your account (only our servers can access)</p>
+                  <div className="bg-muted/50 p-3 rounded-md border border-border mt-2 flex items-center justify-between">
+                    <code className="text-sm font-mono text-blue-600 dark:text-blue-400">{STATIC_IP}</code>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleCopyIP}
+                      data-testid="button-copy-ip"
+                      className="h-8"
+                    >
+                      {copiedIP ? (
+                        <>
+                          <Check className="h-4 w-4 mr-1 text-green-500" />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-4 w-4 mr-1" />
+                          Copy
+                        </>
+                      )}
+                    </Button>
                   </div>
                 </div>
               </div>
