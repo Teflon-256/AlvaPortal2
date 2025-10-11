@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/dialog';
 import { 
   Edit, ExternalLink, Clock, CheckCircle, XCircle, Shield, FileText, Key, Users, 
-  TrendingUp, DollarSign, Activity, BarChart3, Wallet, AlertCircle, Download 
+  TrendingUp, DollarSign, Activity, BarChart3, Wallet, AlertCircle, Download, LogOut 
 } from 'lucide-react';
 import { useState } from 'react';
 import { apiRequest, queryClient } from '@/lib/queryClient';
@@ -32,6 +32,8 @@ import { useAuth } from '@/hooks/useAuth';
 import type { BrokerRequest, WithdrawalRequest, TradingAccount } from '@shared/schema';
 import { MasterAccountConfig } from '@/components/MasterAccountConfig';
 import { CopierManagement } from '@/components/CopierManagement';
+import { LanguageSelector } from '@/components/LanguageSelector';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function AdminPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -66,6 +68,11 @@ export default function AdminPage() {
 
   const { data: systemStats = {} } = useQuery({
     queryKey: ['/api/admin/stats'],
+    enabled: isAuthorizedAdmin,
+  });
+
+  const { data: brokerStats = [] } = useQuery({
+    queryKey: ['/api/admin/broker-stats'],
     enabled: isAuthorizedAdmin,
   });
 
@@ -307,11 +314,27 @@ export default function AdminPage() {
       </div>
 
       <div className="container mx-auto p-6 space-y-6 relative z-10">
-        <div className="mb-8">
-          <h1 className="text-5xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-            ADMIN DASHBOARD
-          </h1>
-          <div className="text-cyan-400 font-mono text-sm tracking-widest mt-2">SYSTEM CONTROL PANEL</div>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-5xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+              ADMIN DASHBOARD
+            </h1>
+            <div className="text-cyan-400 font-mono text-sm tracking-widest mt-2">SYSTEM CONTROL PANEL</div>
+          </div>
+          <div className="flex items-center gap-4">
+            <LanguageSelector />
+            <ThemeToggle />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.location.href = '/api/logout'}
+              className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono"
+              data-testid="button-logout"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              LOGOUT
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
@@ -448,6 +471,51 @@ export default function AdminPage() {
                 </CardContent>
               </Card>
             </div>
+
+            <Card className="bg-zinc-900/50 border-2 border-cyan-500/30 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="font-mono text-cyan-400">BROKER STATISTICS</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-cyan-500/30">
+                      <TableHead className="text-cyan-400 font-mono">BROKER</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">ACCOUNTS</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">TOTAL BALANCE</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">P&L</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">DEPOSITS</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">WITHDRAWALS</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(brokerStats as any[]).map((broker: any) => (
+                      <TableRow key={broker.broker} className="border-cyan-500/30 hover:bg-cyan-500/5">
+                        <TableCell className="font-mono text-white uppercase">{broker.broker}</TableCell>
+                        <TableCell className="font-mono text-white">{broker.accountCount || 0}</TableCell>
+                        <TableCell className="font-mono text-white">${broker.totalBalance?.toLocaleString() || '0'}</TableCell>
+                        <TableCell className={`font-mono ${(broker.totalPnL || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          ${broker.totalPnL?.toLocaleString() || '0'}
+                        </TableCell>
+                        <TableCell className="font-mono text-cyan-400">
+                          ${broker.totalDeposits?.toLocaleString() || '0'}
+                        </TableCell>
+                        <TableCell className="font-mono text-orange-400">
+                          ${broker.totalWithdrawals?.toLocaleString() || '0'}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {(brokerStats as any[]).length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center font-mono text-zinc-500 py-8">
+                          NO BROKER DATA AVAILABLE
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="clients" className="mt-6">
