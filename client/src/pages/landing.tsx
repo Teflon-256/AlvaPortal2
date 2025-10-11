@@ -5,7 +5,6 @@ import { ChartLine, MessageCircle, Shield, TrendingUp, Cpu, Globe, Lock } from "
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import alvaCapitalLogo from "@assets/image_1759129583507.png";
 
 export default function Landing() {
   const { t } = useTranslation();
@@ -174,14 +173,6 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="flex justify-between items-center h-16 md:h-20">
             <div className="flex items-center space-x-2 md:space-x-4 cursor-pointer group" onClick={handleGetStarted} data-testid="logo-alva-capital">
-              <div className="relative">
-                <div className="absolute inset-0 bg-cyan-500 blur-xl opacity-50 group-hover:opacity-100 transition-opacity" />
-                <img 
-                  src={alvaCapitalLogo} 
-                  alt="AlvaCapital" 
-                  className="w-8 h-8 md:w-12 md:h-12 relative z-10"
-                />
-              </div>
               <span className="text-lg md:text-2xl font-mono font-bold text-cyan-400 glitch-text-subtle">ALVA CAPITAL</span>
             </div>
             
@@ -422,7 +413,6 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-4">
-              <img src={alvaCapitalLogo} alt="AlvaCapital" className="w-10 h-10" />
               <span className="font-mono text-cyan-400">© 2025 ALVA CAPITAL</span>
             </div>
             <div className="flex items-center gap-6 font-mono text-sm text-zinc-500">

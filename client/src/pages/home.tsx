@@ -49,7 +49,6 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { TradingAccountForm } from "@/components/TradingAccountForm";
 import futuristicExchange from "@assets/generated_images/Futuristic_stock_exchange_wallpaper_8045bc0a.png";
-import alvaCapitalLogo from "@assets/image_1759129583507.png";
 
 // Form schemas
 const connectAccountSchema = z.object({
@@ -295,12 +294,6 @@ export default function Home() {
           <div className="flex justify-between items-center h-16">
             <Link href="/">
               <div className="flex items-center space-x-2 cursor-pointer">
-                <img 
-                  src={alvaCapitalLogo} 
-                  alt="AlvaCapital Logo" 
-                  className="w-8 h-8 md:w-10 md:h-10 object-contain"
-                  data-testid="logo-image"
-                />
                 <span className="text-lg md:text-2xl font-mono font-bold text-cyan-400" data-testid="nav-logo">ALVA CAPITAL</span>
               </div>
             </Link>
