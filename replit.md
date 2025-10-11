@@ -35,7 +35,9 @@ Preferred communication style: Simple, everyday language.
 - **Copy Trading Engine**: Automated scheduler for position monitoring (every 30s), weekly profit splits, instant trade replication with ratio-based sizing, and automatic profit transfers (50/50 USDT).
 - **Admin Portal**: Comprehensive futuristic cyber-themed interface for system statistics, client management (balance, P&L, account count, CSV export), withdrawal request management, broker requests, master account configuration, and copier management.
 - **Real-time Data**: Integration with Alpha Vantage API for live market prices (10 instruments, 5-minute auto-refresh).
-- **Security**: AWS EC2 proxy (static IP: 13.61.122.170:8888) for Bybit API calls to bypass geo-restrictions and enable secure features like withdrawals.
+- **Security**: 
+  - **AWS EC2 Proxy**: Static IP (13.61.122.170:8888) for Bybit API calls to bypass geo-restrictions and enable secure features like withdrawals
+  - **Two-Factor Authentication (2FA)**: TOTP-based authentication using Speakeasy library with QR code generation via QRCode library. Users can enable/disable 2FA through the Security settings page with encrypted secret storage
 
 ### Feature Specifications
 - **Portfolio Management**: Multi-broker account connection, real-time balance and P&L tracking.
