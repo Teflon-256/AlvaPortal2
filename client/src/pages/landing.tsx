@@ -189,7 +189,7 @@ export default function Landing() {
             </div>
             
             <div className="hidden md:flex items-center space-x-8 font-mono text-sm">
-              <button onClick={() => scrollToSection('protocol')} className="text-cyan-400 hover:text-cyan-300 transition-colors tracking-wider">PROTOCOL</button>
+              <button onClick={() => scrollToSection('brokers')} className="text-cyan-400 hover:text-cyan-300 transition-colors tracking-wider">BROKERS</button>
               <button onClick={() => scrollToSection('features')} className="text-cyan-400 hover:text-cyan-300 transition-colors tracking-wider">FEATURES</button>
               <button onClick={() => scrollToSection('stats')} className="text-cyan-400 hover:text-cyan-300 transition-colors tracking-wider">STATS</button>
             </div>
@@ -200,8 +200,9 @@ export default function Landing() {
               <Button 
                 onClick={handleGetStarted}
                 className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-mono font-bold tracking-wider px-6"
+                data-testid="button-sign-in"
               >
-                SIGN IN
+                CREATE ACCOUNT
               </Button>
             </div>
           </div>
@@ -258,16 +259,18 @@ export default function Landing() {
                 onClick={handleGetStarted}
                 size="lg"
                 className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-mono font-bold text-lg px-12 py-6 tracking-wider relative overflow-hidden group"
+                data-testid="button-create-account-hero"
               >
-                <span className="relative z-10">ENTER PROTOCOL</span>
+                <span className="relative z-10">CREATE ACCOUNT</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity" />
               </Button>
               
               <button 
-                onClick={() => scrollToSection('features')}
+                onClick={handleGetStarted}
                 className="border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono font-bold text-lg px-12 py-6 tracking-wider transition-all"
+                data-testid="button-sign-in-hero"
               >
-                EXPLORE FEATURES
+                SIGN IN
               </button>
             </div>
 
@@ -280,12 +283,12 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Protocol Section */}
-        <section id="protocol" className="relative py-32 px-6">
+        {/* Brokers Section */}
+        <section id="brokers" className="relative py-32 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-20">
               <h2 className="text-5xl md:text-7xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-4">
-                PROTOCOL
+                BROKERS
               </h2>
               <div className="text-cyan-400 font-mono text-lg tracking-widest">MULTI-BROKER TRADING INFRASTRUCTURE</div>
             </div>
@@ -397,8 +400,9 @@ export default function Landing() {
               onClick={handleGetStarted}
               size="lg"
               className="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 hover:from-cyan-400 hover:via-blue-400 hover:to-purple-400 text-black font-mono font-bold text-xl px-16 py-8 tracking-wider relative overflow-hidden group"
+              data-testid="button-create-account-cta"
             >
-              <span className="relative z-10">ENTER PROTOCOL NOW</span>
+              <span className="relative z-10">CREATE ACCOUNT NOW</span>
             </Button>
           </div>
         </section>
