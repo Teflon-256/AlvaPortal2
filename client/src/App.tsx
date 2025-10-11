@@ -14,6 +14,7 @@ import FAQ from "@/pages/faq";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import ProfileSetup from "@/pages/profile-setup";
+import Security from "@/pages/security";
 import "@/i18n";
 
 function Router() {
@@ -38,6 +39,7 @@ function Router() {
           {/* Main app routes */}
           <Route path="/" component={Home} />
           <Route path="/bybit" component={Bybit} />
+          <Route path="/security" component={Security} />
         </>
       )}
       <Route component={NotFound} />
