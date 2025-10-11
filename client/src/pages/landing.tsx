@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChartLine, MessageCircle, Shield, TrendingUp, Cpu, Globe, Lock } from "lucide-react";
+import { ChartLine, MessageCircle, Shield, TrendingUp, Cpu, Globe, Lock, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
