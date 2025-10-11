@@ -299,32 +299,42 @@ export default function Landing() {
                   title: "BYBIT",
                   subtitle: "Crypto Trading",
                   description: "Real-time cryptocurrency trading with instant execution and deep liquidity across spot and perpetual futures",
-                  stats: "24/7 Trading"
+                  stats: "24/7 Trading",
+                  link: "https://partner.bybit.com/b/119776"
                 },
                 {
                   icon: TrendingUp,
-                  title: "TRADEF",
+                  title: "TRADEFI",
                   subtitle: "Forex, CFDs, Indices & Stocks",
                   description: "Professional multi-asset trading platform with institutional spreads across forex, commodities, indices and global equities",
-                  stats: "150+ Markets"
+                  stats: "150+ Markets",
+                  link: "https://www.bybit.com/future-activity/en/tradfi"
                 }
               ].map((broker, idx) => (
-                <Card key={idx} className="bg-zinc-900/50 border-2 border-cyan-500/30 hover:border-cyan-500 transition-all duration-300 group backdrop-blur-sm">
-                  <CardContent className="p-6 md:p-8">
-                    <div className="mb-6">
-                      <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <broker.icon className="w-6 h-6 md:w-8 md:h-8 text-black" />
+                <a 
+                  key={idx} 
+                  href={broker.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  data-testid={`link-broker-${broker.title.toLowerCase()}`}
+                >
+                  <Card className="bg-zinc-900/50 border-2 border-cyan-500/30 hover:border-cyan-500 transition-all duration-300 group backdrop-blur-sm cursor-pointer h-full">
+                    <CardContent className="p-6 md:p-8">
+                      <div className="mb-6">
+                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                          <broker.icon className="w-6 h-6 md:w-8 md:h-8 text-black" />
+                        </div>
+                        <h3 className="text-xl md:text-2xl font-mono font-bold text-cyan-400 mb-1">{broker.title}</h3>
+                        <div className="text-xs md:text-sm font-mono text-zinc-500 tracking-wider">{broker.subtitle}</div>
                       </div>
-                      <h3 className="text-xl md:text-2xl font-mono font-bold text-cyan-400 mb-1">{broker.title}</h3>
-                      <div className="text-xs md:text-sm font-mono text-zinc-500 tracking-wider">{broker.subtitle}</div>
-                    </div>
-                    <p className="text-sm md:text-base text-zinc-400 mb-4 leading-relaxed">{broker.description}</p>
-                    <div className="flex items-center gap-2 text-cyan-400 font-mono text-xs md:text-sm">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      {broker.stats}
-                    </div>
-                  </CardContent>
-                </Card>
+                      <p className="text-sm md:text-base text-zinc-400 mb-4 leading-relaxed">{broker.description}</p>
+                      <div className="flex items-center gap-2 text-cyan-400 font-mono text-xs md:text-sm">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                        {broker.stats}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </a>
               ))}
             </div>
           </div>
