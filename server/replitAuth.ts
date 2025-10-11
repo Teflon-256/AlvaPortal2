@@ -26,11 +26,13 @@ const getOidcConfig = memoize(
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
   
-  // Use memory store temporarily until database issue is resolved
-  const memoryStore = MemoryStore(session);
-  const sessionStore = new memoryStore({
-    checkPeriod: sessionTtl,
-    ttl: sessionTtl,
+  // Use PostgreSQL for session storage
+  const pgStore = connectPg(session);
+  const sessionStore = new pgStore({
+    conString: process.env.DATABASE_URL,
+    createTableIfMissing: false,
+    ttl: sessionTtl / 1000, // Convert to seconds
+    tableName: "sessions",
   });
   
   return session({
