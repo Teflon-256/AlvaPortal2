@@ -83,7 +83,7 @@ export default function ProfileSetup() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 md:p-6 relative overflow-hidden">
       <div className="fixed inset-0 opacity-20 pointer-events-none">
         <div className="absolute inset-0" style={{
           backgroundImage: `
@@ -96,20 +96,20 @@ export default function ProfileSetup() {
       </div>
 
       <Card className="max-w-2xl w-full bg-zinc-900/50 border-2 border-cyan-500/30 backdrop-blur-sm relative z-10">
-        <CardHeader className="text-center">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center mx-auto mb-4">
-            <User className="w-8 h-8 text-black" />
+        <CardHeader className="text-center p-4 md:p-6">
+          <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center mx-auto mb-4">
+            <User className="w-6 h-6 md:w-8 md:h-8 text-black" />
           </div>
-          <CardTitle className="text-3xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+          <CardTitle className="text-2xl md:text-3xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
             COMPLETE YOUR PROFILE
           </CardTitle>
-          <CardDescription className="text-zinc-400 mt-2">
+          <CardDescription className="text-sm md:text-base text-zinc-400 mt-2">
             Please provide your information to get started with AlvaCapital
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 md:p-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
               <div className="grid md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -180,7 +180,7 @@ export default function ProfileSetup() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-mono font-bold text-lg py-6"
+                className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-mono font-bold text-base md:text-lg py-4 md:py-6"
                 disabled={updateProfileMutation.isPending}
                 data-testid="button-complete-profile"
               >

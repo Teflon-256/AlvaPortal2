@@ -297,13 +297,13 @@ export default function Home() {
                 <img 
                   src={alvaCapitalLogo} 
                   alt="AlvaCapital Logo" 
-                  className="w-10 h-10 object-contain"
+                  className="w-8 h-8 md:w-10 md:h-10 object-contain"
                   data-testid="logo-image"
                 />
-                <span className="text-2xl font-mono font-bold text-cyan-400" data-testid="nav-logo">ALVA CAPITAL</span>
+                <span className="text-lg md:text-2xl font-mono font-bold text-cyan-400" data-testid="nav-logo">ALVA CAPITAL</span>
               </div>
             </Link>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 md:space-x-4">
               {/* Only show Admin button for authorized admins */}
               {user?.email && ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'].includes(user.email) ? (
                 <Link href="/admin">
@@ -366,17 +366,17 @@ export default function Home() {
 
       {/* Dashboard Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-        <div className="mb-8">
-          <h1 className="text-3xl lg:text-4xl font-serif font-bold gradient-text mb-2 antialiased" data-testid="dashboard-title">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold gradient-text mb-2 antialiased" data-testid="dashboard-title">
             {t('welcomeBack')}, {user?.firstName || 'Trader'}
           </h1>
-          <p className="text-muted-foreground antialiased" data-testid="dashboard-subtitle">
+          <p className="text-sm md:text-base text-muted-foreground antialiased" data-testid="dashboard-subtitle">
             Advanced trading management. Simplified.
           </p>
         </div>
 
         {/* Dashboard Stats */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
           <Card className="premium-card" data-testid="stat-total-portfolio">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
@@ -446,17 +446,17 @@ export default function Home() {
           </Card>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
           {/* Connected Accounts */}
           <div className="lg:col-span-2">
             <Card className="premium-card" data-testid="connected-accounts-card">
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl font-semibold">Trading Accounts</CardTitle>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <CardTitle className="text-lg md:text-xl font-semibold">Trading Accounts</CardTitle>
                   <Link href="/bybit">
-                    <Button className="bg-primary hover:bg-primary/90" data-testid="connect-account-button">
+                    <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto text-sm md:text-base" data-testid="connect-account-button">
                       <Plus className="h-4 w-4 mr-2" />
-                      Connect Bybit Account
+                      Connect Bybit
                     </Button>
                   </Link>
                 </div>
