@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChartLine, Zap, Shield, TrendingUp, Cpu, Globe, Lock } from "lucide-react";
+import { ChartLine, MessageCircle, Shield, TrendingUp, Cpu, Globe, Lock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -12,7 +12,6 @@ export default function Landing() {
   const [loading, setLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [liveUsers, setLiveUsers] = useState(28);
-  const [soundEnabled, setSoundEnabled] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -154,23 +153,21 @@ export default function Landing() {
         }} />
       </div>
 
-      {/* Sound enable CTA */}
-      {!soundEnabled && (
-        <div 
-          className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-50 cursor-pointer"
-          onClick={() => setSoundEnabled(true)}
+      {/* Contact Support Button */}
+      <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-50">
+        <a 
+          href="https://wa.me/256726151699" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="bg-black border-2 border-cyan-500 rounded-full px-4 py-2 md:px-6 md:py-3 hover:bg-cyan-500/10 transition-colors inline-block"
+          data-testid="link-contact-support"
         >
-          <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-cyan-500 animate-ping opacity-75" />
-            <div className="relative bg-black border-2 border-cyan-500 rounded-full px-4 py-2 md:px-6 md:py-3 hover:bg-cyan-500/10 transition-colors">
-              <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 md:w-5 md:h-5 text-cyan-500" />
-                <span className="text-cyan-500 font-mono text-xs md:text-sm">Enable Sound</span>
-              </div>
-            </div>
+          <div className="flex items-center gap-2">
+            <MessageCircle className="w-4 h-4 md:w-5 md:h-5 text-cyan-500" />
+            <span className="text-cyan-500 font-mono text-xs md:text-sm">Contact Support</span>
           </div>
-        </div>
-      )}
+        </a>
+      </div>
 
       {/* Navigation */}
       <nav className="fixed top-0 w-full bg-black/80 backdrop-blur-md border-b border-cyan-500/30 z-40">
