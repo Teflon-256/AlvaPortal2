@@ -94,7 +94,7 @@ export class DatabaseStorage implements IStorage {
   async upsertUser(userData: UpsertUser): Promise<User> {
     try {
       // Check if user already exists by ID
-      const existingUser = await this.getUser(userData.id);
+      const existingUser = userData.id ? await this.getUser(userData.id) : undefined;
       
       // Generate referral code if not provided
       if (!userData.referralCode) {
@@ -514,14 +514,16 @@ export class MemoryStorage implements IStorage {
       userData.referralCode = this.generateReferralCode();
     }
 
-    const existingUser = this.users.get(userData.id);
+    const userId = userData.id || '';
+    const existingUser = this.users.get(userId);
     const user: User = {
       ...userData,
+      id: userId,
       createdAt: existingUser?.createdAt || new Date(),
       updatedAt: new Date(),
     } as User;
 
-    this.users.set(userData.id, user);
+    this.users.set(userId, user);
 
     // Create default referral links for new users
     if (!existingUser) {
@@ -552,8 +554,8 @@ export class MemoryStorage implements IStorage {
   }
 
   async updateTradingAccountBalance(accountId: string, balance: string, dailyPnL: string): Promise<void> {
-    for (const [userId, accounts] of this.tradingAccounts.entries()) {
-      const account = accounts.find(acc => acc.id === accountId);
+    for (const [userId, accounts] of Array.from(this.tradingAccounts.entries())) {
+      const account = accounts.find((acc: TradingAccount) => acc.id === accountId);
       if (account) {
         account.balance = balance;
         account.dailyPnL = dailyPnL;
@@ -625,8 +627,8 @@ export class MemoryStorage implements IStorage {
   }
 
   async updateMasterCopierStatus(connectionId: string, isActive: boolean): Promise<void> {
-    for (const [userId, connections] of this.masterCopierConnections.entries()) {
-      const connection = connections.find(conn => conn.id === connectionId);
+    for (const [userId, connections] of Array.from(this.masterCopierConnections.entries())) {
+      const connection = connections.find((conn: MasterCopierConnection) => conn.id === connectionId);
       if (connection) {
         connection.isActive = isActive;
         connection.updatedAt = new Date();
@@ -656,8 +658,8 @@ export class MemoryStorage implements IStorage {
   }
 
   async updateReferralLinkStats(linkId: string, clicks?: number, conversions?: number): Promise<void> {
-    for (const [userId, links] of this.referralLinks.entries()) {
-      const link = links.find(l => l.id === linkId);
+    for (const [userId, links] of Array.from(this.referralLinks.entries())) {
+      const link = links.find((l: ReferralLink) => l.id === linkId);
       if (link) {
         if (clicks !== undefined) {
           link.clickCount = (link.clickCount || 0) + clicks;
