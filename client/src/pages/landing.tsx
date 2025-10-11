@@ -176,7 +176,7 @@ export default function Landing() {
       <nav className="fixed top-0 w-full bg-black/80 backdrop-blur-md border-b border-cyan-500/30 z-40">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-center h-20">
-            <div className="flex items-center space-x-4 cursor-pointer group" onClick={() => window.location.href = '/'}>
+            <div className="flex items-center space-x-4 cursor-pointer group" onClick={handleGetStarted} data-testid="logo-alva-capital">
               <div className="relative">
                 <div className="absolute inset-0 bg-cyan-500 blur-xl opacity-50 group-hover:opacity-100 transition-opacity" />
                 <img 
