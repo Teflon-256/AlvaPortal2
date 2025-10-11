@@ -40,6 +40,11 @@ export default function AdminPage() {
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
   const [newStatus, setNewStatus] = useState('');
   const [adminNotes, setAdminNotes] = useState('');
+  const [editClientDialogOpen, setEditClientDialogOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<any>(null);
+  const [editFirstName, setEditFirstName] = useState('');
+  const [editLastName, setEditLastName] = useState('');
+  const [editCountry, setEditCountry] = useState('');
 
   const authorizedAdminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
   const isAuthorizedAdmin = Boolean(user?.email && authorizedAdminEmails.includes(user.email));
@@ -143,6 +148,55 @@ export default function AdminPage() {
       requestId: selectedRequest.id,
       status: newStatus,
       adminNotes: adminNotes || undefined
+    });
+  };
+
+  const updateClientMutation = useMutation({
+    mutationFn: async ({ userId, firstName, lastName, country }: { 
+      userId: string; 
+      firstName: string; 
+      lastName: string; 
+      country: string; 
+    }) => {
+      return await apiRequest('PATCH', `/api/admin/users/${userId}`, { firstName, lastName, country });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/clients'] });
+      setEditClientDialogOpen(false);
+      setSelectedClient(null);
+      setEditFirstName('');
+      setEditLastName('');
+      setEditCountry('');
+      toast({
+        title: "Success",
+        description: "Client information updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update client information",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleEditClient = (client: any) => {
+    setSelectedClient(client);
+    setEditFirstName(client.firstName || '');
+    setEditLastName(client.lastName || '');
+    setEditCountry(client.country || '');
+    setEditClientDialogOpen(true);
+  };
+
+  const handleSubmitClientUpdate = () => {
+    if (!selectedClient || !editFirstName || !editLastName || !editCountry) return;
+    
+    updateClientMutation.mutate({
+      userId: selectedClient.id,
+      firstName: editFirstName,
+      lastName: editLastName,
+      country: editCountry
     });
   };
 
@@ -413,10 +467,12 @@ export default function AdminPage() {
                     <TableRow className="border-cyan-500/30">
                       <TableHead className="text-cyan-400 font-mono">EMAIL</TableHead>
                       <TableHead className="text-cyan-400 font-mono">NAME</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">COUNTRY</TableHead>
                       <TableHead className="text-cyan-400 font-mono">ACCOUNTS</TableHead>
                       <TableHead className="text-cyan-400 font-mono">TOTAL BALANCE</TableHead>
                       <TableHead className="text-cyan-400 font-mono">P&L</TableHead>
                       <TableHead className="text-cyan-400 font-mono">STATUS</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">ACTIONS</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -424,6 +480,7 @@ export default function AdminPage() {
                       <TableRow key={client.id} className="border-cyan-500/30 hover:bg-cyan-500/5">
                         <TableCell className="font-mono text-white">{client.email}</TableCell>
                         <TableCell className="font-mono text-white">{client.firstName} {client.lastName}</TableCell>
+                        <TableCell className="font-mono text-white">{client.country || '-'}</TableCell>
                         <TableCell className="font-mono text-white">{client.accountCount || 0}</TableCell>
                         <TableCell className="font-mono text-white">${client.totalBalance?.toLocaleString() || '0'}</TableCell>
                         <TableCell className={`font-mono ${(client.totalPnL || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -431,6 +488,17 @@ export default function AdminPage() {
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className="border-green-500 text-green-400 bg-green-500/10 font-mono">ACTIVE</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditClient(client)}
+                            className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10"
+                            data-testid={`button-edit-client-${client.id}`}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -656,6 +724,72 @@ export default function AdminPage() {
                     data-testid="submit-update"
                   >
                     {updateRequestMutation.isPending ? 'UPDATING...' : 'UPDATE REQUEST'}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={editClientDialogOpen} onOpenChange={setEditClientDialogOpen}>
+          <DialogContent className="bg-zinc-900 border-2 border-cyan-500/30" data-testid="edit-client-dialog">
+            <DialogHeader>
+              <DialogTitle className="font-mono text-cyan-400">EDIT CLIENT INFORMATION</DialogTitle>
+            </DialogHeader>
+            {selectedClient && (
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="firstName" className="font-mono text-cyan-400">FIRST NAME</Label>
+                  <Input
+                    id="firstName"
+                    value={editFirstName}
+                    onChange={(e) => setEditFirstName(e.target.value)}
+                    placeholder="First name"
+                    className="bg-black border-cyan-500/30 text-white font-mono"
+                    data-testid="input-edit-firstname"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="lastName" className="font-mono text-cyan-400">LAST NAME</Label>
+                  <Input
+                    id="lastName"
+                    value={editLastName}
+                    onChange={(e) => setEditLastName(e.target.value)}
+                    placeholder="Last name"
+                    className="bg-black border-cyan-500/30 text-white font-mono"
+                    data-testid="input-edit-lastname"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="country" className="font-mono text-cyan-400">COUNTRY</Label>
+                  <Input
+                    id="country"
+                    value={editCountry}
+                    onChange={(e) => setEditCountry(e.target.value)}
+                    placeholder="Country"
+                    className="bg-black border-cyan-500/30 text-white font-mono"
+                    data-testid="input-edit-country"
+                  />
+                </div>
+                
+                <div className="flex gap-3 justify-end">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setEditClientDialogOpen(false)}
+                    className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono"
+                    data-testid="button-cancel-edit-client"
+                  >
+                    CANCEL
+                  </Button>
+                  <Button 
+                    onClick={handleSubmitClientUpdate}
+                    disabled={updateClientMutation.isPending || !editFirstName || !editLastName || !editCountry}
+                    className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-mono font-bold"
+                    data-testid="button-submit-edit-client"
+                  >
+                    {updateClientMutation.isPending ? 'UPDATING...' : 'UPDATE CLIENT'}
                   </Button>
                 </div>
               </div>
