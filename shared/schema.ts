@@ -33,7 +33,10 @@ export const users = pgTable("users", {
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
+  country: varchar("country"),
   profileImageUrl: varchar("profile_image_url"),
+  twoFactorSecret: varchar("two_factor_secret"), // For 2FA
+  twoFactorEnabled: boolean("two_factor_enabled").default(false),
   referralCode: varchar("referral_code").unique(),
   referredBy: varchar("referred_by"),
   createdAt: timestamp("created_at").defaultNow(),
