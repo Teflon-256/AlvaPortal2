@@ -833,7 +833,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastName: users.lastName,
           accountCount: sql<number>`count(${tradingAccounts.id})`,
           totalBalance: sql<number>`COALESCE(sum(${tradingAccounts.balance}), 0)`,
-          totalPnL: sql<number>`COALESCE(sum(${tradingAccounts.dailyPnL}), 0)`
+          totalPnL: sql<number>`COALESCE(sum(${tradingAccounts.dailyPnL}), 0)`,
+          totalDeposits: sql<number>`COALESCE(sum(${tradingAccounts.totalDeposits}), 0)`,
+          totalWithdrawals: sql<number>`COALESCE(sum(${tradingAccounts.totalWithdrawals}), 0)`
         })
         .from(users)
         .leftJoin(tradingAccounts, eq(users.id, tradingAccounts.userId))
@@ -843,6 +845,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching admin clients:', error);
       res.status(500).json({ message: 'Failed to fetch admin clients' });
+    }
+  });
+
+  // Admin routes - Broker statistics
+  app.get('/api/admin/broker-stats', isAuthenticated, async (req: any, res) => {
+    try {
+      const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
+      if (!adminEmails.includes(req.user.claims.email)) {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+
+      const { db } = await import('./db');
+      const { tradingAccounts } = await import('@shared/schema');
+
+      const brokerStats = await db
+        .select({
+          broker: tradingAccounts.broker,
+          accountCount: sql<number>`count(${tradingAccounts.id})`,
+          totalBalance: sql<number>`COALESCE(sum(${tradingAccounts.balance}), 0)`,
+          totalPnL: sql<number>`COALESCE(sum(${tradingAccounts.dailyPnL}), 0)`,
+          totalDeposits: sql<number>`COALESCE(sum(${tradingAccounts.totalDeposits}), 0)`,
+          totalWithdrawals: sql<number>`COALESCE(sum(${tradingAccounts.totalWithdrawals}), 0)`
+        })
+        .from(tradingAccounts)
+        .groupBy(tradingAccounts.broker);
+
+      res.json(brokerStats);
+    } catch (error) {
+      console.error('Error fetching broker stats:', error);
+      res.status(500).json({ message: 'Failed to fetch broker stats' });
     }
   });
 

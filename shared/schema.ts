@@ -52,6 +52,8 @@ export const tradingAccounts = pgTable("trading_accounts", {
   accountName: varchar("account_name"),
   balance: decimal("balance", { precision: 15, scale: 2 }).default('0.00'),
   dailyPnL: decimal("daily_pnl", { precision: 15, scale: 2 }).default('0.00'),
+  totalDeposits: decimal("total_deposits", { precision: 15, scale: 2 }).default('0.00'),
+  totalWithdrawals: decimal("total_withdrawals", { precision: 15, scale: 2 }).default('0.00'),
   copyStatus: varchar("copy_status").default('inactive'), // 'active', 'inactive', 'paused'
   isConnected: boolean("is_connected").default(true),
   apiKeyEncrypted: text("api_key_encrypted"), // Encrypted API key

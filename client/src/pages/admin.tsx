@@ -467,11 +467,11 @@ export default function AdminPage() {
                     <TableRow className="border-cyan-500/30">
                       <TableHead className="text-cyan-400 font-mono">EMAIL</TableHead>
                       <TableHead className="text-cyan-400 font-mono">NAME</TableHead>
-                      <TableHead className="text-cyan-400 font-mono">COUNTRY</TableHead>
                       <TableHead className="text-cyan-400 font-mono">ACCOUNTS</TableHead>
-                      <TableHead className="text-cyan-400 font-mono">TOTAL BALANCE</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">BALANCE</TableHead>
                       <TableHead className="text-cyan-400 font-mono">P&L</TableHead>
-                      <TableHead className="text-cyan-400 font-mono">STATUS</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">DEPOSITS</TableHead>
+                      <TableHead className="text-cyan-400 font-mono">WITHDRAWALS</TableHead>
                       <TableHead className="text-cyan-400 font-mono">ACTIONS</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -480,14 +480,16 @@ export default function AdminPage() {
                       <TableRow key={client.id} className="border-cyan-500/30 hover:bg-cyan-500/5">
                         <TableCell className="font-mono text-white">{client.email}</TableCell>
                         <TableCell className="font-mono text-white">{client.firstName} {client.lastName}</TableCell>
-                        <TableCell className="font-mono text-white">{client.country || '-'}</TableCell>
                         <TableCell className="font-mono text-white">{client.accountCount || 0}</TableCell>
                         <TableCell className="font-mono text-white">${client.totalBalance?.toLocaleString() || '0'}</TableCell>
                         <TableCell className={`font-mono ${(client.totalPnL || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                           ${client.totalPnL?.toLocaleString() || '0'}
                         </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="border-green-500 text-green-400 bg-green-500/10 font-mono">ACTIVE</Badge>
+                        <TableCell className="font-mono text-cyan-400">
+                          ${client.totalDeposits?.toLocaleString() || '0'}
+                        </TableCell>
+                        <TableCell className="font-mono text-orange-400">
+                          ${client.totalWithdrawals?.toLocaleString() || '0'}
                         </TableCell>
                         <TableCell>
                           <Button
