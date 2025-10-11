@@ -46,15 +46,13 @@ export function MasterAccountConfig() {
         transfer_user_id: data.transferUserId,
       };
 
-      return await apiRequest("/api/admin/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          settingKey: "master_bybit_config",
-          settingValue: JSON.stringify(masterConfig),
-          description: "Master Bybit account configuration for copy trading",
-        }),
+      const response = await apiRequest("POST", "/api/admin/settings", {
+        settingKey: "master_bybit_config",
+        settingValue: JSON.stringify(masterConfig),
+        description: "Master Bybit account configuration for copy trading",
       });
+
+      return await response.json();
     },
     onSuccess: () => {
       toast({
@@ -75,15 +73,13 @@ export function MasterAccountConfig() {
 
   const saveTransferUserIdMutation = useMutation({
     mutationFn: async (transferUserId: string) => {
-      return await apiRequest("/api/admin/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          settingKey: "profit_transfer_user_id",
-          settingValue: transferUserId,
-          description: "Bybit User ID for receiving 50% profit share transfers",
-        }),
+      const response = await apiRequest("POST", "/api/admin/settings", {
+        settingKey: "profit_transfer_user_id",
+        settingValue: transferUserId,
+        description: "Bybit User ID for receiving 50% profit share transfers",
       });
+
+      return await response.json();
     },
     onSuccess: () => {
       toast({
