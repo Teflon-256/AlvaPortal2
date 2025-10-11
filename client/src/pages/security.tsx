@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, ShieldCheck, Copy, CheckCircle2 } from "lucide-react";
+import { Shield, ShieldCheck, Copy, CheckCircle2, ArrowLeft } from "lucide-react";
+import { Link } from "wouter";
 import {
   Dialog,
   DialogContent,
@@ -33,7 +34,7 @@ export default function SecurityPage() {
   // Setup 2FA mutation
   const setupMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('/api/2fa/setup', {
+      const response = await apiRequest<{ qrCode: string; secret: string; manualEntry: string }>('/api/2fa/setup', {
         method: 'POST',
       });
       return response;
@@ -144,6 +145,12 @@ export default function SecurityPage() {
     <div className="min-h-screen bg-black text-white p-4 sm:p-6 md:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6 sm:mb-8">
+          <Link href="/">
+            <Button variant="ghost" className="mb-4 text-cyan-400 hover:text-cyan-300" data-testid="button-back">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </Link>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">Security Settings</h1>
           <p className="text-gray-400">Manage your account security and authentication</p>
         </div>
