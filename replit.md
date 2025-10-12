@@ -7,6 +7,13 @@ AlvaCapital is a comprehensive trading platform designed for portfolio managemen
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (October 12, 2025)
+- **2FA Testing & Demo Interface**: Added comprehensive TOTP code generator and verification tester:
+  - **`/api/generate-2fa`**: GET endpoint that returns current TOTP code with time remaining (for testing only)
+  - **`/api/verify-2fa`**: POST endpoint that verifies any 6-digit TOTP code
+  - **React Testing Component**: Interactive UI showing current code, countdown timer, and code verification tester
+  - **Auto-refresh**: Codes automatically regenerate every 30 seconds with visual countdown
+  - **Google Authenticator Compatible**: All codes follow TOTP standard (6 digits, 30-second window)
+  - **Educational Tool**: Helps users understand how 2FA works and test their authenticator app setup
 - **Data Sanitization Audit**: Removed all hardcoded/mock data from production code:
   - Eliminated fake statistics from landing page (replaced with trust messaging)
   - Removed hardcoded badges showing fake earnings (+$234.50) and referral increments (+3 this week)
