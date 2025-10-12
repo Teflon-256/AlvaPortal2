@@ -121,35 +121,41 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/logout", (req, res) => {
-    // Destroy the session completely
-    req.session.destroy((err) => {
-      if (err) {
-        console.error('Session destruction error:', err);
+    // Store the protocol and hostname before destroying session
+    const protocol = req.protocol;
+    const hostname = req.hostname;
+    
+    // Logout from passport first
+    req.logout((logoutErr) => {
+      if (logoutErr) {
+        console.error('Passport logout error:', logoutErr);
       }
       
-      // Clear all cookies including session cookie
-      const cookiesToClear = ['connect.sid', 'session', 'token', 'refresh_token', 'remember_me'];
-      cookiesToClear.forEach(cookieName => {
-        res.clearCookie(cookieName, { path: '/' });
-        res.clearCookie(cookieName, { path: '/', domain: req.hostname });
-      });
-      
-      // Set cache control headers to prevent session restoration
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, private');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-      
-      // Logout from passport
-      req.logout((logoutErr) => {
-        if (logoutErr) {
-          console.error('Passport logout error:', logoutErr);
+      // Then destroy the session
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Session destruction error:', err);
         }
         
+        // Clear session cookie only (be specific to avoid breaking OAuth flow)
+        res.clearCookie('connect.sid', { 
+          path: '/',
+          httpOnly: true,
+          secure: true
+        });
+        
+        // Set cache control headers ONLY for this logout response
+        // This prevents browser from caching the logout page
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        
         // Redirect to Replit's end session endpoint
+        // This properly terminates the OAuth session
         res.redirect(
           client.buildEndSessionUrl(config, {
             client_id: process.env.REPL_ID!,
-            post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
+            post_logout_redirect_uri: `${protocol}://${hostname}`,
           }).href
         );
       });
