@@ -424,9 +424,21 @@ export default function Landing() {
               <span className="font-mono text-cyan-400">© 2025 ALVA CAPITAL</span>
             </div>
             <div className="flex items-center gap-6 font-mono text-sm text-zinc-500">
-              <a href="#" className="hover:text-cyan-400 transition-colors">TERMS</a>
-              <a href="#" className="hover:text-cyan-400 transition-colors">PRIVACY</a>
-              <a href="#" className="hover:text-cyan-400 transition-colors">SUPPORT</a>
+              <Link href="/terms">
+                <a className="hover:text-cyan-400 transition-colors" data-testid="link-terms">TERMS</a>
+              </Link>
+              <Link href="/privacy">
+                <a className="hover:text-cyan-400 transition-colors" data-testid="link-privacy">PRIVACY</a>
+              </Link>
+              <a 
+                href="https://wa.me/256726151699" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-cyan-400 transition-colors"
+                data-testid="link-support"
+              >
+                SUPPORT
+              </a>
             </div>
           </div>
         </div>

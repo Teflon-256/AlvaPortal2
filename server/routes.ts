@@ -43,13 +43,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/profile', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { firstName, lastName, country } = req.body;
+      const { firstName, lastName, country, username, email } = req.body;
 
       const updatedUser = await storage.upsertUser({
         id: userId,
         firstName,
         lastName,
         country,
+        username,
+        email,
         updatedAt: new Date(),
       });
 

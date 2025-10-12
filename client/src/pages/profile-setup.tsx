@@ -14,6 +14,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { User, Globe } from "lucide-react";
 
 const profileSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters").optional(),
+  email: z.string().email("Invalid email address").optional(),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   country: z.string().min(1, "Country is required"),
@@ -41,6 +43,8 @@ export default function ProfileSetup() {
   const form = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
+      username: user?.username || "",
+      email: user?.email || "",
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",
       country: user?.country || "",
@@ -50,6 +54,8 @@ export default function ProfileSetup() {
   useEffect(() => {
     if (user) {
       form.reset({
+        username: user.username || "",
+        email: user.email || "",
         firstName: user.firstName || "",
         lastName: user.lastName || "",
         country: user.country || "",
@@ -110,6 +116,45 @@ export default function ProfileSetup() {
         <CardContent className="p-4 md:p-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-cyan-400 font-mono">Username (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Choose a username"
+                        className="bg-zinc-800/50 border-cyan-500/30 focus:border-cyan-500"
+                        data-testid="input-username"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-cyan-400 font-mono">Email (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="email"
+                        placeholder="Enter your email"
+                        className="bg-zinc-800/50 border-cyan-500/30 focus:border-cyan-500"
+                        data-testid="input-email"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <div className="grid md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
