@@ -32,7 +32,14 @@ Preferred communication style: Simple, everyday language.
 - **Multi-Broker Integration**: 
   - **Bybit**: Primary connector for cryptocurrency trading (spot, futures, wallet management, positions, orders, profit split)
   - **TradeF**: Multi-asset trading platform for forex, CFDs, indices, and stocks
-- **Copy Trading Engine**: Automated scheduler for position monitoring (every 30s), weekly profit splits, instant trade replication with ratio-based sizing, and automatic profit transfers (50/50 USDT).
+- **Copy Trading Engine V2**: 
+  - **WebSocket Trade Detection**: Real-time monitoring of master account trades via Bybit WebSocket
+  - **Async Task Queue**: Non-blocking trade replication with priority queue and retry logic
+  - **API Key Validation**: Secure validation via Bybit `/v5/account/info` endpoint
+  - **Risk Management**: Per-user slippage tolerance, position limits, and ratio-based position sizing
+  - **Trade Mirroring**: Automatic replication of master trades to all active copiers with configurable settings
+  - **Comprehensive Logging**: Trade mirroring log, sync status tracking, and task queue monitoring
+  - **Scheduler**: Automated position sync (every 30s) and weekly profit splits (50/50 USDT)
 - **Admin Portal**: Comprehensive futuristic cyber-themed interface for system statistics, client management (balance, P&L, account count, CSV export), withdrawal request management, broker requests, master account configuration, and copier management.
 - **Real-time Data**: Integration with Alpha Vantage API for live market prices (10 instruments, 5-minute auto-refresh).
 - **Security**: 
@@ -48,9 +55,23 @@ Preferred communication style: Simple, everyday language.
 - **Withdrawal Management**: Workflow for client withdrawal requests with admin approval/rejection.
 
 ### System Design Choices
-- **Database Schema**: Comprehensive schema including users, trading accounts, referral system, master-copier connections, sessions, algorithms, signals, trades, positions, risk parameters, broker configurations, withdrawal requests, and performance analytics.
+- **Database Schema**: Comprehensive schema including:
+  - Core: users, trading accounts, referral system, master-copier connections, sessions
+  - Copy Trading V2: copierSettings, syncStatus, tradeMirroringLog, copyTradingTasks
+  - Trading: algorithms, signals, trades, positions, risk parameters
+  - Admin: broker configurations, withdrawal requests, performance analytics, action logs
 - **Modularity**: Consistent interface design for all broker connectors.
 - **Scalability**: Utilizes serverless PostgreSQL (Neon Database) with connection pooling.
+
+### Copy Trading REST API Endpoints
+- `POST /api/copy-trading/validate-key` - Validate Bybit API key via account info endpoint
+- `POST /api/copy-trading/register-copier` - Submit copier API keys and settings with validation
+- `GET /api/copy-trading/sync-status/:accountId` - Get WebSocket sync status for account
+- `GET /api/copy-trading/mirror-history/:accountId` - Retrieve trade mirroring history
+- `GET /api/copy-trading/tasks/:accountId` - Get pending/completed task queue items
+- `PATCH /api/copy-trading/settings/:accountId` - Update copier risk settings
+- `GET /api/copy-trading/settings/:accountId` - Get current copier settings
+- `GET /api/admin/copy-trading/tasks` - Admin endpoint for all copy trading tasks
 
 ## External Dependencies
 
