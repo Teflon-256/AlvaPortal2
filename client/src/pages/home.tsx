@@ -418,9 +418,6 @@ export default function Home() {
                 <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
                   <Users className="text-blue-400 h-6 w-6" />
                 </div>
-                <Badge variant="secondary" className="text-blue-400">
-                  +3 this week
-                </Badge>
               </div>
               <div className="text-2xl font-bold mb-1" data-testid="referral-count">
                 {dashboardData?.referralCount || 0}
@@ -435,9 +432,6 @@ export default function Home() {
                 <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
                   <DollarSign className="text-purple-400 h-6 w-6" />
                 </div>
-                <Badge variant="secondary" className="text-purple-400">
-                  +$234.50
-                </Badge>
               </div>
               <div className="text-2xl font-bold mb-1" data-testid="referral-earnings">
                 ${dashboardData?.referralEarnings || '0.00'}
