@@ -5,6 +5,7 @@ import { ChartLine, MessageCircle, Shield, TrendingUp, Cpu, Globe, Lock, Zap } f
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { Link } from "wouter";
 
 export default function Landing() {
   const { t } = useTranslation();
