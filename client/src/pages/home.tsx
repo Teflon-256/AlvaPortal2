@@ -298,6 +298,20 @@ export default function Home() {
               </div>
             </Link>
             <div className="flex items-center space-x-2 md:space-x-4">
+              {/* Copy Trading Link */}
+              <Link href="/copy-trading">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono"
+                  data-testid="copy-trading-link"
+                >
+                  <Bot className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">COPY TRADING</span>
+                  <span className="sm:hidden">COPY</span>
+                </Button>
+              </Link>
+
               {/* Only show Admin button for authorized admins */}
               {user?.email && ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'].includes(user.email) ? (
                 <Link href="/admin">
