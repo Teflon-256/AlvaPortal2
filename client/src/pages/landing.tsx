@@ -374,24 +374,16 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Stats Section */}
+        {/* Trust Section */}
         <section id="stats" className="relative py-32 px-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid md:grid-cols-4 gap-8 text-center">
-              {[
-                { value: "50M+", label: "DAILY VOLUME" },
-                { value: "10K+", label: "ACTIVE TRADERS" },
-                { value: "99.9%", label: "UPTIME" },
-                { value: "24/7", label: "SUPPORT" }
-              ].map((stat, idx) => (
-                <div key={idx} className="border border-cyan-500/30 bg-zinc-900/50 backdrop-blur-sm p-8">
-                  <div className="text-5xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
-                    {stat.value}
-                  </div>
-                  <div className="text-cyan-400 font-mono text-sm tracking-widest">{stat.label}</div>
-                </div>
-              ))}
-            </div>
+          <div className="max-w-7xl mx-auto text-center">
+            <h2 className="text-4xl md:text-6xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-8">
+              ENTERPRISE-GRADE PLATFORM
+            </h2>
+            <p className="text-xl text-zinc-400 max-w-3xl mx-auto leading-relaxed">
+              Built with institutional-grade security, real-time execution, and professional support. 
+              Your trading operations are backed by cutting-edge technology and unwavering reliability.
+            </p>
           </div>
         </section>
 
