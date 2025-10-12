@@ -6,40 +6,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Users, Activity, DollarSign, TrendingUp } from "lucide-react";
 
 export function CopierManagement() {
-  const { data: users, isLoading } = useQuery({
+  const { data: copiers, isLoading } = useQuery<any[]>({
     queryKey: ["/api/admin/copiers"],
     refetchInterval: 30000,
   });
 
-  // Mock data for development - replace with real API when available
-  const copiers = [
-    {
-      id: "1",
-      email: "user1@example.com",
-      tradingCapital: "5000.00",
-      maxRisk: "2.00",
-      copyStatus: "active",
-      currentBalance: "5250.00",
-      totalPnL: "250.00",
-      connectedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-      id: "2",
-      email: "user2@example.com",
-      tradingCapital: "10000.00",
-      maxRisk: "1.50",
-      copyStatus: "active",
-      currentBalance: "10450.00",
-      totalPnL: "450.00",
-      connectedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-  ];
-
+  // Calculate stats from real backend data
+  const realCopiers = copiers || [];
   const stats = {
-    totalCopiers: copiers.length,
-    activeCopiers: copiers.filter(c => c.copyStatus === 'active').length,
-    totalCapital: copiers.reduce((sum, c) => sum + parseFloat(c.tradingCapital), 0).toFixed(2),
-    totalPnL: copiers.reduce((sum, c) => sum + parseFloat(c.totalPnL), 0).toFixed(2),
+    totalCopiers: realCopiers.length,
+    activeCopiers: realCopiers.filter((c: any) => c.copyStatus === 'active').length,
+    totalCapital: realCopiers.reduce((sum: number, c: any) => sum + parseFloat(c.tradingCapital || '0'), 0).toFixed(2),
+    totalPnL: realCopiers.reduce((sum: number, c: any) => sum + parseFloat(c.totalPnL || '0'), 0).toFixed(2),
   };
 
   return (
@@ -122,7 +100,7 @@ export function CopierManagement() {
         <CardContent>
           {isLoading ? (
             <Skeleton className="h-64" />
-          ) : copiers.length > 0 ? (
+          ) : realCopiers.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -136,14 +114,14 @@ export function CopierManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {copiers.map((copier, index) => {
-                  const pnl = parseFloat(copier.totalPnL);
+                {realCopiers.map((copier: any, index: number) => {
+                  const pnl = parseFloat(copier.totalPnL || '0');
                   return (
                     <TableRow key={copier.id} data-testid={`row-copier-${index}`}>
-                      <TableCell className="font-medium">{copier.email}</TableCell>
-                      <TableCell>${parseFloat(copier.tradingCapital).toLocaleString()}</TableCell>
-                      <TableCell>{copier.maxRisk}%</TableCell>
-                      <TableCell>${parseFloat(copier.currentBalance).toLocaleString()}</TableCell>
+                      <TableCell className="font-medium">{copier.email || 'N/A'}</TableCell>
+                      <TableCell>${parseFloat(copier.tradingCapital || '0').toLocaleString()}</TableCell>
+                      <TableCell>{copier.maxRisk || '0'}%</TableCell>
+                      <TableCell>${parseFloat(copier.currentBalance || '0').toLocaleString()}</TableCell>
                       <TableCell className={pnl >= 0 ? "text-green-500" : "text-red-500"}>
                         {pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}
                       </TableCell>
@@ -152,11 +130,11 @@ export function CopierManagement() {
                           variant={copier.copyStatus === 'active' ? 'default' : 'secondary'}
                           data-testid={`badge-status-${index}`}
                         >
-                          {copier.copyStatus}
+                          {copier.copyStatus || 'inactive'}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {new Date(copier.connectedAt).toLocaleDateString()}
+                        {copier.connectedAt ? new Date(copier.connectedAt).toLocaleDateString() : 'N/A'}
                       </TableCell>
                     </TableRow>
                   );
