@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, ShieldCheck, Copy, CheckCircle2, ArrowLeft } from "lucide-react";
+import { Shield, ShieldCheck, Copy, CheckCircle2, ArrowLeft, Eye, EyeOff, Smartphone } from "lucide-react";
 import { Link } from "wouter";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -31,13 +32,15 @@ export default function SecurityPage() {
     queryKey: ['/api/auth/user'],
   });
 
+  const userData = user as any;
+
   // Setup 2FA mutation
   const setupMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/2fa/setup');
+      const response = await apiRequest('POST', '/api/2fa/setup') as any;
       return response;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setQrCode(data.qrCode);
       setSecret(data.secret);
       setSetupDialogOpen(true);
@@ -148,7 +151,7 @@ export default function SecurityPage() {
         <Card className="bg-zinc-900 border-zinc-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              {user?.twoFactorEnabled ? (
+              {userData?.twoFactorEnabled ? (
                 <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-green-500" />
               ) : (
                 <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
@@ -160,7 +163,7 @@ export default function SecurityPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {user?.twoFactorEnabled ? (
+            {userData?.twoFactorEnabled ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-2 p-3 sm:p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
                   <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
@@ -202,11 +205,26 @@ export default function SecurityPage() {
             <DialogHeader>
               <DialogTitle>Setup Two-Factor Authentication</DialogTitle>
               <DialogDescription className="text-gray-400">
-                Scan the QR code with your authenticator app
+                Open your authenticator app to scan the QR code below
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-6">
+              {/* Supported Apps */}
+              <div className="p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-lg">
+                <p className="text-sm text-gray-300 mb-2 flex items-center gap-2">
+                  <Smartphone className="w-4 h-4 text-cyan-400" />
+                  Supported Authenticator Apps:
+                </p>
+                <ul className="text-xs text-gray-400 space-y-1 ml-6 list-disc">
+                  <li>Google Authenticator (Android, iOS)</li>
+                  <li>Microsoft Authenticator (Android, iOS)</li>
+                  <li>Authy (Android, iOS, Desktop)</li>
+                  <li>1Password (Cross-platform)</li>
+                  <li>Any TOTP-compatible app</li>
+                </ul>
+              </div>
+
               {/* QR Code */}
               <div className="flex justify-center p-4 bg-white rounded-lg">
                 {qrCode && <img src={qrCode} alt="2FA QR Code" className="w-48 h-48" data-testid="img-2fa-qr" />}
@@ -328,6 +346,59 @@ export default function SecurityPage() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Privacy Preferences Card */}
+        <Card className="bg-zinc-900 border-zinc-800 mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <Eye className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
+              Privacy Settings
+            </CardTitle>
+            <CardDescription>
+              Control how your account information is displayed
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between p-4 border border-zinc-800 rounded-lg">
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  {userData?.balancesHidden ? (
+                    <EyeOff className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <Eye className="w-5 h-5 text-cyan-400" />
+                  )}
+                  <Label htmlFor="hide-balances" className="font-medium cursor-pointer">
+                    Hide Balances
+                  </Label>
+                </div>
+                <p className="text-sm text-gray-400 mt-1">
+                  Replace all balance amounts with ****
+                </p>
+              </div>
+              <Switch
+                id="hide-balances"
+                checked={userData?.balancesHidden || false}
+                onCheckedChange={async (checked) => {
+                  try {
+                    await apiRequest('PATCH', '/api/preferences', { balancesHidden: checked });
+                    queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+                    toast({
+                      title: "Preferences Updated",
+                      description: checked ? "Balances are now hidden" : "Balances are now visible",
+                    });
+                  } catch (error) {
+                    toast({
+                      title: "Error",
+                      description: "Failed to update preference",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                data-testid="switch-hide-balances"
+              />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

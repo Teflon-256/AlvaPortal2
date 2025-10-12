@@ -563,6 +563,31 @@ export class MemoryStorage implements IStorage {
     return user;
   }
 
+  async updateUserActivity(userId: string): Promise<void> {
+    const user = this.users.get(userId);
+    if (user) {
+      user.lastActivityAt = new Date();
+      this.users.set(userId, user);
+    }
+  }
+
+  async updateUserPreferences(userId: string, preferences: { balancesHidden?: boolean; sessionTimeout?: number; biometricEnabled?: boolean }): Promise<void> {
+    const user = this.users.get(userId);
+    if (user) {
+      if (preferences.balancesHidden !== undefined) {
+        user.balancesHidden = preferences.balancesHidden;
+      }
+      if (preferences.sessionTimeout !== undefined) {
+        user.sessionTimeout = preferences.sessionTimeout;
+      }
+      if (preferences.biometricEnabled !== undefined) {
+        user.biometricEnabled = preferences.biometricEnabled;
+      }
+      user.updatedAt = new Date();
+      this.users.set(userId, user);
+    }
+  }
+
   // Trading account operations
   async getTradingAccounts(userId: string): Promise<TradingAccount[]> {
     return this.tradingAccounts.get(userId) || [];
