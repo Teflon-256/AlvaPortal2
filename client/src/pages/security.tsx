@@ -38,14 +38,17 @@ export default function SecurityPage() {
   const setupMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest('POST', '/api/2fa/setup') as any;
+      console.log('2FA setup response:', response);
       return response;
     },
     onSuccess: (data: any) => {
+      console.log('2FA setup success - QR code length:', data.qrCode?.length, 'Secret:', data.secret);
       setQrCode(data.qrCode);
       setSecret(data.secret);
       setSetupDialogOpen(true);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('2FA setup error:', error);
       toast({
         title: "Error",
         description: "Failed to setup 2FA. Please try again.",
@@ -227,7 +230,26 @@ export default function SecurityPage() {
 
               {/* QR Code */}
               <div className="flex justify-center p-4 bg-white rounded-lg">
-                {qrCode && <img src={qrCode} alt="2FA QR Code" className="w-48 h-48" data-testid="img-2fa-qr" />}
+                {qrCode ? (
+                  <img 
+                    src={qrCode} 
+                    alt="2FA QR Code" 
+                    className="w-48 h-48" 
+                    data-testid="img-2fa-qr"
+                    onError={(e) => {
+                      console.error('QR code failed to load:', e);
+                      toast({
+                        title: "QR Code Error",
+                        description: "Failed to load QR code. Please use the manual entry key below.",
+                        variant: "destructive"
+                      });
+                    }}
+                  />
+                ) : (
+                  <div className="w-48 h-48 flex items-center justify-center text-gray-400">
+                    Loading QR code...
+                  </div>
+                )}
               </div>
 
               {/* Manual Entry */}
