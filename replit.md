@@ -68,7 +68,14 @@ Preferred communication style: Simple, everyday language.
 - **Real-time Data**: Integration with Alpha Vantage API for live market prices (10 instruments, 5-minute auto-refresh).
 - **Security**: 
   - **AWS EC2 Proxy**: Static IP (13.61.122.170:8888) for Bybit API calls to bypass geo-restrictions and enable secure features like withdrawals
-  - **Two-Factor Authentication (2FA)**: TOTP-based authentication using Speakeasy library with QR code generation via QRCode library. Users can enable/disable 2FA through the Security settings page with encrypted secret storage
+  - **Two-Factor Authentication (2FA)**: 
+    - **TOTP Implementation**: Standards-compliant TOTP using Speakeasy library
+    - **QR Code Generation**: Automatic QR code generation via QRCode library for easy setup
+    - **Secure Storage**: 2FA secrets encrypted using AES-256-GCM before database storage
+    - **Multi-App Support**: Compatible with Google Authenticator, Microsoft Authenticator, Authy, 1Password, and any TOTP app
+    - **User Flow**: Enable/disable 2FA through Security settings page with verification
+    - **Manual Fallback**: Manual secret key entry available if QR code scanning fails
+    - **Session Integration**: 2FA verification required flag stored in session for sensitive operations
   - **Comprehensive Logout**: Complete session termination clearing all server-side sessions, client-side storage (localStorage, sessionStorage, IndexedDB, service worker caches), cookies (connect.sid, session, token, refresh_token, remember_me), and cache-control headers to prevent back button session restoration. Implements TanStack Query cache invalidation and OAuth provider logout redirect
 
 ### Feature Specifications
