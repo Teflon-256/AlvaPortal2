@@ -11,6 +11,7 @@ import { CopyTradingSettings } from "@/components/CopyTradingSettings";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import alvaCapitalLogo from "@assets/image_1759129583507.png";
+import { performLogout } from "@/lib/logout";
 
 export default function BybitPage() {
   const { user } = useAuth();
@@ -26,7 +27,7 @@ export default function BybitPage() {
   );
 
   const handleLogout = () => {
-    window.location.href = "/api/logout";
+    performLogout();
   };
 
   return (

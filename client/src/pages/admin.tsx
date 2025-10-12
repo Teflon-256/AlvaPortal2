@@ -29,6 +29,7 @@ import { useState } from 'react';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { performLogout } from '@/lib/logout';
 import type { BrokerRequest, WithdrawalRequest, TradingAccount } from '@shared/schema';
 import { MasterAccountConfig } from '@/components/MasterAccountConfig';
 import { CopierManagement } from '@/components/CopierManagement';
@@ -327,7 +328,7 @@ export default function AdminPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => window.location.href = '/api/logout'}
+              onClick={() => performLogout()}
               className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono"
               data-testid="button-logout"
             >
