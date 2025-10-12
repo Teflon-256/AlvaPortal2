@@ -89,6 +89,16 @@ export class BybitService {
     });
   }
 
+  async getAccountInfo(): Promise<any> {
+    try {
+      const response = await this.client.getAccountInfo();
+      return response.result;
+    } catch (error: any) {
+      console.error('Bybit getAccountInfo error:', error.message);
+      throw new Error(`Failed to fetch account info: ${error.message}`);
+    }
+  }
+
   async getWalletBalance(accountType: 'UNIFIED' | 'CONTRACT' = 'UNIFIED'): Promise<BybitBalance[]> {
     try {
       const response = await this.client.getWalletBalance({ accountType });
