@@ -605,12 +605,12 @@ export default function Home() {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Performance</span>
+                    <span className="text-muted-foreground">Daily P&L</span>
                     <span 
-                      className={`font-medium ${parseFloat(dashboardData?.performancePercentage || '0') >= 0 ? 'text-green-400' : 'text-red-400'}`} 
+                      className={`font-medium ${parseFloat(dashboardData?.dailyPnL || '0') >= 0 ? 'text-green-400' : 'text-red-400'}`} 
                       data-testid="copier-performance"
                     >
-                      {parseFloat(dashboardData?.performancePercentage || '0') >= 0 ? '+' : ''}{dashboardData?.performancePercentage || '0.00'}%
+                      {parseFloat(dashboardData?.dailyPnL || '0') >= 0 ? '+' : ''}${dashboardData?.dailyPnL || '0.00'}
                     </span>
                   </div>
                 </div>
