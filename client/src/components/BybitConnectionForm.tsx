@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, Key, BookOpen, ChevronLeft, ChevronRight, X, AlertCircle, Info, Copy, Check } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const bybitConnectionSchema = z.object({
   apiKey: z.string().min(1, "API Key is required"),
@@ -225,10 +226,10 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
                   data-testid="button-connect-bybit"
                 >
                   {connectMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Connecting...
-                    </>
+                    <div className="flex items-center gap-2">
+                      <LoadingSpinner size="sm" />
+                      <span>Connecting...</span>
+                    </div>
                   ) : (
                     "Connect Bybit Account"
                   )}

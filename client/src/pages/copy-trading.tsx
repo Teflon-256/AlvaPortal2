@@ -30,6 +30,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const apiKeySchema = z.object({
   tradingAccountId: z.string().min(1, "Please select a trading account"),
@@ -466,10 +467,10 @@ export default function CopyTrading() {
                         data-testid="button-validate"
                       >
                         {validating ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Validating...
-                          </>
+                          <div className="flex items-center gap-2">
+                            <LoadingSpinner size="sm" />
+                            <span>Validating...</span>
+                          </div>
                         ) : (
                           "Validate API Key"
                         )}
@@ -481,10 +482,10 @@ export default function CopyTrading() {
                         data-testid="button-register"
                       >
                         {registerMutation.isPending ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Registering...
-                          </>
+                          <div className="flex items-center gap-2">
+                            <LoadingSpinner size="sm" />
+                            <span>Registering...</span>
+                          </div>
                         ) : (
                           "Register as Copier"
                         )}
