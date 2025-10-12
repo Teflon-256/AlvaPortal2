@@ -271,37 +271,37 @@ export default function CopyTrading() {
         </div>
       </nav>
 
-      <div className="container mx-auto py-8 px-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+      <div className="container mx-auto py-4 sm:py-8 px-3 sm:px-4">
+        <div className="mb-4 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
             Copy Trading
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Mirror trades from master accounts automatically with advanced risk management
           </p>
         </div>
 
-        <Tabs defaultValue="setup" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="setup" data-testid="tab-setup">
-              <Settings className="w-4 h-4 mr-2" />
-              Setup
+        <Tabs defaultValue="setup" className="space-y-4 md:space-y-6">
+          <TabsList className="w-full grid grid-cols-5 md:inline-flex md:w-auto overflow-x-auto">
+            <TabsTrigger value="setup" data-testid="tab-setup" className="text-xs sm:text-sm whitespace-nowrap">
+              <Settings className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Setup</span>
             </TabsTrigger>
-            <TabsTrigger value="status" data-testid="tab-status">
-              <Activity className="w-4 h-4 mr-2" />
-              Status
+            <TabsTrigger value="status" data-testid="tab-status" className="text-xs sm:text-sm whitespace-nowrap">
+              <Activity className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Status</span>
             </TabsTrigger>
-            <TabsTrigger value="settings" data-testid="tab-settings">
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
+            <TabsTrigger value="settings" data-testid="tab-settings" className="text-xs sm:text-sm whitespace-nowrap">
+              <Settings className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Settings</span>
             </TabsTrigger>
-            <TabsTrigger value="history" data-testid="tab-history">
-              <History className="w-4 h-4 mr-2" />
-              History
+            <TabsTrigger value="history" data-testid="tab-history" className="text-xs sm:text-sm whitespace-nowrap">
+              <History className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+              <span className="hidden sm:inline">History</span>
             </TabsTrigger>
-            <TabsTrigger value="tasks" data-testid="tab-tasks">
-              <ListTodo className="w-4 h-4 mr-2" />
-              Tasks
+            <TabsTrigger value="tasks" data-testid="tab-tasks" className="text-xs sm:text-sm whitespace-nowrap">
+              <ListTodo className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Tasks</span>
             </TabsTrigger>
           </TabsList>
 

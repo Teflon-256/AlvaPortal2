@@ -313,15 +313,15 @@ export default function AdminPage() {
         }} />
       </div>
 
-      <div className="container mx-auto p-6 space-y-6 relative z-10">
-        <div className="mb-8 flex items-center justify-between">
+      <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 relative z-10">
+        <div className="mb-4 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-5xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
               ADMIN DASHBOARD
             </h1>
-            <div className="text-cyan-400 font-mono text-sm tracking-widest mt-2">SYSTEM CONTROL PANEL</div>
+            <div className="text-cyan-400 font-mono text-xs sm:text-sm tracking-widest mt-1 sm:mt-2">SYSTEM CONTROL PANEL</div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <LanguageSelector />
             <ThemeToggle />
             <Button
@@ -338,34 +338,36 @@ export default function AdminPage() {
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-6 bg-zinc-900/50 border-2 border-cyan-500/30 p-1">
-            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-overview">
-              <BarChart3 className="w-4 h-4" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="clients" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-clients">
-              <Users className="w-4 h-4" />
-              Clients
-              <Badge variant="secondary" className="ml-1 bg-cyan-500 text-black">{(allClients as any[]).length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="withdrawals" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-withdrawals">
-              <Wallet className="w-4 h-4" />
-              Withdrawals
-              <Badge variant="secondary" className="ml-1 bg-cyan-500 text-black">{(withdrawalRequests as any[]).filter((r: any) => r.status === 'pending').length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="broker-requests" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-broker-requests">
-              <FileText className="w-4 h-4" />
-              Brokers
-            </TabsTrigger>
-            <TabsTrigger value="master-account" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-master-account">
-              <Key className="w-4 h-4" />
-              Master
-            </TabsTrigger>
-            <TabsTrigger value="copiers" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono" data-testid="tab-copiers">
-              <Activity className="w-4 h-4" />
-              Copy Trading
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
+            <TabsList className="inline-flex w-auto min-w-full sm:w-full bg-zinc-900/50 border-2 border-cyan-500/30 p-1">
+              <TabsTrigger value="overview" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3" data-testid="tab-overview">
+                <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Overview</span>
+              </TabsTrigger>
+              <TabsTrigger value="clients" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3" data-testid="tab-clients">
+                <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Clients</span>
+                <Badge variant="secondary" className="ml-1 bg-cyan-500 text-black text-xs">{(allClients as any[]).length}</Badge>
+              </TabsTrigger>
+              <TabsTrigger value="withdrawals" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3" data-testid="tab-withdrawals">
+                <Wallet className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Withdraw</span>
+                <Badge variant="secondary" className="ml-1 bg-cyan-500 text-black text-xs">{(withdrawalRequests as any[]).filter((r: any) => r.status === 'pending').length}</Badge>
+              </TabsTrigger>
+              <TabsTrigger value="broker-requests" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3" data-testid="tab-broker-requests">
+                <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Brokers</span>
+              </TabsTrigger>
+              <TabsTrigger value="master-account" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3" data-testid="tab-master-account">
+                <Key className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Master</span>
+              </TabsTrigger>
+              <TabsTrigger value="copiers" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-black font-mono text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3" data-testid="tab-copiers">
+                <Activity className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Copy</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview" className="mt-6 space-y-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
