@@ -13,7 +13,13 @@ Preferred communication style: Simple, everyday language.
   - Replaced mock copier data with real backend API integration
   - Verified no test emails, usernames, or credentials in codebase
   - All data fields now bound to live backend or gracefully hidden when unavailable
-- **Comprehensive Logout Mechanism**: Implemented complete session termination with server-side session destruction, client-side storage clearing (localStorage, sessionStorage, IndexedDB, caches), cookie removal, and cache-control headers to prevent session restoration via back button
+- **Fixed Login/Logout Flow**: Complete authentication cycle improvements:
+  - **Client-side logout**: Selective storage clearing (only auth-related data, preserves user preferences like theme)
+  - **Server-side logout**: Proper session destruction with targeted cookie clearing (connect.sid only)
+  - **Cache headers**: Applied to logout/login/callback routes to prevent caching issues
+  - **Session activity fix**: Activity timestamp updated before checking timeout to prevent immediate expiration on fresh login
+  - **OAuth preservation**: Removed aggressive IndexedDB/cache clearing that interfered with OAuth flow
+  - **Re-login enabled**: Users can now successfully log back in immediately after logout
 - **Enhanced 2FA Setup UI**: Added comprehensive authenticator app support list (Google Authenticator, Microsoft Authenticator, Authy, 1Password, any TOTP app) with improved setup dialog flow
 - **Balance Hiding Feature**: Implemented privacy toggle in Security Settings allowing users to hide all balance amounts (displays **** when enabled) with persistent storage in userPreferences
 - **Security Page Enhancements**: Added Privacy Settings card with balance visibility toggle, improved 2FA dialog with supported apps information
