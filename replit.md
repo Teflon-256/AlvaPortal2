@@ -7,6 +7,12 @@ AlvaCapital is a comprehensive trading platform designed for portfolio managemen
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (October 12, 2025)
+- **Data Sanitization Audit**: Removed all hardcoded/mock data from production code:
+  - Eliminated fake statistics from landing page (replaced with trust messaging)
+  - Removed hardcoded badges showing fake earnings (+$234.50) and referral increments (+3 this week)
+  - Replaced mock copier data with real backend API integration
+  - Verified no test emails, usernames, or credentials in codebase
+  - All data fields now bound to live backend or gracefully hidden when unavailable
 - **Comprehensive Logout Mechanism**: Implemented complete session termination with server-side session destruction, client-side storage clearing (localStorage, sessionStorage, IndexedDB, caches), cookie removal, and cache-control headers to prevent session restoration via back button
 - **Enhanced 2FA Setup UI**: Added comprehensive authenticator app support list (Google Authenticator, Microsoft Authenticator, Authy, 1Password, any TOTP app) with improved setup dialog flow
 - **Balance Hiding Feature**: Implemented privacy toggle in Security Settings allowing users to hide all balance amounts (displays **** when enabled) with persistent storage in userPreferences
