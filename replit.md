@@ -73,6 +73,36 @@ Preferred communication style: Simple, everyday language.
 - `GET /api/copy-trading/settings/:accountId` - Get current copier settings
 - `GET /api/admin/copy-trading/tasks` - Admin endpoint for all copy trading tasks
 
+### Copy Trading Frontend UI
+- **Page Route**: `/copy-trading` (protected, requires authentication)
+- **Navigation**: "COPY TRADING" button in main dashboard header (visible to all authenticated users)
+- **5 Main Tabs**:
+  1. **Setup Tab**: API key submission form with:
+     - Trading account selector
+     - Bybit API key/secret inputs (password fields, encrypted storage)
+     - Risk settings: slippage tolerance, max position size, copy ratio
+     - "Validate API Key" button (calls `/v5/account/info`)
+     - "Register as Copier" button (submits to backend)
+  2. **Status Tab**: Real-time sync monitoring:
+     - Account selector dropdown
+     - WebSocket connection status (Connected/Disconnected badge)
+     - Sync method, status, last sync time, last error display
+     - Refresh button for manual status update
+  3. **Settings Tab**: Risk management controls:
+     - Slippage tolerance slider (0-10%)
+     - Max position size input (USDT)
+     - Copy ratio slider (0-100%)
+     - Update settings button
+  4. **History Tab**: Trade mirroring log viewer:
+     - Account selector
+     - Sortable table: Time, Symbol, Side, Size, Price, Status
+     - Success/Failed badges with icons
+     - Last 50 trades (configurable)
+  5. **Tasks Tab**: Task queue dashboard:
+     - Account selector
+     - Task table: Time, Type, Symbol, Status, Priority, Retries
+     - Status badges: Completed/Failed/Pending
+
 ## External Dependencies
 
 ### Database & Infrastructure
