@@ -180,25 +180,28 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  // Check session timeout based on user's last activity
+  // Update last activity timestamp first, then check session timeout
   const userId = user.claims?.sub;
   if (userId) {
     try {
+      // Update activity timestamp immediately
+      await storage.updateUserActivity(userId);
+      
+      // Get fresh user data with updated timestamp
       const dbUser = await storage.getUser(userId);
-      if (dbUser) {
+      if (dbUser && dbUser.lastActivityAt) {
         const sessionTimeout = (dbUser.sessionTimeout || 15) * 60 * 1000; // Convert minutes to ms
-        const lastActivity = dbUser.lastActivityAt ? new Date(dbUser.lastActivityAt).getTime() : Date.now();
+        const lastActivity = new Date(dbUser.lastActivityAt).getTime();
         const timeSinceActivity = Date.now() - lastActivity;
 
+        // Only check timeout if session has a valid lastActivityAt and enough time has passed
         if (timeSinceActivity > sessionTimeout) {
           return res.status(401).json({ message: "Session expired due to inactivity" });
         }
-
-        // Update last activity timestamp
-        await storage.updateUserActivity(userId);
       }
     } catch (error) {
       console.error('Error checking session activity:', error);
+      // Don't fail authentication if activity tracking fails
     }
   }
 
