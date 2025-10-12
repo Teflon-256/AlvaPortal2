@@ -189,8 +189,16 @@ export default function Landing() {
               </div>
               <Button 
                 onClick={handleGetStarted}
+                variant="outline"
+                className="border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono font-bold tracking-wider px-3 py-2 md:px-6 text-xs md:text-sm"
+                data-testid="button-sign-in-nav"
+              >
+                SIGN IN
+              </Button>
+              <Button 
+                onClick={handleGetStarted}
                 className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-mono font-bold tracking-wider px-3 py-2 md:px-6 text-xs md:text-sm"
-                data-testid="button-sign-in"
+                data-testid="button-create-account-nav"
               >
                 CREATE ACCOUNT
               </Button>
