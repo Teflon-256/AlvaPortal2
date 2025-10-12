@@ -7,13 +7,15 @@ AlvaCapital is a comprehensive trading platform designed for portfolio managemen
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (October 12, 2025)
+- **Enhanced 2FA Setup UI**: Added comprehensive authenticator app support list (Google Authenticator, Microsoft Authenticator, Authy, 1Password, any TOTP app) with improved setup dialog flow
+- **Balance Hiding Feature**: Implemented privacy toggle in Security Settings allowing users to hide all balance amounts (displays **** when enabled) with persistent storage in userPreferences
+- **Security Page Enhancements**: Added Privacy Settings card with balance visibility toggle, improved 2FA dialog with supported apps information
+- **TypeScript Fixes**: Resolved all LSP type errors in security page with proper type casting for API responses and user data
 - **Mobile Responsiveness**: Enhanced mobile UI across all pages with responsive text sizes (text-xs sm:text-sm), scrollable tabs on mobile, proper padding adjustments, and horizontal table scrolling for better mobile experience
 - **Reusable Loading Component**: Created LoadingSpinner component using landing page animation for API connection states across the platform
 - **Admin Portal Mobile**: Optimized admin dashboard tabs and headers for mobile devices with icon-only display on small screens and responsive text
 - **Landing Page Footer Links**: Added functional navigation links - Terms (/terms), Privacy (/privacy), and Support (WhatsApp redirect to https://wa.me/256726151699)
 - **Profile Settings Enhancement**: Added username and email change functionality to profile setup page with backend support
-- **2FA Integration**: Fixed apiRequest calls in security page for proper two-factor authentication functionality
-- **Error Fixes**: Resolved Link component import issues and DOM nesting warnings in landing page
 
 ## System Architecture
 
