@@ -295,6 +295,87 @@ export const performanceAnalytics = pgTable("performance_analytics", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Copy Trading Task Queue - Async trade replication tasks
+export const copyTradingTasks = pgTable("copy_trading_tasks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  masterAccountId: varchar("master_account_id").notNull(),
+  copierAccountId: varchar("copier_account_id").notNull().references(() => tradingAccounts.id),
+  taskType: varchar("task_type").notNull(), // 'open_position', 'close_position', 'modify_position'
+  symbol: varchar("symbol").notNull(),
+  side: varchar("side").notNull(), // 'Buy', 'Sell'
+  orderType: varchar("order_type").notNull(), // 'Market', 'Limit', 'Stop'
+  quantity: decimal("quantity", { precision: 15, scale: 5 }).notNull(),
+  price: decimal("price", { precision: 15, scale: 5 }),
+  stopLoss: decimal("stop_loss", { precision: 15, scale: 5 }),
+  takeProfit: decimal("take_profit", { precision: 15, scale: 5 }),
+  status: varchar("status").default('pending'), // 'pending', 'processing', 'completed', 'failed'
+  priority: integer("priority").default(1), // Higher number = higher priority
+  retryCount: integer("retry_count").default(0),
+  maxRetries: integer("max_retries").default(3),
+  errorMessage: text("error_message"),
+  metadata: jsonb("metadata"), // Additional task data
+  scheduledAt: timestamp("scheduled_at"),
+  processedAt: timestamp("processed_at"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Trade Mirroring Log - Track all mirrored trades
+export const tradeMirroringLog = pgTable("trade_mirroring_log", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  masterAccountId: varchar("master_account_id").notNull(),
+  masterTradeId: varchar("master_trade_id"),
+  copierAccountId: varchar("copier_account_id").notNull().references(() => tradingAccounts.id),
+  copierTradeId: varchar("copier_trade_id"),
+  symbol: varchar("symbol").notNull(),
+  side: varchar("side").notNull(),
+  orderType: varchar("order_type").notNull(),
+  masterQuantity: decimal("master_quantity", { precision: 15, scale: 5 }).notNull(),
+  copierQuantity: decimal("copier_quantity", { precision: 15, scale: 5 }).notNull(),
+  masterPrice: decimal("master_price", { precision: 15, scale: 5 }),
+  copierPrice: decimal("copier_price", { precision: 15, scale: 5 }),
+  slippage: decimal("slippage", { precision: 5, scale: 2 }), // Percentage difference
+  status: varchar("status").default('pending'), // 'pending', 'executed', 'failed', 'cancelled'
+  executionTime: integer("execution_time"), // Milliseconds
+  errorMessage: text("error_message"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  executedAt: timestamp("executed_at"),
+});
+
+// Copier Settings - Per-copier risk and trading settings
+export const copierSettings = pgTable("copier_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tradingAccountId: varchar("trading_account_id").notNull().references(() => tradingAccounts.id).unique(),
+  slippageTolerance: decimal("slippage_tolerance", { precision: 5, scale: 2 }).default('0.50'), // 0.5% default
+  maxPositionSize: decimal("max_position_size", { precision: 15, scale: 2 }), // Max USD value per position
+  maxDailyTrades: integer("max_daily_trades").default(50),
+  allowedSymbols: text("allowed_symbols").array(), // Whitelist of symbols
+  blockedSymbols: text("blocked_symbols").array(), // Blacklist of symbols
+  autoStopLoss: boolean("auto_stop_loss").default(true),
+  autoTakeProfit: boolean("auto_take_profit").default(true),
+  copyMultiplier: decimal("copy_multiplier", { precision: 5, scale: 2 }).default('1.00'), // Size multiplier
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Sync Status - Track synchronization state
+export const syncStatus = pgTable("sync_status", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tradingAccountId: varchar("trading_account_id").notNull().references(() => tradingAccounts.id).unique(),
+  lastSyncAt: timestamp("last_sync_at"),
+  syncMethod: varchar("sync_method"), // 'polling', 'websocket'
+  syncStatus: varchar("sync_status").default('idle'), // 'idle', 'syncing', 'error'
+  websocketConnected: boolean("websocket_connected").default(false),
+  lastHeartbeat: timestamp("last_heartbeat"),
+  errorCount: integer("error_count").default(0),
+  lastError: text("last_error"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many, one }) => ({
   tradingAccounts: many(tradingAccounts),
@@ -327,6 +408,10 @@ export const tradingAccountsRelations = relations(tradingAccounts, ({ one, many 
   riskParameters: one(riskParameters),
   performanceAnalytics: many(performanceAnalytics),
   withdrawalRequests: many(withdrawalRequests),
+  copyTradingTasks: many(copyTradingTasks),
+  tradeMirroringLog: many(tradeMirroringLog),
+  copierSettings: one(copierSettings),
+  syncStatus: one(syncStatus),
 }));
 
 export const referralEarningsRelations = relations(referralEarnings, ({ one }) => ({
@@ -463,6 +548,34 @@ export const performanceAnalyticsRelations = relations(performanceAnalytics, ({ 
   }),
 }));
 
+export const copyTradingTasksRelations = relations(copyTradingTasks, ({ one }) => ({
+  copierAccount: one(tradingAccounts, {
+    fields: [copyTradingTasks.copierAccountId],
+    references: [tradingAccounts.id],
+  }),
+}));
+
+export const tradeMirroringLogRelations = relations(tradeMirroringLog, ({ one }) => ({
+  copierAccount: one(tradingAccounts, {
+    fields: [tradeMirroringLog.copierAccountId],
+    references: [tradingAccounts.id],
+  }),
+}));
+
+export const copierSettingsRelations = relations(copierSettings, ({ one }) => ({
+  tradingAccount: one(tradingAccounts, {
+    fields: [copierSettings.tradingAccountId],
+    references: [tradingAccounts.id],
+  }),
+}));
+
+export const syncStatusRelations = relations(syncStatus, ({ one }) => ({
+  tradingAccount: one(tradingAccounts, {
+    fields: [syncStatus.tradingAccountId],
+    references: [tradingAccounts.id],
+  }),
+}));
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -566,6 +679,32 @@ export const insertPerformanceAnalyticsSchema = createInsertSchema(performanceAn
   createdAt: true,
 });
 
+export const insertCopyTradingTaskSchema = createInsertSchema(copyTradingTasks).omit({
+  id: true,
+  createdAt: true,
+  scheduledAt: true,
+  processedAt: true,
+  completedAt: true,
+});
+
+export const insertTradeMirroringLogSchema = createInsertSchema(tradeMirroringLog).omit({
+  id: true,
+  createdAt: true,
+  executedAt: true,
+});
+
+export const insertCopierSettingsSchema = createInsertSchema(copierSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSyncStatusSchema = createInsertSchema(syncStatus).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -601,3 +740,11 @@ export type InsertWithdrawalRequest = z.infer<typeof insertWithdrawalRequestSche
 export type WithdrawalRequest = typeof withdrawalRequests.$inferSelect;
 export type InsertPerformanceAnalytics = z.infer<typeof insertPerformanceAnalyticsSchema>;
 export type PerformanceAnalytics = typeof performanceAnalytics.$inferSelect;
+export type InsertCopyTradingTask = z.infer<typeof insertCopyTradingTaskSchema>;
+export type CopyTradingTask = typeof copyTradingTasks.$inferSelect;
+export type InsertTradeMirroringLog = z.infer<typeof insertTradeMirroringLogSchema>;
+export type TradeMirroringLog = typeof tradeMirroringLog.$inferSelect;
+export type InsertCopierSettings = z.infer<typeof insertCopierSettingsSchema>;
+export type CopierSettings = typeof copierSettings.$inferSelect;
+export type InsertSyncStatus = z.infer<typeof insertSyncStatusSchema>;
+export type SyncStatus = typeof syncStatus.$inferSelect;
