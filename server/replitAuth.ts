@@ -121,13 +121,38 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/logout", (req, res) => {
-    req.logout(() => {
-      res.redirect(
-        client.buildEndSessionUrl(config, {
-          client_id: process.env.REPL_ID!,
-          post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
-        }).href
-      );
+    // Destroy the session completely
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Session destruction error:', err);
+      }
+      
+      // Clear all cookies including session cookie
+      const cookiesToClear = ['connect.sid', 'session', 'token', 'refresh_token', 'remember_me'];
+      cookiesToClear.forEach(cookieName => {
+        res.clearCookie(cookieName, { path: '/' });
+        res.clearCookie(cookieName, { path: '/', domain: req.hostname });
+      });
+      
+      // Set cache control headers to prevent session restoration
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, private');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
+      // Logout from passport
+      req.logout((logoutErr) => {
+        if (logoutErr) {
+          console.error('Passport logout error:', logoutErr);
+        }
+        
+        // Redirect to Replit's end session endpoint
+        res.redirect(
+          client.buildEndSessionUrl(config, {
+            client_id: process.env.REPL_ID!,
+            post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
+          }).href
+        );
+      });
     });
   });
 }
