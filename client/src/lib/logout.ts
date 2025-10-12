@@ -1,41 +1,27 @@
 /**
  * Comprehensive logout utility
- * Clears all client-side storage and triggers server-side session termination
+ * Clears auth-related client-side storage and triggers server-side session termination
  */
 export function performLogout() {
   try {
-    // Clear all localStorage items
-    localStorage.clear();
+    // Clear only auth-related localStorage items (preserve user preferences like theme)
+    const authKeys = ['auth_token', 'access_token', 'refresh_token', 'user_session', 'replit_auth'];
+    authKeys.forEach(key => {
+      localStorage.removeItem(key);
+    });
     
-    // Clear all sessionStorage items
+    // Clear all sessionStorage (temporary session data)
     sessionStorage.clear();
     
-    // Clear any indexed DB storage (if used)
-    if (window.indexedDB) {
-      indexedDB.databases().then((databases) => {
-        databases.forEach((db) => {
-          if (db.name) {
-            indexedDB.deleteDatabase(db.name);
-          }
-        });
-      }).catch(err => console.error('IndexedDB cleanup error:', err));
-    }
-    
-    // Clear service worker caches
-    if ('caches' in window) {
-      caches.keys().then((names) => {
-        names.forEach(name => {
-          caches.delete(name);
-        });
-      }).catch(err => console.error('Cache cleanup error:', err));
-    }
-    
-    // Invalidate TanStack Query cache
+    // Clear TanStack Query cache for auth-related data
     try {
       const { queryClient } = require('@/lib/queryClient');
-      queryClient.clear();
+      // Only clear auth-related queries, not all data
+      queryClient.removeQueries({ queryKey: ['/api/auth'] });
+      queryClient.removeQueries({ queryKey: ['/api/dashboard'] });
     } catch (err) {
       // QueryClient might not be available in all contexts
+      console.log('Query cache cleanup skipped');
     }
     
   } catch (error) {
