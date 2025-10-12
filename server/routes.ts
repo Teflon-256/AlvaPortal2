@@ -2,12 +2,24 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertTradingAccountSchema, insertReferralEarningSchema, insertMasterCopierConnectionSchema, insertBrokerRequestSchema } from "@shared/schema";
+import { 
+  insertTradingAccountSchema, 
+  insertReferralEarningSchema, 
+  insertMasterCopierConnectionSchema, 
+  insertBrokerRequestSchema,
+  tradingAccounts,
+  copierSettings,
+  syncStatus,
+  actionLog,
+  tradeMirroringLog,
+  copyTradingTasks
+} from "@shared/schema";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { encrypt, decrypt } from "./crypto";
 import { BybitService } from "./bybit";
 import { eq, sql, desc } from "drizzle-orm";
+import { db } from "./db";
 import speakeasy from "speakeasy";
 import QRCode from "qrcode";
 
@@ -1050,6 +1062,260 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching market prices:", error);
       res.status(500).json({ message: "Failed to fetch market prices" });
+    }
+  });
+
+  // Copy Trading V2 - Comprehensive REST API Endpoints
+  
+  // Validate Bybit API key
+  app.post('/api/copy-trading/validate-key', isAuthenticated, async (req: any, res) => {
+    try {
+      const { apiKey, apiSecret } = req.body;
+      
+      if (!apiKey || !apiSecret) {
+        return res.status(400).json({ message: 'API key and secret are required' });
+      }
+
+      const { copyTradingService } = await import('./copyTradingService');
+      const result = await copyTradingService.validateApiKey(apiKey, apiSecret);
+      
+      res.json(result);
+    } catch (error: any) {
+      console.error('API key validation error:', error);
+      res.status(500).json({ message: error.message || 'Failed to validate API key' });
+    }
+  });
+
+  // Submit copier API keys and settings
+  app.post('/api/copy-trading/register-copier', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { tradingAccountId, apiKey, apiSecret, settings } = req.body;
+
+      if (!tradingAccountId || !apiKey || !apiSecret) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      // Validate API key first
+      const { copyTradingService } = await import('./copyTradingService');
+      const validation = await copyTradingService.validateApiKey(apiKey, apiSecret);
+      
+      if (!validation.valid) {
+        return res.status(400).json({ message: validation.error || 'Invalid API key' });
+      }
+
+      // Get account and verify ownership
+      const account = await storage.getTradingAccountById(tradingAccountId);
+      if (!account || account.userId !== userId) {
+        return res.status(404).json({ message: 'Trading account not found' });
+      }
+
+      // Encrypt and store API keys
+      const encryptedKey = encrypt(apiKey);
+      const encryptedSecret = encrypt(apiSecret);
+
+      // Update trading account with API keys
+      await db.update(tradingAccounts)
+        .set({
+          apiKeyEncrypted: encryptedKey,
+          apiSecretEncrypted: encryptedSecret,
+          copyStatus: 'active',
+          updatedAt: new Date(),
+        })
+        .where(eq(tradingAccounts.id, tradingAccountId));
+
+      // Create or update copier settings
+      const existingSettings = await db.select()
+        .from(copierSettings)
+        .where(eq(copierSettings.tradingAccountId, tradingAccountId))
+        .limit(1);
+
+      if (existingSettings.length > 0) {
+        await db.update(copierSettings)
+          .set({ ...settings, updatedAt: new Date() })
+          .where(eq(copierSettings.tradingAccountId, tradingAccountId));
+      } else {
+        await db.insert(copierSettings).values({
+          tradingAccountId,
+          ...settings,
+        });
+      }
+
+      // Initialize sync status
+      await db.insert(syncStatus).values({
+        tradingAccountId,
+        syncMethod: 'websocket',
+        syncStatus: 'idle',
+        websocketConnected: false,
+      }).onConflictDoUpdate({
+        target: syncStatus.tradingAccountId,
+        set: { syncStatus: 'idle', updatedAt: new Date() },
+      });
+
+      // Log action
+      await db.insert(actionLog).values({
+        userId,
+        action: 'COPIER_REGISTERED',
+        description: `Registered as copier with API keys`,
+        metadata: JSON.stringify({ tradingAccountId, accountInfo: validation.accountInfo }),
+      });
+
+      res.json({ success: true, message: 'Copier registered successfully' });
+    } catch (error: any) {
+      console.error('Copier registration error:', error);
+      res.status(500).json({ message: error.message || 'Failed to register copier' });
+    }
+  });
+
+  // Get sync status for account
+  app.get('/api/copy-trading/sync-status/:accountId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { accountId } = req.params;
+
+      // Verify ownership
+      const account = await storage.getTradingAccountById(accountId);
+      if (!account || account.userId !== userId) {
+        return res.status(404).json({ message: 'Trading account not found' });
+      }
+
+      const status = await db.select()
+        .from(syncStatus)
+        .where(eq(syncStatus.tradingAccountId, accountId))
+        .limit(1);
+
+      res.json(status[0] || { status: 'not_configured' });
+    } catch (error: any) {
+      console.error('Sync status error:', error);
+      res.status(500).json({ message: 'Failed to fetch sync status' });
+    }
+  });
+
+  // Get trade mirroring history
+  app.get('/api/copy-trading/mirror-history/:accountId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { accountId } = req.params;
+      const limit = parseInt(req.query.limit as string) || 50;
+
+      // Verify ownership
+      const account = await storage.getTradingAccountById(accountId);
+      if (!account || account.userId !== userId) {
+        return res.status(404).json({ message: 'Trading account not found' });
+      }
+
+      const history = await db.select()
+        .from(tradeMirroringLog)
+        .where(eq(tradeMirroringLog.copierAccountId, accountId))
+        .orderBy(desc(tradeMirroringLog.createdAt))
+        .limit(limit);
+
+      res.json(history);
+    } catch (error: any) {
+      console.error('Mirror history error:', error);
+      res.status(500).json({ message: 'Failed to fetch mirror history' });
+    }
+  });
+
+  // Get pending tasks for account
+  app.get('/api/copy-trading/tasks/:accountId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { accountId } = req.params;
+
+      // Verify ownership
+      const account = await storage.getTradingAccountById(accountId);
+      if (!account || account.userId !== userId) {
+        return res.status(404).json({ message: 'Trading account not found' });
+      }
+
+      const tasks = await db.select()
+        .from(copyTradingTasks)
+        .where(eq(copyTradingTasks.copierAccountId, accountId))
+        .orderBy(desc(copyTradingTasks.createdAt))
+        .limit(100);
+
+      res.json(tasks);
+    } catch (error: any) {
+      console.error('Tasks fetch error:', error);
+      res.status(500).json({ message: 'Failed to fetch tasks' });
+    }
+  });
+
+  // Update copier settings
+  app.patch('/api/copy-trading/settings/:accountId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { accountId } = req.params;
+      const settings = req.body;
+
+      // Verify ownership
+      const account = await storage.getTradingAccountById(accountId);
+      if (!account || account.userId !== userId) {
+        return res.status(404).json({ message: 'Trading account not found' });
+      }
+
+      await db.update(copierSettings)
+        .set({ ...settings, updatedAt: new Date() })
+        .where(eq(copierSettings.tradingAccountId, accountId));
+
+      // Log action
+      await db.insert(actionLog).values({
+        userId,
+        action: 'COPIER_SETTINGS_UPDATED',
+        description: `Updated copier settings`,
+        metadata: JSON.stringify({ accountId, settings }),
+      });
+
+      res.json({ success: true, message: 'Settings updated successfully' });
+    } catch (error: any) {
+      console.error('Settings update error:', error);
+      res.status(500).json({ message: 'Failed to update settings' });
+    }
+  });
+
+  // Get copier settings
+  app.get('/api/copy-trading/settings/:accountId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { accountId } = req.params;
+
+      // Verify ownership
+      const account = await storage.getTradingAccountById(accountId);
+      if (!account || account.userId !== userId) {
+        return res.status(404).json({ message: 'Trading account not found' });
+      }
+
+      const settings = await db.select()
+        .from(copierSettings)
+        .where(eq(copierSettings.tradingAccountId, accountId))
+        .limit(1);
+
+      res.json(settings[0] || {});
+    } catch (error: any) {
+      console.error('Settings fetch error:', error);
+      res.status(500).json({ message: 'Failed to fetch settings' });
+    }
+  });
+
+  // Admin - Get all copy trading tasks
+  app.get('/api/admin/copy-trading/tasks', isAuthenticated, async (req: any, res) => {
+    try {
+      const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
+      if (!adminEmails.includes(req.user.claims.email)) {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+
+      const limit = parseInt(req.query.limit as string) || 100;
+      const tasks = await db.select()
+        .from(copyTradingTasks)
+        .orderBy(desc(copyTradingTasks.createdAt))
+        .limit(limit);
+
+      res.json(tasks);
+    } catch (error: any) {
+      console.error('Admin tasks fetch error:', error);
+      res.status(500).json({ message: 'Failed to fetch tasks' });
     }
   });
 
