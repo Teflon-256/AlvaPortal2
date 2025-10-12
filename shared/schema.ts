@@ -31,14 +31,21 @@ export const sessions = pgTable(
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email").unique(),
+  username: varchar("username").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   country: varchar("country"),
   profileImageUrl: varchar("profile_image_url"),
-  twoFactorSecret: varchar("two_factor_secret"), // For 2FA
+  twoFactorSecret: varchar("two_factor_secret"), // Encrypted TOTP secret for 2FA
   twoFactorEnabled: boolean("two_factor_enabled").default(false),
+  biometricEnabled: boolean("biometric_enabled").default(false),
+  webauthnCredentialId: text("webauthn_credential_id"), // For biometric/passkey auth
+  webauthnPublicKey: text("webauthn_public_key"),
+  balancesHidden: boolean("balances_hidden").default(false), // Hide balances preference
+  sessionTimeout: integer("session_timeout").default(15), // Minutes of inactivity before logout
   referralCode: varchar("referral_code").unique(),
   referredBy: varchar("referred_by"),
+  lastActivityAt: timestamp("last_activity_at").defaultNow(), // Track last activity for session timeout
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

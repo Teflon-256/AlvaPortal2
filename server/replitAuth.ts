@@ -24,7 +24,7 @@ const getOidcConfig = memoize(
 );
 
 export function getSession() {
-  const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
+  const sessionTtl = 15 * 60 * 1000; // 15 minutes of inactivity
   
   // Use PostgreSQL for session storage
   const pgStore = connectPg(session);
@@ -40,6 +40,7 @@ export function getSession() {
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
+    rolling: true, // Reset expiry on each request (activity-based)
     cookie: {
       httpOnly: true,
       secure: true,
@@ -138,6 +139,28 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
+  // Check session timeout based on user's last activity
+  const userId = user.claims?.sub;
+  if (userId) {
+    try {
+      const dbUser = await storage.getUser(userId);
+      if (dbUser) {
+        const sessionTimeout = (dbUser.sessionTimeout || 15) * 60 * 1000; // Convert minutes to ms
+        const lastActivity = dbUser.lastActivityAt ? new Date(dbUser.lastActivityAt).getTime() : Date.now();
+        const timeSinceActivity = Date.now() - lastActivity;
+
+        if (timeSinceActivity > sessionTimeout) {
+          return res.status(401).json({ message: "Session expired due to inactivity" });
+        }
+
+        // Update last activity timestamp
+        await storage.updateUserActivity(userId);
+      }
+    } catch (error) {
+      console.error('Error checking session activity:', error);
+    }
+  }
+
   const now = Math.floor(Date.now() / 1000);
   if (now <= user.expires_at) {
     return next();
@@ -157,5 +180,34 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
   } catch (error) {
     res.status(401).json({ message: "Unauthorized" });
     return;
+  }
+};
+
+// Middleware to check if 2FA is required and verified
+export const require2FA: RequestHandler = async (req, res, next) => {
+  const user = req.user as any;
+  const userId = user?.claims?.sub;
+
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const dbUser = await storage.getUser(userId);
+    
+    if (dbUser?.twoFactorEnabled) {
+      // Check if 2FA is verified in this session
+      if (!(req.session as any).twoFactorVerified) {
+        return res.status(403).json({ 
+          message: "2FA verification required",
+          requires2FA: true 
+        });
+      }
+    }
+    
+    next();
+  } catch (error) {
+    console.error('Error checking 2FA:', error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

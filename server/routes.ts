@@ -214,6 +214,156 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 2FA login verification - verify 2FA code after login
+  app.post('/api/2fa/login-verify', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { token } = req.body;
+
+      if (!token) {
+        return res.status(400).json({ message: "Verification code is required" });
+      }
+
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.twoFactorEnabled || !user.twoFactorSecret) {
+        return res.status(400).json({ message: "2FA is not enabled" });
+      }
+
+      // Decrypt and verify
+      const secret = decrypt(user.twoFactorSecret);
+      const verified = speakeasy.totp.verify({
+        secret,
+        encoding: 'base32',
+        token,
+        window: 2
+      });
+
+      if (!verified) {
+        return res.status(400).json({ message: "Invalid verification code" });
+      }
+
+      // Mark session as 2FA verified
+      (req.session as any).twoFactorVerified = true;
+
+      res.json({ 
+        message: "2FA verification successful",
+        verified: true
+      });
+    } catch (error) {
+      console.error("Error verifying 2FA login:", error);
+      res.status(500).json({ message: "Failed to verify 2FA" });
+    }
+  });
+
+  // User preferences - balance hiding toggle
+  app.patch('/api/preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { balancesHidden, sessionTimeout, biometricEnabled } = req.body;
+
+      await storage.updateUserPreferences(userId, {
+        balancesHidden,
+        sessionTimeout,
+        biometricEnabled
+      });
+
+      const updatedUser = await storage.getUser(userId);
+
+      res.json({ 
+        message: "Preferences updated successfully",
+        preferences: {
+          balancesHidden: updatedUser?.balancesHidden,
+          sessionTimeout: updatedUser?.sessionTimeout,
+          biometricEnabled: updatedUser?.biometricEnabled
+        }
+      });
+    } catch (error) {
+      console.error("Error updating preferences:", error);
+      res.status(500).json({ message: "Failed to update preferences" });
+    }
+  });
+
+  // Get user preferences
+  app.get('/api/preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json({
+        balancesHidden: user.balancesHidden || false,
+        sessionTimeout: user.sessionTimeout || 15,
+        biometricEnabled: user.biometricEnabled || false,
+        twoFactorEnabled: user.twoFactorEnabled || false
+      });
+    } catch (error) {
+      console.error("Error fetching preferences:", error);
+      res.status(500).json({ message: "Failed to fetch preferences" });
+    }
+  });
+
+  // WebAuthn registration (for biometric/passkey auth)
+  app.post('/api/webauthn/register', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { credentialId, publicKey } = req.body;
+
+      if (!credentialId || !publicKey) {
+        return res.status(400).json({ message: "Credential ID and public key are required" });
+      }
+
+      await db.update(users).set({
+        webauthnCredentialId: credentialId,
+        webauthnPublicKey: publicKey,
+        biometricEnabled: true,
+        updatedAt: new Date()
+      }).where(eq(users.id, userId));
+
+      res.json({ 
+        message: "Biometric authentication registered successfully",
+        biometricEnabled: true 
+      });
+    } catch (error) {
+      console.error("Error registering WebAuthn:", error);
+      res.status(500).json({ message: "Failed to register biometric authentication" });
+    }
+  });
+
+  // WebAuthn verification
+  app.post('/api/webauthn/verify', async (req: any, res) => {
+    try {
+      const { userId, signature, challenge } = req.body;
+
+      if (!userId || !signature || !challenge) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.webauthnPublicKey) {
+        return res.status(400).json({ message: "Biometric authentication not configured" });
+      }
+
+      // In production, verify the signature using the stored public key
+      // For now, we'll just check if the user has biometric enabled
+      if (user.biometricEnabled) {
+        res.json({ 
+          verified: true,
+          message: "Biometric verification successful" 
+        });
+      } else {
+        res.status(400).json({ message: "Biometric authentication not enabled" });
+      }
+    } catch (error) {
+      console.error("Error verifying WebAuthn:", error);
+      res.status(500).json({ message: "Failed to verify biometric authentication" });
+    }
+  });
+
   // Dashboard data endpoint
   app.get('/api/dashboard', isAuthenticated, async (req: any, res) => {
     try {

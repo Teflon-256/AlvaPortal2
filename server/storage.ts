@@ -37,6 +37,8 @@ export interface IStorage {
   // User operations (IMPORTANT) these user operations are mandatory for Replit Auth.
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  updateUserActivity(userId: string): Promise<void>;
+  updateUserPreferences(userId: string, preferences: { balancesHidden?: boolean; sessionTimeout?: number; biometricEnabled?: boolean }): Promise<void>;
   
   // Trading account operations
   getTradingAccounts(userId: string): Promise<TradingAccount[]>;
@@ -146,6 +148,34 @@ export class DatabaseStorage implements IStorage {
       // Re-throw other errors
       console.error('Error upserting user:', error);
       throw error;
+    }
+  }
+
+  async updateUserActivity(userId: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ lastActivityAt: new Date() })
+      .where(eq(users.id, userId));
+  }
+
+  async updateUserPreferences(userId: string, preferences: { balancesHidden?: boolean; sessionTimeout?: number; biometricEnabled?: boolean }): Promise<void> {
+    const updateData: any = {};
+    
+    if (preferences.balancesHidden !== undefined) {
+      updateData.balancesHidden = preferences.balancesHidden;
+    }
+    if (preferences.sessionTimeout !== undefined) {
+      updateData.sessionTimeout = preferences.sessionTimeout;
+    }
+    if (preferences.biometricEnabled !== undefined) {
+      updateData.biometricEnabled = preferences.biometricEnabled;
+    }
+    
+    if (Object.keys(updateData).length > 0) {
+      await db
+        .update(users)
+        .set({ ...updateData, updatedAt: new Date() })
+        .where(eq(users.id, userId));
     }
   }
 
