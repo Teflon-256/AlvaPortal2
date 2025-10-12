@@ -34,9 +34,7 @@ export default function SecurityPage() {
   // Setup 2FA mutation
   const setupMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest<{ qrCode: string; secret: string; manualEntry: string }>('/api/2fa/setup', {
-        method: 'POST',
-      });
+      const response = await apiRequest('POST', '/api/2fa/setup');
       return response;
     },
     onSuccess: (data) => {
@@ -56,11 +54,7 @@ export default function SecurityPage() {
   // Verify 2FA mutation
   const verifyMutation = useMutation({
     mutationFn: async (token: string) => {
-      const response = await apiRequest('/api/2fa/verify', {
-        method: 'POST',
-        body: JSON.stringify({ secret, token }),
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const response = await apiRequest('POST', '/api/2fa/verify', { secret, token });
       return response;
     },
     onSuccess: () => {
@@ -86,11 +80,7 @@ export default function SecurityPage() {
   // Disable 2FA mutation
   const disableMutation = useMutation({
     mutationFn: async (token: string) => {
-      const response = await apiRequest('/api/2fa/disable', {
-        method: 'POST',
-        body: JSON.stringify({ token }),
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const response = await apiRequest('POST', '/api/2fa/disable', { token });
       return response;
     },
     onSuccess: () => {
