@@ -7,6 +7,9 @@ AlvaCapital is a comprehensive trading platform designed for portfolio managemen
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (October 12, 2025)
+- **Mobile Responsiveness**: Enhanced mobile UI across all pages with responsive text sizes (text-xs sm:text-sm), scrollable tabs on mobile, proper padding adjustments, and horizontal table scrolling for better mobile experience
+- **Reusable Loading Component**: Created LoadingSpinner component using landing page animation for API connection states across the platform
+- **Admin Portal Mobile**: Optimized admin dashboard tabs and headers for mobile devices with icon-only display on small screens and responsive text
 - **Landing Page Footer Links**: Added functional navigation links - Terms (/terms), Privacy (/privacy), and Support (WhatsApp redirect to https://wa.me/256726151699)
 - **Profile Settings Enhancement**: Added username and email change functionality to profile setup page with backend support
 - **2FA Integration**: Fixed apiRequest calls in security page for proper two-factor authentication functionality
