@@ -15,6 +15,7 @@ import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import ProfileSetup from "@/pages/profile-setup";
 import Security from "@/pages/security";
+import CopyTrading from "@/pages/copy-trading";
 import "@/i18n";
 
 function Router() {
@@ -39,6 +40,7 @@ function Router() {
           {/* Main app routes */}
           <Route path="/" component={Home} />
           <Route path="/bybit" component={Bybit} />
+          <Route path="/copy-trading" component={CopyTrading} />
           <Route path="/security" component={Security} />
         </>
       )}
