@@ -7,6 +7,7 @@ AlvaCapital is a comprehensive trading platform designed for portfolio managemen
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (October 12, 2025)
+- **Comprehensive Logout Mechanism**: Implemented complete session termination with server-side session destruction, client-side storage clearing (localStorage, sessionStorage, IndexedDB, caches), cookie removal, and cache-control headers to prevent session restoration via back button
 - **Enhanced 2FA Setup UI**: Added comprehensive authenticator app support list (Google Authenticator, Microsoft Authenticator, Authy, 1Password, any TOTP app) with improved setup dialog flow
 - **Balance Hiding Feature**: Implemented privacy toggle in Security Settings allowing users to hide all balance amounts (displays **** when enabled) with persistent storage in userPreferences
 - **Security Page Enhancements**: Added Privacy Settings card with balance visibility toggle, improved 2FA dialog with supported apps information
@@ -56,6 +57,7 @@ Preferred communication style: Simple, everyday language.
 - **Security**: 
   - **AWS EC2 Proxy**: Static IP (13.61.122.170:8888) for Bybit API calls to bypass geo-restrictions and enable secure features like withdrawals
   - **Two-Factor Authentication (2FA)**: TOTP-based authentication using Speakeasy library with QR code generation via QRCode library. Users can enable/disable 2FA through the Security settings page with encrypted secret storage
+  - **Comprehensive Logout**: Complete session termination clearing all server-side sessions, client-side storage (localStorage, sessionStorage, IndexedDB, service worker caches), cookies (connect.sid, session, token, refresh_token, remember_me), and cache-control headers to prevent back button session restoration. Implements TanStack Query cache invalidation and OAuth provider logout redirect
 
 ### Feature Specifications
 - **Portfolio Management**: Multi-broker account connection, real-time balance and P&L tracking.
