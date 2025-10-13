@@ -43,9 +43,10 @@ export default function SecurityPage() {
   // Setup 2FA mutation
   const setupMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/2fa/setup') as any;
-      console.log('2FA setup response:', response);
-      return response;
+      const response = await apiRequest('POST', '/api/2fa/setup');
+      const data = await response.json();
+      console.log('2FA setup response:', data);
+      return data;
     },
     onSuccess: (data: any) => {
       console.log('2FA setup success - QR code length:', data.qrCode?.length, 'Secret:', data.secret);
