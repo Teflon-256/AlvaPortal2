@@ -28,12 +28,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
+  // Middleware to check if 2FA is required but not verified
+  const require2FAVerification = (req: any, res: any, next: any) => {
+    const user = (req as any).userFromAuth; // User from previous auth check
+    
+    // If user has 2FA enabled but session is not verified, return specific status
+    if (user && user.twoFactorEnabled && !(req.session as any).twoFactorVerified) {
+      return res.status(403).json({ 
+        message: "2FA verification required",
+        requires2FA: true,
+        twoFactorEnabled: true
+      });
+    }
+    
+    next();
+  };
+
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
-      res.json(user);
+      
+      // Include 2FA verification status in response
+      const response = {
+        ...user,
+        twoFactorVerified: (req.session as any).twoFactorVerified || false,
+        requires2FA: user?.twoFactorEnabled && !(req.session as any).twoFactorVerified
+      };
+      
+      res.json(response);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });

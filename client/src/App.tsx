@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { useEffect } from "react";
+import { useLocation } from "wouter";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
@@ -16,10 +18,30 @@ import Terms from "@/pages/terms";
 import ProfileSetup from "@/pages/profile-setup";
 import Security from "@/pages/security";
 import CopyTrading from "@/pages/copy-trading";
+import Verify2FA from "@/pages/verify-2fa";
 import "@/i18n";
 
 function Router() {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const [location, setLocation] = useLocation();
+
+  // Check if 2FA verification is required and redirect
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user) {
+      const userData = user as any;
+      
+      // If user requires 2FA verification and not already on verify page
+      if (userData.requires2FA && location !== '/verify-2fa') {
+        setLocation('/verify-2fa');
+      }
+      
+      // If user doesn't have 2FA enabled and not on security page, force setup
+      // This makes 2FA mandatory for all users
+      if (!userData.twoFactorEnabled && location !== '/security' && location !== '/profile-setup') {
+        setLocation('/security');
+      }
+    }
+  }, [user, isAuthenticated, isLoading, location, setLocation]);
 
   return (
     <Switch>
@@ -27,6 +49,7 @@ function Router() {
       <Route path="/faq" component={FAQ} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
+      <Route path="/verify-2fa" component={Verify2FA} />
       <Route path="/admin" component={Admin} />
       
       {/* Authentication-based routes */}
@@ -37,11 +60,13 @@ function Router() {
           {/* Profile setup route for users without country */}
           <Route path="/profile-setup" component={ProfileSetup} />
           
+          {/* Security page - accessible for 2FA setup */}
+          <Route path="/security" component={Security} />
+          
           {/* Main app routes */}
           <Route path="/" component={Home} />
           <Route path="/bybit" component={Bybit} />
           <Route path="/copy-trading" component={CopyTrading} />
-          <Route path="/security" component={Security} />
         </>
       )}
       <Route component={NotFound} />
