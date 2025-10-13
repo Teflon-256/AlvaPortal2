@@ -17,6 +17,7 @@ import ProfileSetup from "@/pages/profile-setup";
 import Security from "@/pages/security";
 import CopyTrading from "@/pages/copy-trading";
 import TwoFactorDemo from "@/pages/2fa-demo";
+import QRCodeDemo from "@/pages/qr-demo";
 import "@/i18n";
 
 function Router() {
@@ -26,6 +27,7 @@ function Router() {
     <Switch>
       {/* Public routes accessible regardless of authentication */}
       <Route path="/2fa-demo" component={TwoFactorDemo} />
+      <Route path="/qr-demo" component={QRCodeDemo} />
       <Route path="/faq" component={FAQ} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
