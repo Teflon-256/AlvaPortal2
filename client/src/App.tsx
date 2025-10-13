@@ -16,6 +16,7 @@ import Terms from "@/pages/terms";
 import ProfileSetup from "@/pages/profile-setup";
 import Security from "@/pages/security";
 import CopyTrading from "@/pages/copy-trading";
+import TwoFactorDemo from "@/pages/2fa-demo";
 import "@/i18n";
 
 function Router() {
@@ -24,6 +25,7 @@ function Router() {
   return (
     <Switch>
       {/* Public routes accessible regardless of authentication */}
+      <Route path="/2fa-demo" component={TwoFactorDemo} />
       <Route path="/faq" component={FAQ} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
