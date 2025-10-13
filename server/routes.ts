@@ -905,7 +905,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin settings routes
-  app.get('/api/admin/settings/:key', isAuthenticated, async (req: any, res) => {
+  app.get('/api/admin/settings/:key', isAuthenticated, require2FAVerification, async (req: any, res) => {
     try {
       const { key } = req.params;
       const setting = await storage.getAdminSetting(key);
@@ -921,7 +921,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/admin/settings', isAuthenticated, async (req: any, res) => {
+  app.post('/api/admin/settings', isAuthenticated, require2FAVerification, async (req: any, res) => {
     try {
       const { settingKey, settingValue, description } = req.body;
       
@@ -968,7 +968,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes - Stats dashboard
-  app.get('/api/admin/stats', isAuthenticated, async (req: any, res) => {
+  app.get('/api/admin/stats', isAuthenticated, require2FAVerification, async (req: any, res) => {
     try {
       const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
       if (!adminEmails.includes(req.user.claims.email)) {
@@ -1004,7 +1004,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes - All clients
-  app.get('/api/admin/clients', isAuthenticated, async (req: any, res) => {
+  app.get('/api/admin/clients', isAuthenticated, require2FAVerification, async (req: any, res) =>{
     try {
       const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
       if (!adminEmails.includes(req.user.claims.email)) {
@@ -1038,7 +1038,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes - Broker statistics
-  app.get('/api/admin/broker-stats', isAuthenticated, async (req: any, res) => {
+  app.get('/api/admin/broker-stats', isAuthenticated, require2FAVerification, async (req: any, res) => {
     try {
       const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
       if (!adminEmails.includes(req.user.claims.email)) {
@@ -1068,7 +1068,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes - Withdrawal requests
-  app.get('/api/admin/withdrawals', isAuthenticated, async (req: any, res) => {
+  app.get('/api/admin/withdrawals', isAuthenticated, require2FAVerification, async (req: any, res) => {
     try {
       const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
       if (!adminEmails.includes(req.user.claims.email)) {
@@ -1102,7 +1102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes - Update withdrawal request
-  app.patch('/api/admin/withdrawals/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/admin/withdrawals/:id', isAuthenticated, require2FAVerification, async (req: any, res) => {
     try {
       const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
       if (!adminEmails.includes(req.user.claims.email)) {
@@ -1133,7 +1133,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes - Update user profile
-  app.patch('/api/admin/users/:userId', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/admin/users/:userId', isAuthenticated, require2FAVerification, async (req: any, res) => {
     try {
       const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
       if (!adminEmails.includes(req.user.claims.email)) {
@@ -1476,7 +1476,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin - Get all copy trading tasks
-  app.get('/api/admin/copy-trading/tasks', isAuthenticated, async (req: any, res) => {
+  app.get('/api/admin/copy-trading/tasks', isAuthenticated, require2FAVerification, async (req: any, res) => {
     try {
       const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
       if (!adminEmails.includes(req.user.claims.email)) {

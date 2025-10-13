@@ -163,7 +163,7 @@ export default function SecurityPage() {
               Two-Factor Authentication (2FA)
             </CardTitle>
             <CardDescription>
-              Add an extra layer of security to your account
+              Two-factor authentication is required for all users to ensure maximum security
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -187,6 +187,11 @@ export default function SecurityPage() {
               </div>
             ) : (
               <div className="space-y-4">
+                <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg mb-4">
+                  <p className="text-sm text-amber-400 font-medium">
+                    ⚠️ 2FA Setup Required: Two-factor authentication is mandatory for all users. Please enable it to access the platform.
+                  </p>
+                </div>
                 <p className="text-sm text-gray-400">
                   Two-factor authentication adds an extra layer of security by requiring a code from your authenticator app in addition to your password.
                 </p>
