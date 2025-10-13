@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, ShieldCheck, Copy, CheckCircle2, ArrowLeft, Eye, EyeOff, Smartphone, RefreshCw, Clock } from "lucide-react";
+import { Shield, ShieldCheck, Copy, CheckCircle2, ArrowLeft, Eye, EyeOff, Smartphone } from "lucide-react";
 import { Link } from "wouter";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -26,12 +26,6 @@ export default function SecurityPage() {
   const [verificationCode, setVerificationCode] = useState("");
   const [disableCode, setDisableCode] = useState("");
   const [copied, setCopied] = useState(false);
-  
-  // 2FA Testing state
-  const [currentCode, setCurrentCode] = useState("");
-  const [timeRemaining, setTimeRemaining] = useState(30);
-  const [testCode, setTestCode] = useState("");
-  const [verifyResult, setVerifyResult] = useState<{ valid: boolean; message: string } | null>(null);
 
   // Fetch user data
   const { data: user, isLoading } = useQuery({
@@ -133,72 +127,6 @@ export default function SecurityPage() {
   const handleDisable = () => {
     if (disableCode.length === 6) {
       disableMutation.mutate(disableCode);
-    }
-  };
-
-  // Fetch current 2FA code mutation
-  const fetchCodeMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest('GET', '/api/generate-2fa') as any;
-      return response;
-    },
-    onSuccess: (data: any) => {
-      setCurrentCode(data.code);
-      setTimeRemaining(data.timeRemaining);
-    },
-    onError: (error: any) => {
-      console.error('Failed to fetch 2FA code:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to fetch code. Please ensure 2FA is enabled.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Verify test code mutation
-  const verifyTestMutation = useMutation({
-    mutationFn: async (code: string) => {
-      const response = await apiRequest('POST', '/api/verify-2fa', { code }) as any;
-      return response;
-    },
-    onSuccess: (data: any) => {
-      setVerifyResult(data);
-      toast({
-        title: data.valid ? "Success!" : "Invalid Code",
-        description: data.message,
-        variant: data.valid ? "default" : "destructive",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to verify code",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Auto-refresh code when time expires and when 2FA is enabled
-  useEffect(() => {
-    if (userData?.twoFactorEnabled && timeRemaining <= 0) {
-      fetchCodeMutation.mutate();
-    }
-  }, [timeRemaining, userData?.twoFactorEnabled]);
-
-  // Countdown timer
-  useEffect(() => {
-    if (currentCode && timeRemaining > 0) {
-      const timer = setInterval(() => {
-        setTimeRemaining(prev => prev - 1);
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [currentCode, timeRemaining]);
-
-  const handleTestVerify = () => {
-    if (testCode.length === 6) {
-      verifyTestMutation.mutate(testCode);
     }
   };
 
@@ -494,116 +422,6 @@ export default function SecurityPage() {
             </div>
           </CardContent>
         </Card>
-
-        {/* 2FA Testing Component - Only show when 2FA is enabled */}
-        {userData?.twoFactorEnabled && (
-          <Card className="bg-zinc-900 border-zinc-800 mt-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
-                2FA Code Generator & Tester
-              </CardTitle>
-              <CardDescription>
-                Test your two-factor authentication setup
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Current TOTP Code Display */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm text-gray-400">Current TOTP Code:</Label>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => fetchCodeMutation.mutate()}
-                    disabled={fetchCodeMutation.isPending}
-                    data-testid="button-refresh-code"
-                  >
-                    <RefreshCw className={`w-4 h-4 mr-2 ${fetchCodeMutation.isPending ? 'animate-spin' : ''}`} />
-                    Refresh
-                  </Button>
-                </div>
-                
-                <div className="p-6 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-lg">
-                  <div className="text-center">
-                    <div className="text-4xl font-mono font-bold text-cyan-400 tracking-wider mb-2" data-testid="text-current-code">
-                      {currentCode || "------"}
-                    </div>
-                    {currentCode && (
-                      <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
-                        <Clock className="w-4 h-4" />
-                        <span data-testid="text-time-remaining">Expires in {timeRemaining}s</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {!currentCode && (
-                  <Button
-                    onClick={() => fetchCodeMutation.mutate()}
-                    disabled={fetchCodeMutation.isPending}
-                    className="w-full bg-cyan-500 hover:bg-cyan-600"
-                    data-testid="button-generate-code"
-                  >
-                    {fetchCodeMutation.isPending ? "Generating..." : "Generate Code"}
-                  </Button>
-                )}
-              </div>
-
-              {/* Code Verification Tester */}
-              <div className="space-y-3 pt-6 border-t border-zinc-800">
-                <Label className="text-sm text-gray-400">Test Code Verification:</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={testCode}
-                    onChange={(e) => {
-                      setTestCode(e.target.value.replace(/\D/g, '').slice(0, 6));
-                      setVerifyResult(null);
-                    }}
-                    placeholder="Enter 6-digit code"
-                    className="bg-zinc-800 border-zinc-700 text-center text-xl tracking-wider"
-                    maxLength={6}
-                    data-testid="input-test-code"
-                  />
-                  <Button
-                    onClick={handleTestVerify}
-                    disabled={testCode.length !== 6 || verifyTestMutation.isPending}
-                    className="bg-cyan-500 hover:bg-cyan-600 whitespace-nowrap"
-                    data-testid="button-verify-test-code"
-                  >
-                    {verifyTestMutation.isPending ? "Verifying..." : "Verify"}
-                  </Button>
-                </div>
-
-                {verifyResult && (
-                  <div className={`p-3 rounded-lg border ${
-                    verifyResult.valid 
-                      ? 'bg-green-500/10 border-green-500/20' 
-                      : 'bg-red-500/10 border-red-500/20'
-                  }`}>
-                    <p className={`text-sm flex items-center gap-2 ${
-                      verifyResult.valid ? 'text-green-400' : 'text-red-400'
-                    }`} data-testid="text-verify-result">
-                      {verifyResult.valid ? (
-                        <CheckCircle2 className="w-4 h-4" />
-                      ) : (
-                        <Shield className="w-4 h-4" />
-                      )}
-                      {verifyResult.message}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                <p className="text-xs text-blue-400">
-                  <strong>Note:</strong> This feature is for testing purposes. In production, codes should be generated 
-                  by your authenticator app (Google Authenticator, Authy, etc.) and verified through the login process.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );
