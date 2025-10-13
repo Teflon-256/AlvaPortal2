@@ -6,14 +6,16 @@ AlvaCapital is a comprehensive trading platform designed for portfolio managemen
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
-## Recent Changes (October 12, 2025)
-- **2FA Testing & Demo Interface**: Added comprehensive TOTP code generator and verification tester:
-  - **`/api/generate-2fa`**: GET endpoint that returns current TOTP code with time remaining (for testing only)
-  - **`/api/verify-2fa`**: POST endpoint that verifies any 6-digit TOTP code
-  - **React Testing Component**: Interactive UI showing current code, countdown timer, and code verification tester
-  - **Auto-refresh**: Codes automatically regenerate every 30 seconds with visual countdown
-  - **Google Authenticator Compatible**: All codes follow TOTP standard (6 digits, 30-second window)
-  - **Educational Tool**: Helps users understand how 2FA works and test their authenticator app setup
+## Recent Changes (October 13, 2025)
+- **Production-Ready 2FA System**: Cleaned up all test/demo code and implemented mandatory 2FA enforcement:
+  - **Removed**: All demo pages (/2fa-demo, /qr-demo) and testing endpoints (/api/generate-2fa, /api/verify-2fa)
+  - **Removed**: 2FA testing interface from security page (code generator/tester removed)
+  - **Mandatory 2FA**: All users are now required to enable 2FA - redirected to setup on login if not enabled
+  - **Post-Login Verification**: Users with 2FA enabled must verify with TOTP code after authentication
+  - **New Route**: `/verify-2fa` - Dedicated 2FA verification page with 6-digit code input
+  - **Admin Protection**: All admin portal routes now require 2FA verification (`require2FAVerification` middleware)
+  - **Session Tracking**: `twoFactorVerified` flag in session prevents unauthorized access
+  - **Clean Assets**: Removed all unused images and test files (kept only logo and featured image)
 - **Data Sanitization Audit**: Removed all hardcoded/mock data from production code:
   - Eliminated fake statistics from landing page (replaced with trust messaging)
   - Removed hardcoded badges showing fake earnings (+$234.50) and referral increments (+3 this week)
@@ -75,14 +77,16 @@ Preferred communication style: Simple, everyday language.
 - **Real-time Data**: Integration with Alpha Vantage API for live market prices (10 instruments, 5-minute auto-refresh).
 - **Security**: 
   - **AWS EC2 Proxy**: Static IP (13.61.122.170:8888) for Bybit API calls to bypass geo-restrictions and enable secure features like withdrawals
-  - **Two-Factor Authentication (2FA)**: 
+  - **Mandatory Two-Factor Authentication (2FA)**: 
     - **TOTP Implementation**: Standards-compliant TOTP using Speakeasy library
     - **QR Code Generation**: Automatic QR code generation via QRCode library for easy setup
     - **Secure Storage**: 2FA secrets encrypted using AES-256-GCM before database storage
     - **Multi-App Support**: Compatible with Google Authenticator, Microsoft Authenticator, Authy, 1Password, and any TOTP app
-    - **User Flow**: Enable/disable 2FA through Security settings page with verification
-    - **Manual Fallback**: Manual secret key entry available if QR code scanning fails
-    - **Session Integration**: 2FA verification required flag stored in session for sensitive operations
+    - **Mandatory Enforcement**: All users must enable 2FA to access the platform
+    - **Post-Login Verification**: 6-digit TOTP code required after authentication for users with 2FA enabled
+    - **Session Protection**: `twoFactorVerified` session flag prevents access until verification complete
+    - **Admin Portal Protection**: All admin routes require 2FA verification via `require2FAVerification` middleware
+    - **User Flow**: Setup through Security settings page with QR code scan or manual secret entry
   - **Comprehensive Logout**: Complete session termination clearing all server-side sessions, client-side storage (localStorage, sessionStorage, IndexedDB, service worker caches), cookies (connect.sid, session, token, refresh_token, remember_me), and cache-control headers to prevent back button session restoration. Implements TanStack Query cache invalidation and OAuth provider logout redirect
 
 ### Feature Specifications
@@ -90,8 +94,9 @@ Preferred communication style: Simple, everyday language.
 - **Referral System**: Tracking, earnings management, click/conversion analytics.
 - **Copy Trading**: Master-copier relationships, automated trade replication, profit splitting.
 - **Trading Algorithms**: Support for algorithm configurations, signals, and risk management parameters.
-- **User Management**: User profiles, referral codes, hierarchical referral relationships.
-- **Withdrawal Management**: Workflow for client withdrawal requests with admin approval/rejection.
+- **User Management**: User profiles, referral codes, hierarchical referral relationships with mandatory 2FA.
+- **Withdrawal Management**: Workflow for client withdrawal requests with admin approval/rejection (2FA protected).
+- **Admin Portal**: 2FA-protected administrative interface for system management, client oversight, and withdrawal processing.
 
 ### System Design Choices
 - **Database Schema**: Comprehensive schema including:
