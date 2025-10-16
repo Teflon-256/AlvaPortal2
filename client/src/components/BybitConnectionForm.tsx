@@ -277,7 +277,7 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
                 )}
               />
 
-              <div className="space-y-3">
+              <div className="space-y-3 pt-2 pb-4">
                 <Button
                   type="button"
                   variant={validationStatus === 'success' ? 'default' : 'outline'}

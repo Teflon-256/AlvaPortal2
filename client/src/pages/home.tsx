@@ -449,7 +449,7 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <CardTitle className="text-lg md:text-xl font-semibold">Trading Accounts</CardTitle>
                   <Link href="/bybit">
-                    <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto text-sm md:text-base" data-testid="connect-account-button">
+                    <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 w-full sm:w-auto text-sm md:text-base shadow-lg shadow-cyan-500/20" data-testid="connect-account-button">
                       <Plus className="h-4 w-4 mr-2" />
                       Connect Bybit
                     </Button>
@@ -553,18 +553,17 @@ export default function Home() {
                   {dashboardData?.referralLinks?.filter((link: any) => link.broker === 'bybit').map((link: any) => (
                     <Button
                       key={link.id}
-                      variant="outline"
-                      className="w-full justify-between h-auto p-4 bg-muted/30 hover:bg-muted/50 border-primary/20"
+                      className="w-full justify-between h-auto p-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 border-0 shadow-lg shadow-cyan-500/20"
                       onClick={() => window.open(link.referralUrl, '_blank')}
                       data-testid={`create-account-${link.broker}`}
                     >
                       <div className="flex items-center space-x-3">
-                        <div className={`w-10 h-10 ${brokerIcons[link.broker as keyof typeof brokerIcons]?.color} rounded-lg flex items-center justify-center`}>
+                        <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
                           {brokerIcons[link.broker as keyof typeof brokerIcons]?.icon()}
                         </div>
                         <div className="text-left">
-                          <div className="font-medium capitalize">{link.broker}</div>
-                          <div className="text-xs text-muted-foreground">Start trading</div>
+                          <div className="font-medium capitalize text-white">{link.broker}</div>
+                          <div className="text-xs text-cyan-100">Start trading</div>
                         </div>
                       </div>
                       <ExternalLink className="h-4 w-4" />
