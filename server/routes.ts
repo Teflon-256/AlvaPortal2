@@ -1250,16 +1250,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { apiKey, apiSecret } = req.body;
       
       if (!apiKey || !apiSecret) {
-        return res.status(400).json({ message: 'API key and secret are required' });
+        return res.status(400).json({ success: false, error: 'API key and secret are required' });
       }
 
       const { copyTradingService } = await import('./copyTradingService');
       const result = await copyTradingService.validateApiKey(apiKey, apiSecret);
       
-      res.json(result);
+      // Map 'valid' to 'success' for frontend compatibility
+      res.json({
+        success: result.valid,
+        error: result.error,
+        accountInfo: result.accountInfo
+      });
     } catch (error: any) {
       console.error('API key validation error:', error);
-      res.status(500).json({ message: error.message || 'Failed to validate API key' });
+      res.status(500).json({ success: false, error: error.message || 'Failed to validate API key' });
     }
   });
 
