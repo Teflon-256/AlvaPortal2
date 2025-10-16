@@ -35,11 +35,7 @@ function Router() {
         setLocation('/verify-2fa');
       }
       
-      // If user doesn't have 2FA enabled and not on security page, force setup
-      // This makes 2FA mandatory for all users
-      if (!userData.twoFactorEnabled && location !== '/security' && location !== '/profile-setup') {
-        setLocation('/security');
-      }
+      // 2FA is now optional - users can enable it from Security settings if they want
     }
   }, [user, isAuthenticated, isLoading, location, setLocation]);
 
