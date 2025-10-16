@@ -55,7 +55,7 @@ const resources = {
       "todaysPnL": "Today's P&L",
       "earnings": "Earnings",
       "tradingAccounts": "Trading Accounts",
-      "startTrading": "Start Trading",
+      "startTrading": "Open Trading Account",
       "algorithmicTrading": "Algorithmic Trading",
       "noAccountsMessage": "Ready to connect your first account?",
       "noAccountsSubtitle": "Seamless integration with leading trading platforms.",

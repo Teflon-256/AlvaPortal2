@@ -66,6 +66,41 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
     },
   });
 
+  const [isValidated, setIsValidated] = useState(false);
+  const [validationStatus, setValidationStatus] = useState<'idle' | 'validating' | 'success' | 'error'>('idle');
+
+  const validateMutation = useMutation({
+    mutationFn: async (data: BybitConnectionForm) => {
+      const response = await apiRequest("POST", "/api/copy-trading/validate-key", data);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        setIsValidated(true);
+        setValidationStatus('success');
+        toast({
+          title: "✓ API Key Validated",
+          description: "Your Bybit API credentials are valid!",
+        });
+      } else {
+        setValidationStatus('error');
+        toast({
+          title: "Validation Failed",
+          description: data.error || "Invalid API credentials",
+          variant: "destructive",
+        });
+      }
+    },
+    onError: (error: any) => {
+      setValidationStatus('error');
+      toast({
+        title: "Validation Error",
+        description: error.message || "Failed to validate API credentials",
+        variant: "destructive",
+      });
+    },
+  });
+
   const connectMutation = useMutation({
     mutationFn: async (data: BybitConnectionForm) => {
       const response = await apiRequest("POST", "/api/bybit/connect", data);
@@ -78,6 +113,8 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
       form.reset();
+      setIsValidated(false);
+      setValidationStatus('idle');
       onSuccess?.();
     },
     onError: (error: any) => {
@@ -89,7 +126,29 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
     },
   });
 
+  const handleValidate = () => {
+    const formData = form.getValues();
+    if (!formData.apiKey || !formData.apiSecret) {
+      toast({
+        title: "Missing Fields",
+        description: "Please enter both API Key and API Secret",
+        variant: "destructive",
+      });
+      return;
+    }
+    setValidationStatus('validating');
+    validateMutation.mutate(formData);
+  };
+
   const onSubmit = (data: BybitConnectionForm) => {
+    if (!isValidated) {
+      toast({
+        title: "Validation Required",
+        description: "Please validate your API credentials first",
+        variant: "destructive",
+      });
+      return;
+    }
     connectMutation.mutate(data);
   };
 
@@ -218,34 +277,59 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
                 )}
               />
 
-              <div className="flex gap-2">
-                <Button
-                  type="submit"
-                  className="flex-1"
-                  disabled={connectMutation.isPending}
-                  data-testid="button-connect-bybit"
-                >
-                  {connectMutation.isPending ? (
-                    <div className="flex items-center gap-2">
-                      <LoadingSpinner size="sm" />
-                      <span>Connecting...</span>
-                    </div>
-                  ) : (
-                    "Connect Bybit Account"
-                  )}
-                </Button>
-                
+              <div className="space-y-3">
                 <Button
                   type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowGuide(true)}
-                  data-testid="button-guide"
-                  className="px-3"
+                  variant={validationStatus === 'success' ? 'default' : 'outline'}
+                  className={`w-full ${validationStatus === 'success' ? 'bg-green-600 hover:bg-green-700 border-green-500' : ''}`}
+                  onClick={handleValidate}
+                  disabled={validateMutation.isPending || validationStatus === 'success'}
+                  data-testid="button-validate-api"
                 >
-                  <BookOpen className="w-4 h-4 mr-1" />
-                  Guide
+                  {validateMutation.isPending ? (
+                    <div className="flex items-center gap-2">
+                      <LoadingSpinner size="sm" />
+                      <span>Validating...</span>
+                    </div>
+                  ) : validationStatus === 'success' ? (
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4" />
+                      <span>API Key Validated</span>
+                    </div>
+                  ) : (
+                    "Validate API Key"
+                  )}
                 </Button>
+
+                <div className="flex gap-2">
+                  <Button
+                    type="submit"
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
+                    disabled={connectMutation.isPending || !isValidated}
+                    data-testid="button-connect-bybit"
+                  >
+                    {connectMutation.isPending ? (
+                      <div className="flex items-center gap-2">
+                        <LoadingSpinner size="sm" />
+                        <span>Connecting...</span>
+                      </div>
+                    ) : (
+                      "Connect Bybit Account"
+                    )}
+                  </Button>
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowGuide(true)}
+                    data-testid="button-guide"
+                    className="px-3"
+                  >
+                    <BookOpen className="w-4 h-4 mr-1" />
+                    Guide
+                  </Button>
+                </div>
               </div>
             </form>
           </Form>
