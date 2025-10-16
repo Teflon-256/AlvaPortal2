@@ -539,9 +539,11 @@ export default function Home() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Create Trading Account */}
-            <Card className="premium-card" data-testid="create-trading-account-card">
+            <Card className="premium-card border-cyan-500/30 bg-gradient-to-br from-cyan-500/5 to-blue-500/5" data-testid="create-trading-account-card">
               <CardHeader>
-                <CardTitle className="text-xl font-semibold">Start Trading</CardTitle>
+                <CardTitle className="text-xl font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                  Open Trading Account
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
