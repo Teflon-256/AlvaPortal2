@@ -448,12 +448,17 @@ export default function Home() {
               <CardHeader>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <CardTitle className="text-lg md:text-xl font-semibold">Trading Accounts</CardTitle>
-                  <Link href="/bybit">
-                    <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 w-full sm:w-auto text-sm md:text-base shadow-lg shadow-cyan-500/20" data-testid="connect-account-button">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Connect Bybit
+                  {dashboardData?.referralLinks?.filter((link: any) => link.broker === 'bybit').map((link: any) => (
+                    <Button
+                      key={link.id}
+                      className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 w-full sm:w-auto text-sm md:text-base shadow-lg shadow-cyan-500/20"
+                      onClick={() => window.open(link.referralUrl, '_blank')}
+                      data-testid="open-trading-account-button"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Open Trading Account
                     </Button>
-                  </Link>
+                  ))}
                 </div>
               </CardHeader>
               <CardContent>
@@ -538,37 +543,32 @@ export default function Home() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Create Trading Account */}
-            <Card className="premium-card border-cyan-500/30 bg-gradient-to-br from-cyan-500/5 to-blue-500/5" data-testid="create-trading-account-card">
+            {/* Connect Bybit */}
+            <Card className="premium-card border-cyan-500/30 bg-gradient-to-br from-cyan-500/5 to-blue-500/5" data-testid="connect-bybit-card">
               <CardHeader>
                 <CardTitle className="text-xl font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                  Open Trading Account
+                  Connect Bybit
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground mb-4">
-                    Begin your trading journey with Bybit.
+                    Connect your existing Bybit account to start trading.
                   </p>
-                  {dashboardData?.referralLinks?.filter((link: any) => link.broker === 'bybit').map((link: any) => (
-                    <Button
-                      key={link.id}
-                      className="w-full justify-between h-auto p-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 border-0 shadow-lg shadow-cyan-500/20"
-                      onClick={() => window.open(link.referralUrl, '_blank')}
-                      data-testid={`create-account-${link.broker}`}
-                    >
+                  <Link href="/bybit">
+                    <Button className="w-full justify-between h-auto p-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 border-0 shadow-lg shadow-cyan-500/20" data-testid="connect-bybit-button">
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                          {brokerIcons[link.broker as keyof typeof brokerIcons]?.icon()}
+                          <Plus className="h-5 w-5" />
                         </div>
                         <div className="text-left">
-                          <div className="font-medium capitalize text-white">{link.broker}</div>
-                          <div className="text-xs text-cyan-100">Start trading</div>
+                          <div className="font-medium text-white">Connect Bybit Account</div>
+                          <div className="text-xs text-cyan-100">Link your trading account</div>
                         </div>
                       </div>
                       <ExternalLink className="h-4 w-4" />
                     </Button>
-                  ))}
+                  </Link>
                 </div>
               </CardContent>
             </Card>
