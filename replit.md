@@ -21,7 +21,7 @@ Preferred communication style: Simple, everyday language.
 - **Frontend**: React 18 with TypeScript, Vite, Wouter for routing, TanStack Query for state management, React Hook Form with Zod for form validation.
 - **Backend**: Express.js with TypeScript on Node.js.
 - **Database ORM**: Drizzle ORM for type-safe database operations.
-- **Authentication**: Replit Auth with OpenID Connect, supporting Google, Apple, X (Twitter), GitHub, and Email/Password. Mandatory Two-Factor Authentication (2FA) using TOTP (Speakeasy library) enforced platform-wide, including for admin access.
+- **Authentication**: Replit Auth with OpenID Connect, supporting Google, Apple, X (Twitter), GitHub, and Email/Password.
 - **API Design**: RESTful endpoints with centralized error handling.
 - **Multi-Broker Integration**: Connectors for Bybit (cryptocurrency) and TradeF (forex, CFDs, indices, stocks).
 - **Copy Trading Engine V2**: Real-time trade replication via Bybit WebSocket, async task queue, API key validation, risk management (slippage, position limits, ratio sizing), and automated profit splits.
@@ -34,8 +34,8 @@ Preferred communication style: Simple, everyday language.
 - **Referral System**: Tracking, earnings management, click/conversion analytics.
 - **Copy Trading**: Master-copier relationships, automated trade replication, profit splitting.
 - **Trading Algorithms**: Support for algorithm configurations, signals, and risk management parameters.
-- **User Management**: User profiles, referral codes, hierarchical referral relationships with mandatory 2FA.
-- **Withdrawal Management**: Workflow for client withdrawal requests with 2FA-protected admin approval.
+- **User Management**: User profiles, referral codes, hierarchical referral relationships.
+- **Withdrawal Management**: Workflow for client withdrawal requests with admin approval.
 
 ### System Design Choices
 - **Database Schema**: Comprehensive schema covering users, trading accounts, referral system, master-copier connections, copy trading specific tables, algorithms, signals, trades, positions, and admin configurations.
