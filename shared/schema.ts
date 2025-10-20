@@ -36,11 +36,6 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   country: varchar("country"),
   profileImageUrl: varchar("profile_image_url"),
-  twoFactorSecret: varchar("two_factor_secret"), // Encrypted TOTP secret for 2FA
-  twoFactorEnabled: boolean("two_factor_enabled").default(false),
-  biometricEnabled: boolean("biometric_enabled").default(false),
-  webauthnCredentialId: text("webauthn_credential_id"), // For biometric/passkey auth
-  webauthnPublicKey: text("webauthn_public_key"),
   balancesHidden: boolean("balances_hidden").default(false), // Hide balances preference
   sessionTimeout: integer("session_timeout").default(15), // Minutes of inactivity before logout
   referralCode: varchar("referral_code").unique(),

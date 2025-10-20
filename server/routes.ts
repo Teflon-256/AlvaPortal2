@@ -21,28 +21,10 @@ import { encrypt, decrypt } from "./crypto";
 import { BybitService } from "./bybit";
 import { eq, sql, desc } from "drizzle-orm";
 import { db } from "./db";
-import speakeasy from "speakeasy";
-import QRCode from "qrcode";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
-
-  // Middleware to check if 2FA is required but not verified
-  const require2FAVerification = (req: any, res: any, next: any) => {
-    const user = (req as any).userFromAuth; // User from previous auth check
-    
-    // If user has 2FA enabled but session is not verified, return specific status
-    if (user && user.twoFactorEnabled && !(req.session as any).twoFactorVerified) {
-      return res.status(403).json({ 
-        message: "2FA verification required",
-        requires2FA: true,
-        twoFactorEnabled: true
-      });
-    }
-    
-    next();
-  };
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
@@ -50,14 +32,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
       
-      // Include 2FA verification status in response
-      const response = {
-        ...user,
-        twoFactorVerified: (req.session as any).twoFactorVerified || false,
-        requires2FA: user?.twoFactorEnabled && !(req.session as any).twoFactorVerified
-      };
-      
-      res.json(response);
+      res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -84,200 +59,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating profile:", error);
       res.status(500).json({ message: "Failed to update profile" });
-    }
-  });
-
-  // 2FA Routes
-  // Setup 2FA - Generate secret and QR code
-  app.post('/api/2fa/setup', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Generate a new secret
-      const secret = speakeasy.generateSecret({
-        name: `AlvaCapital (${user.email})`,
-        issuer: 'AlvaCapital',
-        length: 32
-      });
-
-      // Generate QR code
-      const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url || '');
-
-      // Return secret and QR code (don't save to DB yet - wait for verification)
-      res.json({
-        secret: secret.base32,
-        qrCode: qrCodeUrl,
-        manualEntry: secret.base32
-      });
-    } catch (error) {
-      console.error("Error setting up 2FA:", error);
-      res.status(500).json({ message: "Failed to setup 2FA" });
-    }
-  });
-
-  // Verify and enable 2FA
-  app.post('/api/2fa/verify', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const { secret, token } = req.body;
-
-      if (!secret || !token) {
-        return res.status(400).json({ message: "Secret and token are required" });
-      }
-
-      // Verify the token
-      const verified = speakeasy.totp.verify({
-        secret,
-        encoding: 'base32',
-        token,
-        window: 2 // Allow 2 time steps before and after
-      });
-
-      if (!verified) {
-        return res.status(400).json({ message: "Invalid verification code" });
-      }
-
-      // Save the secret to the database and enable 2FA
-      const updatedUser = await storage.upsertUser({
-        id: userId,
-        twoFactorSecret: encrypt(secret),
-        twoFactorEnabled: true,
-        updatedAt: new Date(),
-      });
-
-      res.json({ 
-        message: "2FA enabled successfully",
-        twoFactorEnabled: true
-      });
-    } catch (error) {
-      console.error("Error verifying 2FA:", error);
-      res.status(500).json({ message: "Failed to verify 2FA" });
-    }
-  });
-
-  // Validate 2FA token (for future logins/sensitive operations)
-  app.post('/api/2fa/validate', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const { token } = req.body;
-
-      if (!token) {
-        return res.status(400).json({ message: "Token is required" });
-      }
-
-      const user = await storage.getUser(userId);
-      
-      if (!user || !user.twoFactorEnabled || !user.twoFactorSecret) {
-        return res.status(400).json({ message: "2FA is not enabled" });
-      }
-
-      // Decrypt the secret and verify
-      const secret = decrypt(user.twoFactorSecret);
-      const verified = speakeasy.totp.verify({
-        secret,
-        encoding: 'base32',
-        token,
-        window: 2
-      });
-
-      if (!verified) {
-        return res.status(400).json({ message: "Invalid verification code" });
-      }
-
-      res.json({ valid: true });
-    } catch (error) {
-      console.error("Error validating 2FA:", error);
-      res.status(500).json({ message: "Failed to validate 2FA" });
-    }
-  });
-
-  // Disable 2FA
-  app.post('/api/2fa/disable', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const { token } = req.body;
-
-      const user = await storage.getUser(userId);
-      
-      if (!user || !user.twoFactorEnabled || !user.twoFactorSecret) {
-        return res.status(400).json({ message: "2FA is not enabled" });
-      }
-
-      // Verify token before disabling
-      const secret = decrypt(user.twoFactorSecret);
-      const verified = speakeasy.totp.verify({
-        secret,
-        encoding: 'base32',
-        token,
-        window: 2
-      });
-
-      if (!verified) {
-        return res.status(400).json({ message: "Invalid verification code" });
-      }
-
-      // Disable 2FA
-      const updatedUser = await storage.upsertUser({
-        id: userId,
-        twoFactorSecret: null,
-        twoFactorEnabled: false,
-        updatedAt: new Date(),
-      });
-
-      res.json({ 
-        message: "2FA disabled successfully",
-        twoFactorEnabled: false
-      });
-    } catch (error) {
-      console.error("Error disabling 2FA:", error);
-      res.status(500).json({ message: "Failed to disable 2FA" });
-    }
-  });
-
-  // 2FA login verification - verify 2FA code after login
-  app.post('/api/2fa/login-verify', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const { token } = req.body;
-
-      if (!token) {
-        return res.status(400).json({ message: "Verification code is required" });
-      }
-
-      const user = await storage.getUser(userId);
-      
-      if (!user || !user.twoFactorEnabled || !user.twoFactorSecret) {
-        return res.status(400).json({ message: "2FA is not enabled" });
-      }
-
-      // Decrypt and verify
-      const secret = decrypt(user.twoFactorSecret);
-      const verified = speakeasy.totp.verify({
-        secret,
-        encoding: 'base32',
-        token,
-        window: 2
-      });
-
-      if (!verified) {
-        return res.status(400).json({ message: "Invalid verification code" });
-      }
-
-      // Mark session as 2FA verified
-      (req.session as any).twoFactorVerified = true;
-
-      res.json({ 
-        message: "2FA verification successful",
-        verified: true
-      });
-    } catch (error) {
-      console.error("Error verifying 2FA login:", error);
-      res.status(500).json({ message: "Failed to verify 2FA" });
     }
   });
 
@@ -322,8 +103,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         balancesHidden: user.balancesHidden || false,
         sessionTimeout: user.sessionTimeout || 15,
-        biometricEnabled: user.biometricEnabled || false,
-        twoFactorEnabled: user.twoFactorEnabled || false
+        biometricEnabled: user.biometricEnabled || false
       });
     } catch (error) {
       console.error("Error fetching preferences:", error);
@@ -905,7 +685,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin settings routes
-  app.get('/api/admin/settings/:key', isAuthenticated, require2FAVerification, async (req: any, res) => {
+  app.get('/api/admin/settings/:key', isAuthenticated, async (req: any, res) => {
     try {
       const { key } = req.params;
       const setting = await storage.getAdminSetting(key);
@@ -921,7 +701,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/admin/settings', isAuthenticated, require2FAVerification, async (req: any, res) => {
+  app.post('/api/admin/settings', isAuthenticated, async (req: any, res) => {
     try {
       const { settingKey, settingValue, description } = req.body;
       
@@ -968,7 +748,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes - Stats dashboard
-  app.get('/api/admin/stats', isAuthenticated, require2FAVerification, async (req: any, res) => {
+  app.get('/api/admin/stats', isAuthenticated, async (req: any, res) => {
     try {
       const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
       if (!adminEmails.includes(req.user.claims.email)) {
@@ -1004,7 +784,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes - All clients
-  app.get('/api/admin/clients', isAuthenticated, require2FAVerification, async (req: any, res) =>{
+  app.get('/api/admin/clients', isAuthenticated, async (req: any, res) =>{
     try {
       const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
       if (!adminEmails.includes(req.user.claims.email)) {
@@ -1038,7 +818,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes - Broker statistics
-  app.get('/api/admin/broker-stats', isAuthenticated, require2FAVerification, async (req: any, res) => {
+  app.get('/api/admin/broker-stats', isAuthenticated, async (req: any, res) => {
     try {
       const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
       if (!adminEmails.includes(req.user.claims.email)) {
@@ -1068,7 +848,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes - Withdrawal requests
-  app.get('/api/admin/withdrawals', isAuthenticated, require2FAVerification, async (req: any, res) => {
+  app.get('/api/admin/withdrawals', isAuthenticated, async (req: any, res) => {
     try {
       const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
       if (!adminEmails.includes(req.user.claims.email)) {
@@ -1102,7 +882,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes - Update withdrawal request
-  app.patch('/api/admin/withdrawals/:id', isAuthenticated, require2FAVerification, async (req: any, res) => {
+  app.patch('/api/admin/withdrawals/:id', isAuthenticated, async (req: any, res) => {
     try {
       const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
       if (!adminEmails.includes(req.user.claims.email)) {
@@ -1133,7 +913,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes - Update user profile
-  app.patch('/api/admin/users/:userId', isAuthenticated, require2FAVerification, async (req: any, res) => {
+  app.patch('/api/admin/users/:userId', isAuthenticated, async (req: any, res) => {
     try {
       const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
       if (!adminEmails.includes(req.user.claims.email)) {
@@ -1481,7 +1261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin - Get all copy trading tasks
-  app.get('/api/admin/copy-trading/tasks', isAuthenticated, require2FAVerification, async (req: any, res) => {
+  app.get('/api/admin/copy-trading/tasks', isAuthenticated, async (req: any, res) => {
     try {
       const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
       if (!adminEmails.includes(req.user.claims.email)) {
