@@ -5,8 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { useEffect } from "react";
-import { useLocation } from "wouter";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
@@ -21,8 +19,6 @@ import "@/i18n";
 
 function Router() {
   const { user, isAuthenticated, isLoading } = useAuth();
-  const [location, setLocation] = useLocation();
-
 
   return (
     <Switch>
