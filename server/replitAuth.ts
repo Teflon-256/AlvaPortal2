@@ -226,32 +226,3 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
     return;
   }
 };
-
-// Middleware to check if 2FA is required and verified
-export const require2FA: RequestHandler = async (req, res, next) => {
-  const user = req.user as any;
-  const userId = user?.claims?.sub;
-
-  if (!userId) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  try {
-    const dbUser = await storage.getUser(userId);
-    
-    if (dbUser?.twoFactorEnabled) {
-      // Check if 2FA is verified in this session
-      if (!(req.session as any).twoFactorVerified) {
-        return res.status(403).json({ 
-          message: "2FA verification required",
-          requires2FA: true 
-        });
-      }
-    }
-    
-    next();
-  } catch (error) {
-    console.error('Error checking 2FA:', error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};

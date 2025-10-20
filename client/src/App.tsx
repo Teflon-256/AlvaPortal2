@@ -16,28 +16,13 @@ import FAQ from "@/pages/faq";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import ProfileSetup from "@/pages/profile-setup";
-import Security from "@/pages/security";
 import CopyTrading from "@/pages/copy-trading";
-import Verify2FA from "@/pages/verify-2fa";
 import "@/i18n";
 
 function Router() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const [location, setLocation] = useLocation();
 
-  // Check if 2FA verification is required and redirect
-  useEffect(() => {
-    if (!isLoading && isAuthenticated && user) {
-      const userData = user as any;
-      
-      // If user requires 2FA verification and not already on verify page
-      if (userData.requires2FA && location !== '/verify-2fa') {
-        setLocation('/verify-2fa');
-      }
-      
-      // 2FA is now optional - users can enable it from Security settings if they want
-    }
-  }, [user, isAuthenticated, isLoading, location, setLocation]);
 
   return (
     <Switch>
@@ -45,7 +30,6 @@ function Router() {
       <Route path="/faq" component={FAQ} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
-      <Route path="/verify-2fa" component={Verify2FA} />
       <Route path="/admin" component={Admin} />
       
       {/* Authentication-based routes */}
@@ -55,9 +39,6 @@ function Router() {
         <>
           {/* Profile setup route for users without country */}
           <Route path="/profile-setup" component={ProfileSetup} />
-          
-          {/* Security page - accessible for 2FA setup */}
-          <Route path="/security" component={Security} />
           
           {/* Main app routes */}
           <Route path="/" component={Home} />

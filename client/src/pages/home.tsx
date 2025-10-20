@@ -346,12 +346,6 @@ export default function Home() {
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile Settings</span>
                     </DropdownMenuItem>
-                    <Link href="/security">
-                      <DropdownMenuItem data-testid="security-settings">
-                        <Shield className="mr-2 h-4 w-4" />
-                        <span>Security</span>
-                      </DropdownMenuItem>
-                    </Link>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} data-testid="logout-menu-item">
                       <LogOut className="mr-2 h-4 w-4" />
