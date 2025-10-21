@@ -71,12 +71,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/preferences', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { balancesHidden, sessionTimeout, biometricEnabled } = req.body;
+      const { balancesHidden, sessionTimeout } = req.body;
 
       await storage.updateUserPreferences(userId, {
         balancesHidden,
-        sessionTimeout,
-        biometricEnabled
+        sessionTimeout
       });
 
       const updatedUser = await storage.getUser(userId);
@@ -85,8 +84,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Preferences updated successfully",
         preferences: {
           balancesHidden: updatedUser?.balancesHidden,
-          sessionTimeout: updatedUser?.sessionTimeout,
-          biometricEnabled: updatedUser?.biometricEnabled
+          sessionTimeout: updatedUser?.sessionTimeout
         }
       });
     } catch (error) {
@@ -107,70 +105,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({
         balancesHidden: user.balancesHidden || false,
-        sessionTimeout: user.sessionTimeout || 15,
-        biometricEnabled: user.biometricEnabled || false
+        sessionTimeout: user.sessionTimeout || 15
       });
     } catch (error) {
       console.error("Error fetching preferences:", error);
       res.status(500).json({ message: "Failed to fetch preferences" });
-    }
-  });
-
-  // WebAuthn registration (for biometric/passkey auth)
-  app.post('/api/webauthn/register', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const { credentialId, publicKey } = req.body;
-
-      if (!credentialId || !publicKey) {
-        return res.status(400).json({ message: "Credential ID and public key are required" });
-      }
-
-      await db.update(users).set({
-        webauthnCredentialId: credentialId,
-        webauthnPublicKey: publicKey,
-        biometricEnabled: true,
-        updatedAt: new Date()
-      }).where(eq(users.id, userId));
-
-      res.json({ 
-        message: "Biometric authentication registered successfully",
-        biometricEnabled: true 
-      });
-    } catch (error) {
-      console.error("Error registering WebAuthn:", error);
-      res.status(500).json({ message: "Failed to register biometric authentication" });
-    }
-  });
-
-  // WebAuthn verification
-  app.post('/api/webauthn/verify', async (req: any, res) => {
-    try {
-      const { userId, signature, challenge } = req.body;
-
-      if (!userId || !signature || !challenge) {
-        return res.status(400).json({ message: "Missing required fields" });
-      }
-
-      const user = await storage.getUser(userId);
-      
-      if (!user || !user.webauthnPublicKey) {
-        return res.status(400).json({ message: "Biometric authentication not configured" });
-      }
-
-      // In production, verify the signature using the stored public key
-      // For now, we'll just check if the user has biometric enabled
-      if (user.biometricEnabled) {
-        res.json({ 
-          verified: true,
-          message: "Biometric verification successful" 
-        });
-      } else {
-        res.status(400).json({ message: "Biometric authentication not enabled" });
-      }
-    } catch (error) {
-      console.error("Error verifying WebAuthn:", error);
-      res.status(500).json({ message: "Failed to verify biometric authentication" });
     }
   });
 
