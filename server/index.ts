@@ -61,6 +61,17 @@ app.use((req, res, next) => {
     throw err;
   });
 
+  // Start copy trading scheduler asynchronously (non-blocking)
+  (async () => {
+    try {
+      const { copyTradingScheduler } = await import('./copyTradingScheduler');
+      copyTradingScheduler.start();
+      log('✓ Copy trading scheduler started');
+    } catch (error: any) {
+      console.error('Failed to start copy trading scheduler:', error.message);
+    }
+  })();
+
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
@@ -68,12 +79,7 @@ app.use((req, res, next) => {
     const distPath = path.join(import.meta.dirname, "../dist/public");
     app.use(express.static(distPath));
 
-    // Serve index.html at root
-    app.get("/", (_req: Request, res: Response) => {
-      res.sendFile("index.html", { root: distPath });
-    });
-
-    // Fallback for SPA routing
+    // Fallback for SPA routing (catch-all must be last)
     app.get("*", (_req: Request, res: Response) => {
       res.sendFile("index.html", { root: distPath });
     });
@@ -86,17 +92,8 @@ app.use((req, res, next) => {
       host: "0.0.0.0",
       reusePort: true,
     },
-    async () => {
+    () => {
       log(`serving on port ${port}`);
-      
-      // Start copy trading scheduler
-      try {
-        const { copyTradingScheduler } = await import('./copyTradingScheduler');
-        copyTradingScheduler.start();
-        log('✓ Copy trading scheduler started');
-      } catch (error: any) {
-        console.error('Failed to start copy trading scheduler:', error.message);
-      }
     },
   );
 })();
