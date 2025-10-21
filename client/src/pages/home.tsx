@@ -577,8 +577,6 @@ export default function Home() {
                   <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Bot className="text-primary h-8 w-8" />
                   </div>
-                  <div className="text-lg font-semibold mb-2">Origins and Balances V1.2</div>
-                  <div className="text-sm text-muted-foreground">Advanced algorithmic trading system</div>
                 </div>
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between">
