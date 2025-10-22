@@ -5,30 +5,19 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
-// Handle www redirect - must be first middleware
+// CRITICAL: Health check endpoint MUST be FIRST - before ANY middleware
+// This responds immediately for deployment health checks
+app.get('/health', (_req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: Date.now() });
+});
+
+// Handle www redirect
 app.use((req, res, next) => {
   const host = req.get('host');
   if (host && host.startsWith('www.')) {
     const nonWwwHost = host.slice(4); // Remove 'www.'
     return res.redirect(301, `https://${nonWwwHost}${req.originalUrl}`);
   }
-  next();
-});
-
-// CRITICAL: Health check endpoint MUST be first for deployment
-// This endpoint responds immediately without any database or auth setup
-app.get('/health', (_req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: Date.now() });
-});
-
-// Also respond to root for health checks in production
-app.get('/', (req, res, next) => {
-  // In production, if this is a health check (Accept header or query param), respond immediately
-  const isHealthCheck = req.headers.accept?.includes('application/json') && !req.headers.accept?.includes('text/html');
-  if (isHealthCheck) {
-    return res.status(200).json({ status: 'ok', timestamp: Date.now() });
-  }
-  // Otherwise, continue to SPA serving
   next();
 });
 
@@ -78,17 +67,6 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // Start copy trading scheduler asynchronously (non-blocking)
-  (async () => {
-    try {
-      const { copyTradingScheduler } = await import('./copyTradingScheduler');
-      copyTradingScheduler.start();
-      log('✓ Copy trading scheduler started');
-    } catch (error: any) {
-      console.error('Failed to start copy trading scheduler:', error.message);
-    }
-  })();
-
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
@@ -111,6 +89,18 @@ app.use((req, res, next) => {
     },
     () => {
       log(`serving on port ${port}`);
+      
+      // Start copy trading scheduler AFTER server is listening
+      // This prevents it from blocking startup and health checks
+      (async () => {
+        try {
+          const { copyTradingScheduler } = await import('./copyTradingScheduler');
+          copyTradingScheduler.start();
+          log('✓ Copy trading scheduler started');
+        } catch (error: any) {
+          console.error('Failed to start copy trading scheduler:', error.message);
+        }
+      })();
     },
   );
 })();
