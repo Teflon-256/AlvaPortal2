@@ -15,6 +15,23 @@ app.use((req, res, next) => {
   next();
 });
 
+// CRITICAL: Health check endpoint MUST be first for deployment
+// This endpoint responds immediately without any database or auth setup
+app.get('/health', (_req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: Date.now() });
+});
+
+// Also respond to root for health checks in production
+app.get('/', (req, res, next) => {
+  // In production, if this is a health check (Accept header or query param), respond immediately
+  const isHealthCheck = req.headers.accept?.includes('application/json') && !req.headers.accept?.includes('text/html');
+  if (isHealthCheck) {
+    return res.status(200).json({ status: 'ok', timestamp: Date.now() });
+  }
+  // Otherwise, continue to SPA serving
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
