@@ -7,9 +7,9 @@ channel = "stable-24_05"
 packages = ["dig"]
 
 [deployment]
-deploymentTarget = "vm"
+deploymentTarget = "autoscale"
 build = ["npm", "run", "build"]
-run = ["npm", "start"]
+run = ["npm"]
 
 [[ports]]
 localPort = 5000

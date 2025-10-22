@@ -5,12 +5,6 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
-// CRITICAL: Health check endpoint MUST be FIRST - before ANY middleware
-// This responds immediately for deployment health checks
-app.get('/health', (_req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: Date.now() });
-});
-
 // Handle www redirect
 app.use((req, res, next) => {
   const host = req.get('host');
@@ -73,6 +67,26 @@ app.use((req, res, next) => {
     // Serve static files from Vite build output
     const distPath = path.join(import.meta.dirname, "../dist/public");
     app.use(express.static(distPath));
+
+    // CRITICAL: Health check endpoint BEFORE catch-all route
+    // This ensures deployment health checks work in production
+    app.get('/health', (_req, res) => {
+      res.status(200).json({ status: 'ok', timestamp: Date.now() });
+    });
+
+    // Also handle root for health checks
+    app.get('/', (req, res, next) => {
+      // Check if this is a health check request (no browser Accept header)
+      const acceptHeader = req.headers.accept || '';
+      const isHealthCheck = !acceptHeader.includes('text/html') && acceptHeader.includes('*/*');
+      
+      if (isHealthCheck || req.query.health === 'check') {
+        return res.status(200).json({ status: 'ok', timestamp: Date.now() });
+      }
+      
+      // Otherwise serve the SPA
+      res.sendFile("index.html", { root: distPath });
+    });
 
     // Fallback for SPA routing (catch-all must be last)
     app.get("*", (_req: Request, res: Response) => {
