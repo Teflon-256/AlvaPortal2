@@ -10,9 +10,16 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, Key, BookOpen, ChevronLeft, ChevronRight, X, AlertCircle, Info, Copy, Check } from "lucide-react";
+import { Loader2, Key, BookOpen, ChevronLeft, ChevronRight, X, AlertCircle, Info, Copy, Check, ShieldAlert } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import guideImage1 from "@assets/1_1761212185690.webp";
+import guideImage2 from "@assets/2_1761215729879.png";
+import guideImage3 from "@assets/3_1761215755322.webp";
+import guideImage4 from "@assets/4_1761216422229.png";
+import guideImage5 from "@assets/5_1761216433452.png";
+import guideImage6 from "@assets/6_1761216770009.png";
+import guideImage7 from "@assets/7_1761217086906.png";
 
 const bybitConnectionSchema = z.object({
   apiKey: z.string().min(1, "API Key is required"),
@@ -30,46 +37,16 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
   const [showApiSecret, setShowApiSecret] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [copiedIP, setCopiedIP] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
 
-  const guideImages: string[] = [];
-  
-  // Fetch the dynamic proxy IP from the backend
-  const { data: proxyData } = useQuery<{ proxyIP: string; configured: boolean }>({
-    queryKey: ['/api/system/proxy-ip'],
-  });
-  
-  const STATIC_IP = proxyData?.proxyIP || "Loading...";
-  const BYBIT_API_LINK = "https://www.bybit.com/app/user/api-management";
-
-  const handleCopyIP = () => {
-    if (STATIC_IP === "Loading..." || STATIC_IP === "Not configured") {
-      toast({
-        title: "Not ready",
-        description: "Proxy IP is not configured yet",
-        variant: "destructive"
-      });
-      return;
-    }
-    navigator.clipboard.writeText(STATIC_IP);
-    setCopiedIP(true);
-    setTimeout(() => setCopiedIP(false), 2000);
-    toast({
-      title: "Copied!",
-      description: "IP address copied to clipboard",
-    });
-  };
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(BYBIT_API_LINK);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
-    toast({
-      title: "Copied!",
-      description: "Bybit API link copied to clipboard",
-    });
-  };
+  const guideImages: string[] = [
+    guideImage1,
+    guideImage2,
+    guideImage3,
+    guideImage4,
+    guideImage5,
+    guideImage6,
+    guideImage7,
+  ];
 
   const form = useForm<BybitConnectionForm>({
     resolver: zodResolver(bybitConnectionSchema),
@@ -186,56 +163,20 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Alert className="mb-6 bg-blue-500/10 border-blue-500/30">
-            <Info className="h-4 w-4 text-blue-500" />
+          <Alert className="mb-6 bg-red-500/10 border-red-500/30">
+            <ShieldAlert className="h-4 w-4 text-red-500" />
             <AlertDescription className="text-sm">
-              <div className="space-y-3">
-                <p className="font-semibold text-blue-600 dark:text-blue-400">📍 IP Whitelist Configuration</p>
-                <div className="space-y-2 text-muted-foreground">
-                  <p className="font-medium text-foreground">When creating or editing your Bybit API key:</p>
-                  <ol className="list-decimal list-inside space-y-1 ml-2">
-                    <li className="flex items-center gap-2">
-                      <span>Go to Bybit API Management:</span>
-                      <a href={BYBIT_API_LINK} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center gap-1">
-                        bybit.com/app/user/api-management
-                      </a>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2"
-                        onClick={handleCopyLink}
-                        data-testid="button-copy-api-link"
-                      >
-                        {copiedLink ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
-                      </Button>
-                    </li>
-                    <li>IP with permissions granted to access the BybitAPI:</li>
-                  </ol>
-                  <div className="bg-muted/50 p-3 rounded-md border border-border mt-2 flex items-center justify-between">
-                    <code className="text-sm font-mono text-blue-600 dark:text-blue-400">{STATIC_IP}</code>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleCopyIP}
-                      data-testid="button-copy-ip"
-                      className="h-8"
-                    >
-                      {copiedIP ? (
-                        <>
-                          <Check className="h-4 w-4 mr-1 text-green-500" />
-                          Copied
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-4 w-4 mr-1" />
-                          Copy
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
+              <div className="space-y-2">
+                <p className="font-semibold text-red-600 dark:text-red-400">🔒 Important Security Notice</p>
+                <p className="text-muted-foreground">
+                  Your API keys provide access to your Bybit account. Keep them secure and <strong className="text-foreground">never share them with anyone</strong>.
+                </p>
+                <ul className="list-disc list-inside space-y-1 ml-2 text-muted-foreground text-xs">
+                  <li>Click <strong className="text-foreground">"Guide"</strong> button below for step-by-step instructions</li>
+                  <li>When creating your API key, select <strong className="text-foreground">"No IP restriction"</strong></li>
+                  <li>Enable <strong className="text-foreground">"Read-Write"</strong> permissions and <strong className="text-foreground">"Unified Trading"</strong></li>
+                  <li>Your keys are encrypted and stored securely on our platform</li>
+                </ul>
               </div>
             </AlertDescription>
           </Alert>
