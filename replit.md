@@ -27,7 +27,8 @@ Preferred communication style: Simple, everyday language.
 - **Copy Trading Engine V2**: Real-time trade replication via Bybit WebSocket, async task queue, API key validation, risk management (slippage, position limits, ratio sizing), and automated profit splits.
 - **Admin Portal**: Cyber-themed interface for system statistics, client management, withdrawal requests, broker configurations, and copy trading oversight.
 - **Real-time Data**: Alpha Vantage API integration for live market prices.
-- **Security**: AWS EC2 Proxy for static IP to bypass geo-restrictions; comprehensive logout mechanism clearing all session data and caches.
+- **Security**: Encrypted API key storage, comprehensive logout mechanism clearing all session data and caches. Users configure Bybit API keys with "No IP restriction" option for easier onboarding.
+- **Bybit Connection Guide**: Interactive step-by-step guide with 7 screenshots showing users how to create Bybit API keys with proper permissions (Read-Write, No IP restriction, Unified Trading).
 
 ### Feature Specifications
 - **Portfolio Management**: Multi-broker account connection, real-time balance and P&L tracking.
@@ -47,7 +48,6 @@ Preferred communication style: Simple, everyday language.
 ### Database & Infrastructure
 - **Neon Database**: Serverless PostgreSQL.
 - **Drizzle Kit**: Database migration and schema management.
-- **AWS EC2**: For static IP proxy (TinyProxy).
 
 ### Authentication Services
 - **Replit Auth**: OIDC-based authentication.
