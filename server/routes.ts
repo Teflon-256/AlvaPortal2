@@ -26,6 +26,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
+  // Public system info - proxy static IP for users to whitelist
+  app.get('/api/system/proxy-ip', async (_req, res) => {
+    try {
+      const proxyUrl = process.env.BYBIT_PROXY_URL || '';
+      
+      // Extract IP from proxy URL (format: http://IP:PORT)
+      let proxyIP = 'Not configured';
+      if (proxyUrl) {
+        const match = proxyUrl.match(/http:\/\/([^:]+):/);
+        if (match && match[1]) {
+          proxyIP = match[1];
+        }
+      }
+      
+      res.json({ 
+        proxyIP,
+        configured: proxyUrl.length > 0
+      });
+    } catch (error) {
+      console.error("Error fetching proxy IP:", error);
+      res.status(500).json({ message: "Failed to fetch proxy IP" });
+    }
+  });
+
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {

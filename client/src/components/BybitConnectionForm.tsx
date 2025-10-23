@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -35,10 +35,23 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
 
   const guideImages: string[] = [];
   
-  const STATIC_IP = "13.61.122.170";
+  // Fetch the dynamic proxy IP from the backend
+  const { data: proxyData } = useQuery({
+    queryKey: ['/api/system/proxy-ip'],
+  });
+  
+  const STATIC_IP = proxyData?.proxyIP || "Loading...";
   const BYBIT_API_LINK = "https://www.bybit.com/app/user/api-management";
 
   const handleCopyIP = () => {
+    if (STATIC_IP === "Loading..." || STATIC_IP === "Not configured") {
+      toast({
+        title: "Not ready",
+        description: "Proxy IP is not configured yet",
+        variant: "destructive"
+      });
+      return;
+    }
     navigator.clipboard.writeText(STATIC_IP);
     setCopiedIP(true);
     setTimeout(() => setCopiedIP(false), 2000);
