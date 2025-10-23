@@ -169,11 +169,10 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
               <div className="space-y-2">
                 <p className="font-semibold text-red-600 dark:text-red-400">🔒 Important Security Notice</p>
                 <p className="text-muted-foreground">
-                  Your API keys provide access to your Bybit account. Keep them secure and <strong className="text-foreground">never share them with anyone</strong>.
+                  Keep them secure and <strong className="text-foreground">never share them with anyone</strong>.
                 </p>
                 <ul className="list-disc list-inside space-y-1 ml-2 text-muted-foreground text-xs">
                   <li>Click <strong className="text-foreground">"Guide"</strong> button below for step-by-step instructions</li>
-                  <li>When creating your API key, select <strong className="text-foreground">"No IP restriction"</strong></li>
                   <li>Enable <strong className="text-foreground">"Read-Write"</strong> permissions and <strong className="text-foreground">"Unified Trading"</strong></li>
                   <li>Your keys are encrypted and stored securely on our platform</li>
                 </ul>

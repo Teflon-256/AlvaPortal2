@@ -1,26 +1,5 @@
-import { HttpsProxyAgent } from 'https-proxy-agent';
-import { HttpProxyAgent } from 'http-proxy-agent';
 import { RestClientV5 } from 'bybit-api';
 import { decrypt } from './crypto';
-import axios from 'axios';
-import https from 'https';
-import http from 'http';
-
-let globalProxyAgent: HttpsProxyAgent<string> | null = null;
-
-if (process.env.BYBIT_PROXY_URL) {
-  const proxyUrl = process.env.BYBIT_PROXY_URL;
-  console.log(`[Bybit] Configuring global proxy: ${proxyUrl}`);
-  globalProxyAgent = new HttpsProxyAgent(proxyUrl, { keepAlive: true });
-  const httpProxyAgent = new HttpProxyAgent(proxyUrl, { keepAlive: true });
-  
-  (https.globalAgent as any) = globalProxyAgent;
-  (http.globalAgent as any) = httpProxyAgent;
-  
-  axios.defaults.httpAgent = httpProxyAgent;
-  axios.defaults.httpsAgent = globalProxyAgent;
-  axios.defaults.proxy = false;
-}
 
 export interface BybitCredentials {
   apiKey: string;
@@ -66,20 +45,11 @@ export class BybitService {
   private client: RestClientV5;
   
   constructor(credentials: BybitCredentials) {
-    const clientOptions: any = {
+    this.client = new RestClientV5({
       key: credentials.apiKey,
       secret: credentials.apiSecret,
       testnet: false,
-    };
-    
-    if (globalProxyAgent) {
-      clientOptions.requestOptions = {
-        httpsAgent: globalProxyAgent,
-        proxy: false,
-      };
-    }
-    
-    this.client = new RestClientV5(clientOptions);
+    });
   }
 
   static createFromEncrypted(encryptedKey: string, encryptedSecret: string): BybitService {

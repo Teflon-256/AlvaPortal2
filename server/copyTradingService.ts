@@ -11,11 +11,6 @@ import {
 import { eq, and, or, desc, isNotNull } from 'drizzle-orm';
 import { BybitService } from './bybit';
 import { encrypt, decrypt } from './crypto';
-import { HttpsProxyAgent } from 'https-proxy-agent';
-
-// Global proxy configuration
-const PROXY_URL = process.env.BYBIT_PROXY_URL || 'http://13.61.122.170:8888';
-const proxyAgent = new HttpsProxyAgent(PROXY_URL);
 
 interface WebSocketConfig {
   key: string;
@@ -78,10 +73,8 @@ export class CopyTradingService {
         testnet: false,
       };
 
-      // Create WebSocket client with proxy
-      const wsClient = new WebsocketClient(wsConfig, {
-        httpsAgent: proxyAgent,
-      } as any);
+      // Create WebSocket client
+      const wsClient = new WebsocketClient(wsConfig);
 
       // Subscribe to order updates
       wsClient.on('update' as any, async (message: any) => {
