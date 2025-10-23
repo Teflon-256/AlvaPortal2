@@ -36,7 +36,7 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
   const guideImages: string[] = [];
   
   // Fetch the dynamic proxy IP from the backend
-  const { data: proxyData } = useQuery({
+  const { data: proxyData } = useQuery<{ proxyIP: string; configured: boolean }>({
     queryKey: ['/api/system/proxy-ip'],
   });
   
