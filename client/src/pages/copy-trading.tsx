@@ -254,13 +254,6 @@ export default function CopyTrading() {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/security">
-                    <User className="w-4 h-4 mr-2" />
-                    Profile & Security
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout} data-testid="button-logout">
                   <LogOut className="w-4 h-4 mr-2" />
                   Logout
