@@ -3,8 +3,22 @@
 ## Overview
 AlvaCapital is a comprehensive trading platform designed for portfolio management, referral tracking, and copy trading. It allows users to connect multiple trading accounts from various brokers (Bybit for crypto, TradeF for forex/CFDs/indices/stocks), monitor performance, manage referrals, and engage in master-copier copy trading relationships. The platform is a full-stack web application focusing on real-time data and a user-friendly interface for financial operations, aiming for a strong market presence in financial technology.
 
+### Copy Trading Flow
+1. **Users Connect Bybit**: When users add their Bybit API credentials, they automatically become copiers
+2. **Admin Sets Master Account**: Admins configure the master account credentials in the admin portal
+3. **Automatic Trade Replication**: All trades from the master account are automatically replicated to all registered copiers
+4. **No Manual Setup**: Users don't need to manually register as copiers - it happens automatically when they connect their Bybit account
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
+
+## Recent Changes
+### October 25, 2025
+- **Simplified User Onboarding**: Removed validation step from Bybit connection - users just enter credentials and are automatically registered as copiers
+- **Master Account Configuration**: Created dedicated admin endpoints (`/api/admin/master-account`) for configuring the master trading account
+- **Auto-Copier Registration**: Users who connect Bybit are automatically registered as copiers without manual setup
+- **Success Message Flow**: Success messages now display immediately after credentials are stored in the database
+- **Admin Portal Enhancement**: Added master account configuration UI in admin portal for setting up the master account credentials
 
 ## System Architecture
 
@@ -25,7 +39,7 @@ Preferred communication style: Simple, everyday language.
 - **API Design**: RESTful endpoints with centralized error handling.
 - **Multi-Broker Integration**: Connectors for Bybit (cryptocurrency) and TradeF (forex, CFDs, indices, stocks).
 - **Bybit API Integration**: Server-side validation is disabled to avoid CloudFront IP blocking (Replit datacenter IPs are blocked). User credentials are stored and validated naturally when users access Bybit from their browser (home IPs work). Proxy support remains available via `BYBIT_PROXY_URL` for server-side operations if needed.
-- **Copy Trading Engine V2**: Real-time trade replication via Bybit WebSocket, async task queue, API key validation, risk management (slippage, position limits, ratio sizing), and automated profit splits.
+- **Copy Trading Engine V2**: Real-time trade replication via Bybit WebSocket, async task queue, risk management (slippage, position limits, ratio sizing), and automated profit splits. Users automatically become copiers when they connect their Bybit account. Admin configures master account credentials via the admin portal.
 - **Admin Portal**: Cyber-themed interface for system statistics, client management, withdrawal requests, broker configurations, and copy trading oversight.
 - **Real-time Data**: Alpha Vantage API integration for live market prices.
 - **Security**: Encrypted API key storage, comprehensive logout mechanism clearing all session data and caches. Users configure Bybit API keys with "No IP restriction" option for easier onboarding.

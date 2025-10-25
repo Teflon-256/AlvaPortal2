@@ -24,7 +24,12 @@ export function MasterAccountConfig() {
   const { toast } = useToast();
   const [showApiSecret, setShowApiSecret] = useState(false);
 
-  const { data: masterAccountStatus } = useQuery({
+  const { data: masterAccountStatus } = useQuery<{
+    configured: boolean;
+    transferUserId?: string;
+    hasApiKey?: boolean;
+    hasApiSecret?: boolean;
+  }>({
     queryKey: ["/api/admin/master-account"],
   });
 
@@ -35,7 +40,7 @@ export function MasterAccountConfig() {
     defaultValues: {
       apiKey: "",
       apiSecret: "",
-      transferUserId: masterAccountStatus?.transferUserId || "",
+      transferUserId: "",
     },
   });
 
