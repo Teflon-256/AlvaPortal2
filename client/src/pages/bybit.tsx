@@ -111,17 +111,9 @@ export default function BybitPage() {
         </div>
 
         {!bybitAccount ? (
-          <Card className="bg-zinc-900/50 border-2 border-cyan-500/30 backdrop-blur-sm relative z-10">
-            <CardHeader>
-              <CardTitle className="font-mono text-cyan-400">CONNECT BYBIT ACCOUNT</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-zinc-400 mb-6 font-mono">
-                Connect your Bybit account to start copy trading and track your performance.
-              </p>
-              <BybitConnectionForm />
-            </CardContent>
-          </Card>
+          <div className="relative z-10">
+            <BybitConnectionForm />
+          </div>
         ) : (
           <Tabs defaultValue="dashboard" className="w-full relative z-10">
             <TabsList className="grid w-full grid-cols-3 mb-6 bg-zinc-900/50 border-2 border-cyan-500/30 p-1">
