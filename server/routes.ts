@@ -460,40 +460,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         copyStatus: 'active'
       });
 
-      // Auto-connect as copier to master account (sahabyoona@gmail.com)
-      // Query database to find master user by email
-      const { users } = await import ('@shared/schema');
-      const { eq } = await import('drizzle-orm');
-      const { db } = await import('./db');
-      
-      const [masterUser] = await db.select().from(users).where(eq(users.email, 'sahabyoona@gmail.com')).limit(1);
-      
-      if (masterUser) {
-        const masterAccounts = await storage.getTradingAccounts(masterUser.id);
-        const masterBybitAccount = masterAccounts.find(acc => acc.broker === 'bybit');
-        
-        if (masterBybitAccount) {
-          // Create master-copier connection
-          await storage.createMasterCopierConnection({
-            userId,
-            masterAccountId: masterBybitAccount.id,
-            tradingAccountId: tradingAccount.id,
-            copyRatio: '1.0',
-            isActive: true
-          });
-        }
-      }
+      // User is automatically a copier when they connect Bybit
+      // copyStatus is already set to 'active' above
+      // The copy trading engine will use the master account config from admin settings
 
       await storage.createActionLog({
         userId,
         action: 'connect_bybit_account',
-        description: 'Connected Bybit account with API keys and auto-joined copy trading',
+        description: 'Connected Bybit account - automatically registered as copier',
         metadata: { accountId: tradingAccount.id },
         ipAddress: req.ip,
       });
 
       res.json({ 
-        message: "Bybit account connected successfully and joined copy trading",
+        message: "Bybit account connected successfully! You are now registered as a copier and will receive trades from the master account.",
         accountId: tradingAccount.id 
       });
     } catch (error: any) {
