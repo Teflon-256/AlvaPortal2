@@ -685,6 +685,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Master Account Configuration - Admin Only
+  app.get('/api/admin/master-account', isAuthenticated, async (req: any, res) => {
+    try {
+      const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
+      if (!adminEmails.includes(req.user.claims.email)) {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+
+      const { db } = await import('./db');
+      const { adminSettings } = await import('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+
+      const [setting] = await db.select()
+        .from(adminSettings)
+        .where(eq(adminSettings.settingKey, 'master_bybit_config'))
+        .limit(1);
+
+      if (!setting) {
+        return res.json({ configured: false });
+      }
+
+      const config = JSON.parse(setting.settingValue || '{}');
+      
+      // Return only non-sensitive info
+      res.json({
+        configured: true,
+        transferUserId: config.transfer_user_id || '',
+        hasApiKey: !!config.api_key,
+        hasApiSecret: !!config.api_secret,
+      });
+    } catch (error) {
+      console.error('Error fetching master account config:', error);
+      res.status(500).json({ message: 'Failed to fetch master account configuration' });
+    }
+  });
+
+  app.post('/api/admin/master-account', isAuthenticated, async (req: any, res) => {
+    try {
+      const adminEmails = ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'];
+      if (!adminEmails.includes(req.user.claims.email)) {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+
+      const { apiKey, apiSecret, transferUserId } = req.body;
+
+      if (!apiKey || !apiSecret) {
+        return res.status(400).json({ message: 'API Key and Secret are required' });
+      }
+
+      // Store master account configuration
+      const config = {
+        api_key: apiKey,
+        api_secret: apiSecret,
+        transfer_user_id: transferUserId || '',
+      };
+
+      const { db } = await import('./db');
+      const { adminSettings } = await import('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+
+      // Check if setting exists
+      const [existing] = await db.select()
+        .from(adminSettings)
+        .where(eq(adminSettings.settingKey, 'master_bybit_config'))
+        .limit(1);
+
+      if (existing) {
+        await db.update(adminSettings)
+          .set({
+            settingValue: JSON.stringify(config),
+            updatedAt: new Date(),
+          })
+          .where(eq(adminSettings.settingKey, 'master_bybit_config'));
+      } else {
+        await db.insert(adminSettings).values({
+          settingKey: 'master_bybit_config',
+          settingValue: JSON.stringify(config),
+          description: 'Master Bybit account configuration for copy trading',
+        });
+      }
+
+      // Log the action
+      const { actionLog } = await import('@shared/schema');
+      await db.insert(actionLog).values({
+        userId: req.user.claims.sub,
+        action: 'MASTER_ACCOUNT_CONFIGURED',
+        description: 'Updated master Bybit account configuration',
+        metadata: JSON.stringify({ hasApiKey: !!apiKey, hasApiSecret: !!apiSecret }),
+      });
+
+      res.json({ 
+        success: true, 
+        message: 'Master account configured successfully. All copiers will now receive trades from this account.' 
+      });
+    } catch (error: any) {
+      console.error('Error configuring master account:', error);
+      res.status(500).json({ message: error.message || 'Failed to configure master account' });
+    }
+  });
+
   // Profit transfers routes
   app.get('/api/profit-transfers', isAuthenticated, async (req: any, res) => {
     try {

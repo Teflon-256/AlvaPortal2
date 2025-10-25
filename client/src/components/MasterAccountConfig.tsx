@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 const masterAccountSchema = z.object({
   apiKey: z.string().min(1, "API Key is required"),
   apiSecret: z.string().min(1, "API Secret is required"),
-  transferUserId: z.string().min(1, "Transfer User ID is required"),
+  transferUserId: z.string().optional(),
 });
 
 type MasterAccountForm = z.infer<typeof masterAccountSchema>;
@@ -23,44 +23,39 @@ type MasterAccountForm = z.infer<typeof masterAccountSchema>;
 export function MasterAccountConfig() {
   const { toast } = useToast();
   const [showApiSecret, setShowApiSecret] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
 
-  const { data: currentSettings } = useQuery({
-    queryKey: ["/api/admin/settings/master_bybit_config"],
+  const { data: masterAccountStatus } = useQuery({
+    queryKey: ["/api/admin/master-account"],
   });
+
+  const isConnected = masterAccountStatus?.configured || false;
 
   const form = useForm<MasterAccountForm>({
     resolver: zodResolver(masterAccountSchema),
     defaultValues: {
       apiKey: "",
       apiSecret: "",
-      transferUserId: "",
+      transferUserId: masterAccountStatus?.transferUserId || "",
     },
   });
 
   const saveMasterAccountMutation = useMutation({
     mutationFn: async (data: MasterAccountForm) => {
-      const masterConfig = {
-        api_key: data.apiKey,
-        api_secret: data.apiSecret,
-        transfer_user_id: data.transferUserId,
-      };
-
-      const response = await apiRequest("POST", "/api/admin/settings", {
-        settingKey: "master_bybit_config",
-        settingValue: JSON.stringify(masterConfig),
-        description: "Master Bybit account configuration for copy trading",
+      const response = await apiRequest("POST", "/api/admin/master-account", {
+        apiKey: data.apiKey,
+        apiSecret: data.apiSecret,
+        transferUserId: data.transferUserId || "",
       });
 
       return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
-        title: "Success",
-        description: "Master account configuration saved successfully!",
+        title: "✅ Success!",
+        description: data.message || "Master account configured successfully! All copiers will now receive trades from this account.",
       });
-      setIsConnected(true);
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/settings/master_bybit_config"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/master-account"] });
+      form.reset();
     },
     onError: (error: any) => {
       toast({
@@ -71,34 +66,8 @@ export function MasterAccountConfig() {
     },
   });
 
-  const saveTransferUserIdMutation = useMutation({
-    mutationFn: async (transferUserId: string) => {
-      const response = await apiRequest("POST", "/api/admin/settings", {
-        settingKey: "profit_transfer_user_id",
-        settingValue: transferUserId,
-        description: "Bybit User ID for receiving 50% profit share transfers",
-      });
-
-      return await response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Transfer User ID saved successfully!",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Save Failed",
-        description: error.message || "Failed to save transfer user ID",
-        variant: "destructive",
-      });
-    },
-  });
-
   const onSubmit = (data: MasterAccountForm) => {
     saveMasterAccountMutation.mutate(data);
-    saveTransferUserIdMutation.mutate(data.transferUserId);
   };
 
   return (
@@ -183,20 +152,20 @@ export function MasterAccountConfig() {
                 name="transferUserId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Profit Transfer User ID</FormLabel>
+                    <FormLabel>Profit Transfer User ID (Optional)</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                           {...field}
-                          placeholder="Enter Bybit User ID for profit transfers"
+                          placeholder="Enter Bybit User ID for profit transfers (optional)"
                           className="pl-9"
                           data-testid="input-transfer-user-id"
                         />
                       </div>
                     </FormControl>
                     <FormDescription>
-                      Your Bybit User ID where 50% profit share will be automatically transferred (in USDT)
+                      Optional: Your Bybit User ID where 50% profit share will be automatically transferred (in USDT)
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
