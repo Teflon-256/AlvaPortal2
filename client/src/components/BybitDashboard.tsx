@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, TrendingDown, DollarSign, Activity, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { BybitBalanceDisplay } from "@/components/BybitBalanceDisplay";
 
 interface BybitDashboardProps {
   accountId: string;
