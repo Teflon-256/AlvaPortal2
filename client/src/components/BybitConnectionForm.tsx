@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Loader2, Key, BookOpen, ChevronLeft, ChevronRight, X, AlertCircle, Info, Copy, Check, ShieldAlert } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { BybitBalanceDisplay } from "@/components/BybitBalanceDisplay";
 import guideImage1 from "@assets/1_1761212185690.webp";
 import guideImage2 from "@assets/2_1761215729879.png";
 import guideImage3 from "@assets/3_1761215755322.webp";
@@ -37,6 +38,7 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
   const [showApiSecret, setShowApiSecret] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [connectedAccountId, setConnectedAccountId] = useState<string | null>(null);
 
   const guideImages: string[] = [
     guideImage1,
@@ -61,11 +63,12 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
       const response = await apiRequest("POST", "/api/bybit/connect", data);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data: { accountId: string; message: string }) => {
       toast({
         title: "✅ Success!",
         description: "Your Bybit account has been connected and you're now registered as a copier. You'll automatically copy trades from the master account!",
       });
+      setConnectedAccountId(data.accountId);
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["/api/copy-trading/status"] });
       form.reset();
@@ -94,117 +97,123 @@ export function BybitConnectionForm({ onSuccess }: BybitConnectionFormProps) {
 
   return (
     <>
-      <Card className="border-blue-500/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Key className="w-5 h-5 text-blue-500" />
-            Connect Bybit API
-          </CardTitle>
-          <CardDescription>
-            Enter your Bybit API credentials to enable real-time data sync and copy trading
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Alert className="mb-6 bg-red-500/10 border-red-500/30">
-            <ShieldAlert className="h-4 w-4 text-red-500" />
-            <AlertDescription className="text-sm">
-              <div className="space-y-2">
-                <p className="font-semibold text-red-600 dark:text-red-400">🔒 Important Security Notice</p>
-                <p className="text-muted-foreground">
-                  Keep them secure and <strong className="text-foreground">never share them with anyone</strong>.
-                </p>
-                <ul className="list-disc list-inside space-y-1 ml-2 text-muted-foreground text-xs">
-                  <li>Click <strong className="text-foreground">"Guide"</strong> button below for step-by-step instructions</li>
-                  <li>Enable <strong className="text-foreground">"Read-Write"</strong> permissions and <strong className="text-foreground">"Unified Trading"</strong></li>
-                  <li>Your keys are encrypted and stored securely on our platform</li>
-                </ul>
-              </div>
-            </AlertDescription>
-          </Alert>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="apiKey"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>API Key</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Enter your Bybit API Key"
-                        data-testid="input-bybit-api-key"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="apiSecret"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>API Secret</FormLabel>
-                    <FormControl>
-                      <div className="relative">
+      <div className="space-y-6">
+        <Card className="border-blue-500/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Key className="w-5 h-5 text-blue-500" />
+              Connect Bybit API
+            </CardTitle>
+            <CardDescription>
+              Enter your Bybit API credentials to enable real-time data sync and copy trading
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Alert className="mb-6 bg-red-500/10 border-red-500/30">
+              <ShieldAlert className="h-4 w-4 text-red-500" />
+              <AlertDescription className="text-sm">
+                <div className="space-y-2">
+                  <p className="font-semibold text-red-600 dark:text-red-400">🔒 Important Security Notice</p>
+                  <p className="text-muted-foreground">
+                    Keep them secure and <strong className="text-foreground">never share them with anyone</strong>.
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 ml-2 text-muted-foreground text-xs">
+                    <li>Click <strong className="text-foreground">"Guide"</strong> button below for step-by-step instructions</li>
+                    <li>Enable <strong className="text-foreground">"Read-Write"</strong> permissions and <strong className="text-foreground">"Unified Trading"</strong></li>
+                    <li>Your keys are encrypted and stored securely on our platform</li>
+                  </ul>
+                </div>
+              </AlertDescription>
+            </Alert>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="apiKey"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>API Key</FormLabel>
+                      <FormControl>
                         <Input
                           {...field}
-                          type={showApiSecret ? "text" : "password"}
-                          placeholder="Enter your Bybit API Secret"
-                          data-testid="input-bybit-api-secret"
+                          placeholder="Enter your Bybit API Key"
+                          data-testid="input-bybit-api-key"
                         />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-1 top-1/2 -translate-y-1/2"
-                          onClick={() => setShowApiSecret(!showApiSecret)}
-                          data-testid="button-toggle-secret"
-                        >
-                          {showApiSecret ? "Hide" : "Show"}
-                        </Button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex gap-2 pt-2">
-                <Button
-                  type="submit"
-                  className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
-                  disabled={connectMutation.isPending}
-                  data-testid="button-connect-bybit"
-                >
-                  {connectMutation.isPending ? (
-                    <div className="flex items-center gap-2">
-                      <LoadingSpinner size="sm" />
-                      <span>Connecting...</span>
-                    </div>
-                  ) : (
-                    "Connect & Become Copier"
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </Button>
-                
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowGuide(true)}
-                  data-testid="button-guide"
-                  className="px-3"
-                >
-                  <BookOpen className="w-4 h-4 mr-1" />
-                  Guide
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                />
+
+                <FormField
+                  control={form.control}
+                  name="apiSecret"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>API Secret</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            {...field}
+                            type={showApiSecret ? "text" : "password"}
+                            placeholder="Enter your Bybit API Secret"
+                            data-testid="input-bybit-api-secret"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-1 top-1/2 -translate-y-1/2"
+                            onClick={() => setShowApiSecret(!showApiSecret)}
+                            data-testid="button-toggle-secret"
+                          >
+                            {showApiSecret ? "Hide" : "Show"}
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    type="submit"
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
+                    disabled={connectMutation.isPending}
+                    data-testid="button-connect-bybit"
+                  >
+                    {connectMutation.isPending ? (
+                      <div className="flex items-center gap-2">
+                        <LoadingSpinner size="sm" />
+                        <span>Connecting...</span>
+                      </div>
+                    ) : (
+                      "Connect & Become Copier"
+                    )}
+                  </Button>
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowGuide(true)}
+                    data-testid="button-guide"
+                    className="px-3"
+                  >
+                    <BookOpen className="w-4 h-4 mr-1" />
+                    Guide
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+
+        {connectedAccountId && (
+          <BybitBalanceDisplay accountId={connectedAccountId} />
+        )}
+      </div>
 
       <Dialog open={showGuide} onOpenChange={setShowGuide}>
         <DialogContent className="max-w-4xl">
