@@ -1,9 +1,11 @@
 import { RestClientV5 } from 'bybit-api';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 import { decrypt } from './crypto';
 
 export interface BybitCredentials {
   apiKey: string;
   apiSecret: string;
+  proxyUrl?: string;
 }
 
 export interface BybitBalance {
@@ -45,17 +47,29 @@ export class BybitService {
   private client: RestClientV5;
   
   constructor(credentials: BybitCredentials) {
-    this.client = new RestClientV5({
+    const clientConfig: any = {
       key: credentials.apiKey,
       secret: credentials.apiSecret,
       testnet: false,
-    });
+    };
+
+    const requestOptions: any = {};
+
+    if (credentials.proxyUrl) {
+      console.log('🔄 Configuring Bybit with proxy:', credentials.proxyUrl.replace(/:[^:@]+@/, ':****@'));
+      const proxyAgent = new HttpsProxyAgent(credentials.proxyUrl);
+      requestOptions.httpsAgent = proxyAgent;
+      requestOptions.httpAgent = proxyAgent;
+    }
+
+    this.client = new RestClientV5(clientConfig, requestOptions);
   }
 
-  static createFromEncrypted(encryptedKey: string, encryptedSecret: string): BybitService {
+  static createFromEncrypted(encryptedKey: string, encryptedSecret: string, proxyUrl?: string): BybitService {
     return new BybitService({
       apiKey: decrypt(encryptedKey),
       apiSecret: decrypt(encryptedSecret),
+      proxyUrl,
     });
   }
 

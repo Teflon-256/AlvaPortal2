@@ -155,13 +155,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ]);
 
       // Fetch real-time Bybit balances for connected accounts
+      const proxyUrl = process.env.BYBIT_PROXY_URL || '';
       const accountsWithBalance = await Promise.all(
         tradingAccounts.map(async (account) => {
           if (account.broker === 'bybit' && account.apiKeyEncrypted && account.apiSecretEncrypted) {
             try {
               const bybitService = BybitService.createFromEncrypted(
                 account.apiKeyEncrypted,
-                account.apiSecretEncrypted
+                account.apiSecretEncrypted,
+                proxyUrl
               );
               const balances = await bybitService.getWalletBalance('UNIFIED');
               const totalBalance = balances.reduce((sum, balance) => {
@@ -433,7 +435,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Test connection with Bybit API
-      const bybitService = new BybitService({ apiKey, apiSecret });
+      const proxyUrl = process.env.BYBIT_PROXY_URL || '';
+      const bybitService = new BybitService({ 
+        apiKey, 
+        apiSecret,
+        proxyUrl
+      });
       const connectionTest = await bybitService.testConnection();
       
       if (!connectionTest.success) {
@@ -519,9 +526,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Bybit account not found or not connected" });
       }
 
+      const proxyUrl = process.env.BYBIT_PROXY_URL || '';
       const bybitService = BybitService.createFromEncrypted(
         account.apiKeyEncrypted,
-        account.apiSecretEncrypted
+        account.apiSecretEncrypted,
+        proxyUrl
       );
       
       const balances = await bybitService.getWalletBalance();
@@ -541,9 +550,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Bybit account not found or not connected" });
       }
 
+      const proxyUrl = process.env.BYBIT_PROXY_URL || '';
       const bybitService = BybitService.createFromEncrypted(
         account.apiKeyEncrypted,
-        account.apiSecretEncrypted
+        account.apiSecretEncrypted,
+        proxyUrl
       );
       
       const positions = await bybitService.getPositions();
@@ -563,9 +574,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Bybit account not found or not connected" });
       }
 
+      const proxyUrl = process.env.BYBIT_PROXY_URL || '';
       const bybitService = BybitService.createFromEncrypted(
         account.apiKeyEncrypted,
-        account.apiSecretEncrypted
+        account.apiSecretEncrypted,
+        proxyUrl
       );
       
       const transactions = await bybitService.getTransactionHistory();
@@ -585,9 +598,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Bybit account not found or not connected" });
       }
 
+      const proxyUrl = process.env.BYBIT_PROXY_URL || '';
       const bybitService = BybitService.createFromEncrypted(
         account.apiKeyEncrypted,
-        account.apiSecretEncrypted
+        account.apiSecretEncrypted,
+        proxyUrl
       );
       
       const performance = await bybitService.getPerformanceStats();
