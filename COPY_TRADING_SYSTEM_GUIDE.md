@@ -75,6 +75,13 @@ Risk management applied (position limits, slippage checks)
 ✅ Success Toast Message:
 "Your Bybit account has been connected and you're now registered as a copier.
 You'll automatically copy trades from the master account!"
+
+✅ Account Balances Display:
+After successful connection, your real-time Bybit account balances will be displayed:
+- Total Balance (USD)
+- Individual coin balances (BTC, USDT, etc.)
+- Available balances for trading
+- Auto-refreshes every 30 seconds
 ```
 
 **Backend (what happens)**:

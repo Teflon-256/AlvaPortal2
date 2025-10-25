@@ -19,6 +19,8 @@ Preferred communication style: Simple, everyday language.
 - **Auto-Copier Registration**: Users who connect Bybit are automatically registered as copiers without manual setup
 - **Success Message Flow**: Success messages now display immediately after credentials are stored in the database
 - **Admin Portal Enhancement**: Added master account configuration UI in admin portal for setting up the master account credentials
+- **Balance Display**: Created BybitBalanceDisplay component that shows real-time account balances after API keys are saved, with auto-refresh every 30 seconds
+- **Enhanced User Experience**: Users can immediately see their account balances after connecting Bybit, confirming successful connection
 
 ## System Architecture
 
