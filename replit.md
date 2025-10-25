@@ -24,6 +24,7 @@ Preferred communication style: Simple, everyday language.
 - **Authentication**: Replit Auth with OpenID Connect, supporting Google, Apple, X (Twitter), GitHub, and Email/Password.
 - **API Design**: RESTful endpoints with centralized error handling.
 - **Multi-Broker Integration**: Connectors for Bybit (cryptocurrency) and TradeF (forex, CFDs, indices, stocks).
+- **Bybit Proxy Support**: All Bybit API calls now route through configurable proxy via `BYBIT_PROXY_URL` environment variable (supports HttpsProxyAgent for residential proxies). Configured in BybitService, routes, copy trading service, and scheduler.
 - **Copy Trading Engine V2**: Real-time trade replication via Bybit WebSocket, async task queue, API key validation, risk management (slippage, position limits, ratio sizing), and automated profit splits.
 - **Admin Portal**: Cyber-themed interface for system statistics, client management, withdrawal requests, broker configurations, and copy trading oversight.
 - **Real-time Data**: Alpha Vantage API integration for live market prices.
