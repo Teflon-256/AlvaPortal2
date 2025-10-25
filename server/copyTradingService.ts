@@ -31,9 +31,11 @@ export class CopyTradingService {
     error?: string;
   }> {
     try {
+      const proxyUrl = process.env.BYBIT_PROXY_URL || '';
       const bybitService = new BybitService({
         apiKey,
         apiSecret,
+        proxyUrl,
       });
 
       // Validate by fetching account info
@@ -260,9 +262,11 @@ export class CopyTradingService {
       const copier = copiers[0];
 
       // Create Bybit service for copier
+      const proxyUrl = process.env.BYBIT_PROXY_URL || '';
       const copierService = BybitService.createFromEncrypted(
         copier.apiKeyEncrypted!,
-        copier.apiSecretEncrypted!
+        copier.apiSecretEncrypted!,
+        proxyUrl
       );
 
       // Get copier settings for risk management

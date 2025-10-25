@@ -72,9 +72,11 @@ export class CopyTradingScheduler {
         return;
       }
       
+      const proxyUrl = process.env.BYBIT_PROXY_URL || '';
       const masterService = new BybitService({
         apiKey: masterAccount.apiKey,
         apiSecret: masterAccount.apiSecret,
+        proxyUrl,
       });
 
       const masterBalance = await masterService.getWalletBalance('UNIFIED');
@@ -90,9 +92,11 @@ export class CopyTradingScheduler {
 
       for (const copier of activeCopiers) {
         try {
+          const proxyUrl = process.env.BYBIT_PROXY_URL || '';
           const copierService = BybitService.createFromEncrypted(
             copier.apiKeyEncrypted!,
-            copier.apiSecretEncrypted!
+            copier.apiSecretEncrypted!,
+            proxyUrl
           );
 
           const copierCapital = parseFloat(copier.balance || '0');
@@ -146,9 +150,11 @@ export class CopyTradingScheduler {
 
       for (const copier of activeCopiers) {
         try {
+          const proxyUrl = process.env.BYBIT_PROXY_URL || '';
           const copierService = BybitService.createFromEncrypted(
             copier.apiKeyEncrypted!,
-            copier.apiSecretEncrypted!
+            copier.apiSecretEncrypted!,
+            proxyUrl
           );
 
           const performance = await copierService.getPerformanceStats();
@@ -208,9 +214,11 @@ export class CopyTradingScheduler {
           return;
         }
 
+        const proxyUrl = process.env.BYBIT_PROXY_URL || '';
         const copierService = BybitService.createFromEncrypted(
           copier[0].apiKeyEncrypted,
-          copier[0].apiSecretEncrypted
+          copier[0].apiSecretEncrypted,
+          proxyUrl
         );
 
         const masterAccount = await this.getMasterAccount();
@@ -220,9 +228,11 @@ export class CopyTradingScheduler {
           return;
         }
         
+        const masterProxyUrl = process.env.BYBIT_PROXY_URL || '';
         const masterService = new BybitService({
           apiKey: masterAccount.apiKey,
           apiSecret: masterAccount.apiSecret,
+          proxyUrl: masterProxyUrl,
         });
 
         const masterBalance = await masterService.getWalletBalance('UNIFIED');
