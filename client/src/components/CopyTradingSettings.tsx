@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,8 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Settings, Activity, History } from "lucide-react";
@@ -18,7 +15,6 @@ import { Loader2, Settings, Activity, History } from "lucide-react";
 const settingsSchema = z.object({
   tradingCapital: z.string().min(1, "Trading capital is required"),
   maxRiskPercentage: z.string().min(1, "Max risk percentage is required"),
-  copyStatus: z.enum(['active', 'inactive', 'paused']),
 });
 
 type SettingsForm = z.infer<typeof settingsSchema>;
@@ -37,14 +33,12 @@ export function CopyTradingSettings({
   currentMaxRisk = '2.00'
 }: CopyTradingSettingsProps) {
   const { toast } = useToast();
-  const [isEnabled, setIsEnabled] = useState(currentStatus === 'active');
 
   const form = useForm<SettingsForm>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       tradingCapital: currentCapital,
       maxRiskPercentage: currentMaxRisk,
-      copyStatus: currentStatus as any,
     },
   });
 
@@ -77,17 +71,6 @@ export function CopyTradingSettings({
     },
   });
 
-  const toggleCopyTrading = async (enabled: boolean) => {
-    setIsEnabled(enabled);
-    const newStatus = enabled ? 'active' : 'inactive';
-    form.setValue('copyStatus', newStatus);
-    
-    await updateSettingsMutation.mutateAsync({
-      ...form.getValues(),
-      copyStatus: newStatus,
-    });
-  };
-
   const onSubmit = (data: SettingsForm) => {
     updateSettingsMutation.mutate(data);
   };
@@ -106,26 +89,6 @@ export function CopyTradingSettings({
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {/* Enable/Disable Toggle */}
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="space-y-0.5">
-                <div className="font-medium">Copy Trading Status</div>
-                <div className="text-sm text-muted-foreground">
-                  {isEnabled ? "Currently copying master trades" : "Copy trading is disabled"}
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Badge variant={isEnabled ? "default" : "secondary"} data-testid="badge-copy-status">
-                  {isEnabled ? "Active" : "Inactive"}
-                </Badge>
-                <Switch
-                  checked={isEnabled}
-                  onCheckedChange={toggleCopyTrading}
-                  data-testid="switch-copy-trading"
-                />
-              </div>
-            </div>
-
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
