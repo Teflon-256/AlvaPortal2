@@ -57,20 +57,13 @@ export class CopyTradingScheduler {
   }
 
   async syncPositions() {
-    if (this.isRunning) {
-      console.log('Copy trading sync already running, skipping...');
-      return;
-    }
+    if (this.isRunning) return;
 
     this.isRunning = true;
 
     try {
       const masterAccount = await this.getMasterAccount();
-      
-      if (!masterAccount) {
-        console.log('Master account not configured, skipping copy trading sync');
-        return;
-      }
+      if (!masterAccount) return;
       
       const proxyUrl = process.env.BYBIT_PROXY_URL || '';
       const masterService = new BybitService({
@@ -87,8 +80,6 @@ export class CopyTradingScheduler {
 
       const copyEngine = new CopyTradingEngine(masterService, masterCapital);
       const activeCopiers = await this.getActiveCopiers();
-
-      console.log(`Syncing ${activeCopiers.length} active copiers...`);
 
       for (const copier of activeCopiers) {
         try {
@@ -115,8 +106,6 @@ export class CopyTradingScheduler {
             metadata: JSON.stringify(results),
           });
 
-          console.log(`Copier ${copier.id}: ${results.opened} opened, ${results.closed} closed`);
-
           if (results.errors.length > 0) {
             console.error(`Copier ${copier.id} errors:`, results.errors);
           }
@@ -131,8 +120,6 @@ export class CopyTradingScheduler {
           });
         }
       }
-
-      console.log('Copy trading sync completed successfully');
     } catch (error: any) {
       console.error('Copy trading sync error:', error.message);
     } finally {
@@ -142,8 +129,6 @@ export class CopyTradingScheduler {
 
   async processWeeklyProfitSplits() {
     try {
-      console.log('Processing weekly profit splits...');
-      
       const platformUserId = await this.getPlatformTransferUserId();
       const activeCopiers = await this.getActiveCopiers();
       const profitService = new ProfitSplitService();
@@ -181,8 +166,6 @@ export class CopyTradingScheduler {
             description: `Weekly profit split: $${result.split.platformShare.toFixed(2)} transferred`,
             metadata: JSON.stringify(result.split),
           });
-
-          console.log(`Copier ${copier.id}: Profit split completed - $${result.split.platformShare.toFixed(2)}`);
         } catch (error: any) {
           console.error(`Failed to process profit split for copier ${copier.id}:`, error.message);
           
@@ -194,8 +177,6 @@ export class CopyTradingScheduler {
           });
         }
       }
-
-      console.log('Weekly profit splits completed');
     } catch (error: any) {
       console.error('Weekly profit split error:', error.message);
     }
@@ -222,11 +203,7 @@ export class CopyTradingScheduler {
         );
 
         const masterAccount = await this.getMasterAccount();
-        
-        if (!masterAccount) {
-          console.log('Master account not configured, cannot close positions');
-          return;
-        }
+        if (!masterAccount) return;
         
         const masterProxyUrl = process.env.BYBIT_PROXY_URL || '';
         const masterService = new BybitService({
@@ -273,8 +250,6 @@ export class CopyTradingScheduler {
           description: `Copy trading disabled. All positions closed. Profit split: $${result.split.platformShare.toFixed(2)}`,
           metadata: JSON.stringify(result),
         });
-
-        console.log(`Copier ${copierId} disabled: positions closed, profit split completed`);
       } catch (error: any) {
         console.error(`Failed to handle copier status change for ${copierId}:`, error.message);
       }
@@ -282,8 +257,6 @@ export class CopyTradingScheduler {
   }
 
   start() {
-    console.log('Starting copy trading scheduler...');
-
     const positionSyncInterval = setInterval(() => {
       this.syncPositions().catch(err => {
         console.error('Position sync error:', err);
@@ -296,9 +269,6 @@ export class CopyTradingScheduler {
       });
     });
 
-    console.log(`✓ Position sync running every ${this.syncIntervalMs / 1000}s`);
-    console.log(`✓ Profit splits scheduled: ${this.profitSplitCron}`);
-
     return {
       positionSyncInterval,
       profitSplitJob,
@@ -306,10 +276,8 @@ export class CopyTradingScheduler {
   }
 
   async stop(jobs: { positionSyncInterval: NodeJS.Timeout; profitSplitJob: any }) {
-    console.log('Stopping copy trading scheduler...');
     clearInterval(jobs.positionSyncInterval);
     jobs.profitSplitJob.stop();
-    console.log('Copy trading scheduler stopped');
   }
 }
 
