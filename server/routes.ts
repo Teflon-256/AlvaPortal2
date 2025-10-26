@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { Server as SocketIOServer } from "socket.io";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { 
@@ -21,6 +22,7 @@ import { encrypt, decrypt } from "./crypto";
 import { BybitService } from "./bybit";
 import { eq, sql, desc } from "drizzle-orm";
 import { db } from "./db";
+import { masterWebSocket } from "./bybitWebSocket";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -1180,5 +1182,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+  
+  // Initialize Socket.io for real-time updates
+  const io = new SocketIOServer(httpServer, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    }
+  });
+
+  // Socket.io connection handling
+  io.on('connection', (socket) => {
+    console.log('✅ Client connected:', socket.id);
+    
+    socket.on('disconnect', () => {
+      console.log('🔌 Client disconnected:', socket.id);
+    });
+  });
+
+  // Initialize WebSocket service for master account monitoring
+  masterWebSocket.setSocketIO(io);
+  
+  // Connect to master account (async, non-blocking)
+  setTimeout(async () => {
+    try {
+      await masterWebSocket.connectToMasterAccount();
+      console.log('✅ Master account WebSocket initialized');
+    } catch (error: any) {
+      console.error('Failed to initialize master WebSocket:', error.message);
+    }
+  }, 2000);
+
+  // Add WebSocket status endpoint
+  app.get('/api/copy-trading/websocket-status', isAuthenticated, async (_req: any, res) => {
+    const status = masterWebSocket.getConnectionStatus();
+    res.json(status);
+  });
+
   return httpServer;
 }

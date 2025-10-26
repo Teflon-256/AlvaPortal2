@@ -164,13 +164,13 @@ export class BybitWebSocketService {
       });
 
       // Handle errors
-      this.wsClient.on('error', (error) => {
+      this.wsClient.on('error', (error: any) => {
         console.error('❌ WebSocket error:', error);
         
         this.broadcastToFrontend('copy-trading-status', {
           status: 'error',
           message: 'WebSocket error occurred',
-          error: error.message
+          error: error?.message || 'Unknown error'
         });
       });
 
@@ -375,17 +375,12 @@ export class BybitWebSocketService {
           
           for (const pos of copierPositions) {
             if (parseFloat(pos.size) > 0) {
-              // Close the position
-              const closeSide = pos.side === 'Buy' ? 'Sell' : 'Buy';
-              
-              await copierService.placeOrder({
-                category: 'linear',
-                symbol: pos.symbol,
-                side: closeSide,
-                orderType: 'Market',
-                qty: pos.size,
-                reduceOnly: true
-              });
+              // Close the position using the closePosition method
+              await copierService.closePosition(
+                'linear',
+                pos.symbol,
+                pos.side as 'Buy' | 'Sell'
+              );
 
               console.log(`✅ Closed position for copier ${copier.id}`);
             }
