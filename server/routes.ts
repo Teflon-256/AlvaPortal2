@@ -154,78 +154,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         storage.getReferralLinks(userId)
       ]);
 
-      // Fetch real-time Bybit balances for connected accounts
-      const proxyUrl = process.env.BYBIT_PROXY_URL || '';
-      const accountsWithBalance = await Promise.all(
-        tradingAccounts.map(async (account) => {
-          if (account.broker === 'bybit' && account.apiKeyEncrypted && account.apiSecretEncrypted) {
-            try {
-              const bybitService = BybitService.createFromEncrypted(
-                account.apiKeyEncrypted,
-                account.apiSecretEncrypted,
-                proxyUrl
-              );
-              const balances = await bybitService.getWalletBalance('UNIFIED');
-              const totalBalance = balances.reduce((sum, balance) => {
-                return sum + parseFloat(balance.usdValue || balance.walletBalance || '0');
-              }, 0);
-              
-              // Get performance stats for P&L
-              const performance = await bybitService.getPerformanceStats();
-              
-              return {
-                ...account,
-                balance: totalBalance.toString(),
-                dailyPnL: performance.totalUnrealizedPnl
-              };
-            } catch (error) {
-              console.error(`Error fetching Bybit balance for account ${account.id}:`, error);
-              return account; // Return account with stored balance if API call fails
-            }
-          }
-          return account;
-        })
-      );
-
-      // Calculate total portfolio balance
-      const totalBalance = accountsWithBalance.reduce((sum, account) => {
+      // Use stored balances for instant loading - real-time balances shown in BybitBalanceDisplay component
+      const totalBalance = tradingAccounts.reduce((sum, account) => {
         return sum + parseFloat(account.balance || '0');
       }, 0);
 
-      // Calculate today's P&L
-      const dailyPnL = accountsWithBalance.reduce((sum, account) => {
+      const dailyPnL = tradingAccounts.reduce((sum, account) => {
         return sum + parseFloat(account.dailyPnL || '0');
       }, 0);
-
-      // Calculate total performance percentage
-      let totalPerformancePercentage = 0;
-      let accountsWithCapital = 0;
-      
-      accountsWithBalance.forEach(account => {
-        const currentBalance = parseFloat(account.balance || '0');
-        const initialCapital = parseFloat(account.tradingCapital || '0');
-        
-        if (initialCapital > 0) {
-          const performancePercent = ((currentBalance - initialCapital) / initialCapital) * 100;
-          totalPerformancePercentage += performancePercent;
-          accountsWithCapital++;
-        }
-      });
-      
-      const averagePerformance = accountsWithCapital > 0 
-        ? (totalPerformancePercentage / accountsWithCapital).toFixed(2)
-        : '0.00';
 
       res.json({
         totalBalance: totalBalance.toFixed(2),
         dailyPnL: dailyPnL.toFixed(2),
         referralCount: referralCount.count,
         referralEarnings: totalEarnings.total,
-        tradingAccounts: accountsWithBalance,
-        recentReferralEarnings: referralEarnings.slice(0, 5), // Latest 5 earnings
+        tradingAccounts,
+        recentReferralEarnings: referralEarnings.slice(0, 5),
         masterCopierConnections,
         referralLinks,
-        performancePercentage: averagePerformance
       });
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
