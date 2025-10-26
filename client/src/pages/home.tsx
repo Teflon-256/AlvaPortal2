@@ -342,11 +342,6 @@ export default function Home() {
                   <DropdownMenuContent align="end" className="w-56">
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem data-testid="profile-settings">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile Settings</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} data-testid="logout-menu-item">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Logout</span>
