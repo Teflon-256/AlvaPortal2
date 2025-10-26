@@ -63,7 +63,10 @@ export class CopyTradingScheduler {
 
     try {
       const masterAccount = await this.getMasterAccount();
-      if (!masterAccount) return;
+      if (!masterAccount) {
+        this.isRunning = false;
+        return;
+      }
       
       const proxyUrl = process.env.BYBIT_PROXY_URL || '';
       const masterService = new BybitService({
