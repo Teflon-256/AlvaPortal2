@@ -434,9 +434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "API key and secret are required" });
       }
 
-      // Skip server-side validation - user will validate from their browser (their IP works)
-      // Server validation fails because Replit's datacenter IP is blocked by Bybit CloudFront
-      console.log('Storing Bybit credentials without server-side validation (user will validate from browser)');
+      // Skip server-side validation - user validates from browser
       
       // Encrypt API credentials
       const apiKeyEncrypted = encrypt(apiKey);
@@ -485,12 +483,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/bybit/balance/:accountId', isAuthenticated, async (req: any, res) => {
     try {
       const { accountId } = req.params;
-      console.log(`📊 Fetching balance for account: ${accountId}`);
-      
       const account = await storage.getTradingAccountById(accountId);
       
       if (!account || !account.apiKeyEncrypted || !account.apiSecretEncrypted) {
-        console.log('❌ Account not found or missing credentials');
         return res.status(404).json({ message: "Bybit account not found or not connected" });
       }
 
@@ -501,15 +496,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         proxyUrl
       );
       
-      console.log(`🔄 Calling Bybit API for UNIFIED account balance...`);
       const balances = await bybitService.getWalletBalance('UNIFIED');
-      console.log(`✅ Bybit balance fetch successful. Balances count: ${balances.length}`);
-      console.log('Balance data:', JSON.stringify(balances, null, 2));
-      
       res.json({ balances });
     } catch (error: any) {
-      console.error("❌ Error fetching Bybit balance:", error.message);
-      console.error("Error stack:", error.stack);
+      console.error("Error fetching Bybit balance:", error.message);
       res.status(500).json({ message: error.message || "Failed to fetch balance" });
     }
   });
@@ -1073,107 +1063,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Copy Trading V2 - Comprehensive REST API Endpoints
-  
-  // Validate Bybit API key (skip server-side validation - user validates from browser)
-  app.post('/api/copy-trading/validate-key', isAuthenticated, async (req: any, res) => {
-    try {
-      const { apiKey, apiSecret } = req.body;
-      
-      if (!apiKey || !apiSecret) {
-        return res.status(400).json({ success: false, error: 'API key and secret are required' });
-      }
-
-      // Skip server-side validation - Replit's IP is blocked by Bybit
-      // User will validate naturally when they use the app from their browser (their IP works)
-      console.log('API key validation requested - accepting without server validation');
-      
-      res.json({
-        success: true,
-        message: 'Credentials accepted. They will be validated when you use them from your browser.',
-        accountInfo: { uid: 'pending_validation' }
-      });
-    } catch (error: any) {
-      console.error('API key validation error:', error);
-      res.status(500).json({ success: false, error: error.message || 'Failed to validate API key' });
-    }
-  });
-
-  // Submit copier API keys and settings
-  app.post('/api/copy-trading/register-copier', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const { tradingAccountId, apiKey, apiSecret, settings } = req.body;
-
-      if (!tradingAccountId || !apiKey || !apiSecret) {
-        return res.status(400).json({ message: 'Missing required fields' });
-      }
-
-      // Skip server-side validation - user validates from browser
-      console.log('Registering copier without server-side validation');
-
-      // Get account and verify ownership
-      const account = await storage.getTradingAccountById(tradingAccountId);
-      if (!account || account.userId !== userId) {
-        return res.status(404).json({ message: 'Trading account not found' });
-      }
-
-      // Encrypt and store API keys
-      const encryptedKey = encrypt(apiKey);
-      const encryptedSecret = encrypt(apiSecret);
-
-      // Update trading account with API keys
-      await db.update(tradingAccounts)
-        .set({
-          apiKeyEncrypted: encryptedKey,
-          apiSecretEncrypted: encryptedSecret,
-          copyStatus: 'active',
-          updatedAt: new Date(),
-        })
-        .where(eq(tradingAccounts.id, tradingAccountId));
-
-      // Create or update copier settings
-      const existingSettings = await db.select()
-        .from(copierSettings)
-        .where(eq(copierSettings.tradingAccountId, tradingAccountId))
-        .limit(1);
-
-      if (existingSettings.length > 0) {
-        await db.update(copierSettings)
-          .set({ ...settings, updatedAt: new Date() })
-          .where(eq(copierSettings.tradingAccountId, tradingAccountId));
-      } else {
-        await db.insert(copierSettings).values({
-          tradingAccountId,
-          ...settings,
-        });
-      }
-
-      // Initialize sync status
-      await db.insert(syncStatus).values({
-        tradingAccountId,
-        syncMethod: 'websocket',
-        syncStatus: 'idle',
-        websocketConnected: false,
-      }).onConflictDoUpdate({
-        target: syncStatus.tradingAccountId,
-        set: { syncStatus: 'idle', updatedAt: new Date() },
-      });
-
-      // Log action
-      await db.insert(actionLog).values({
-        userId,
-        action: 'COPIER_REGISTERED',
-        description: `Registered as copier with API keys`,
-        metadata: JSON.stringify({ tradingAccountId }),
-      });
-
-      res.json({ success: true, message: 'Copier registered successfully' });
-    } catch (error: any) {
-      console.error('Copier registration error:', error);
-      res.status(500).json({ message: error.message || 'Failed to register copier' });
-    }
-  });
+  // Copy Trading V2 - REST API Endpoints
 
   // Get sync status for account
   app.get('/api/copy-trading/sync-status/:accountId', isAuthenticated, async (req: any, res) => {
