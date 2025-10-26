@@ -220,7 +220,7 @@ export default function Home() {
     performLogout();
   };
 
-  if (authLoading || dashboardLoading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
@@ -241,7 +241,7 @@ export default function Home() {
               />
             </svg>
           </div>
-          <div className="text-2xl font-mono text-cyan-400">LOADING DASHBOARD...</div>
+          <div className="text-2xl font-mono text-cyan-400">AUTHENTICATING...</div>
         </div>
       </div>
     );
