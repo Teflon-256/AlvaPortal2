@@ -485,9 +485,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/bybit/balance/:accountId', isAuthenticated, async (req: any, res) => {
     try {
       const { accountId } = req.params;
+      console.log(`📊 Fetching balance for account: ${accountId}`);
+      
       const account = await storage.getTradingAccountById(accountId);
       
       if (!account || !account.apiKeyEncrypted || !account.apiSecretEncrypted) {
+        console.log('❌ Account not found or missing credentials');
         return res.status(404).json({ message: "Bybit account not found or not connected" });
       }
 
@@ -498,10 +501,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         proxyUrl
       );
       
-      const balances = await bybitService.getWalletBalance();
+      console.log(`🔄 Calling Bybit API for UNIFIED account balance...`);
+      const balances = await bybitService.getWalletBalance('UNIFIED');
+      console.log(`✅ Bybit balance fetch successful. Balances count: ${balances.length}`);
+      console.log('Balance data:', JSON.stringify(balances, null, 2));
+      
       res.json({ balances });
     } catch (error: any) {
-      console.error("Error fetching Bybit balance:", error);
+      console.error("❌ Error fetching Bybit balance:", error.message);
+      console.error("Error stack:", error.stack);
       res.status(500).json({ message: error.message || "Failed to fetch balance" });
     }
   });
