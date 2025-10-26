@@ -40,6 +40,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { TradingAccountForm } from "@/components/TradingAccountForm";
 import futuristicExchange from "@assets/generated_images/Futuristic_stock_exchange_wallpaper_8045bc0a.png";
+import { useRealtimeUpdates } from "@/hooks/useRealtimeUpdates";
 
 // Form schemas
 const connectAccountSchema = z.object({
@@ -75,6 +76,9 @@ export default function Home() {
   const { toast } = useToast();
   const { t } = useTranslation();
   const [connectDialogOpen, setConnectDialogOpen] = useState(false);
+  
+  // Initialize real-time updates via WebSocket
+  const { connectionStatus } = useRealtimeUpdates();
 
   // Redirect if not authenticated
   useEffect(() => {
