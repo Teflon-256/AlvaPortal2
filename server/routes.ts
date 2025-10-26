@@ -443,6 +443,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       
       const balances = await bybitService.getWalletBalance('UNIFIED');
+      
+      // Calculate total balance and update in database
+      const totalBalance = balances.reduce((sum, balance) => {
+        return sum + parseFloat(balance.usdValue || balance.walletBalance || '0');
+      }, 0);
+      
+      // Get performance stats for P&L
+      const performance = await bybitService.getPerformanceStats();
+      
+      // Update stored balance in database
+      await storage.updateTradingAccountBalance(
+        accountId, 
+        totalBalance.toString(),
+        performance.totalUnrealizedPnl || '0'
+      );
+      
       res.json({ balances });
     } catch (error: any) {
       console.error("Error fetching Bybit balance:", error.message);

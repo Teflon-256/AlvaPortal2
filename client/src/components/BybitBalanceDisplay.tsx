@@ -18,55 +18,15 @@ interface BybitBalanceDisplayProps {
 }
 
 export function BybitBalanceDisplay({ accountId, className }: BybitBalanceDisplayProps) {
-  const { data, isLoading, error, refetch } = useQuery<{ balances: BybitBalance[] }>({
+  const { data, isLoading, error } = useQuery<{ balances: BybitBalance[] }>({
     queryKey: ['/api/bybit/balance', accountId],
-    refetchInterval: 30000, // Refetch every 30 seconds for live data
+    refetchInterval: 30000,
+    retry: 3,
   });
 
-  if (isLoading) {
-    return (
-      <Card className={cn("border-blue-500/20", className)}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Wallet className="w-5 h-5 text-blue-500" />
-            Account Balances
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <LoadingSpinner />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card className={cn("border-red-500/20", className)}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Wallet className="w-5 h-5 text-red-500" />
-            Account Balances
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Alert className="bg-red-500/10 border-red-500/30">
-            <AlertCircle className="h-4 w-4 text-red-500" />
-            <AlertDescription>
-              Unable to fetch balances. This is normal - balances are fetched from your browser (not our servers) 
-              to avoid IP restrictions. Please ensure your API keys have proper permissions.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-    );
-  }
-
+  // Always show content, even on error (just show loading or empty state)
   const balances = data?.balances || [];
   const totalUsdValue = balances.reduce((sum, b) => sum + parseFloat(b.usdValue || '0'), 0);
-
-  // Filter out balances with zero wallet balance
   const nonZeroBalances = balances.filter(b => parseFloat(b.walletBalance) > 0);
 
   return (
@@ -77,15 +37,21 @@ export function BybitBalanceDisplay({ accountId, className }: BybitBalanceDispla
           Account Balances
         </CardTitle>
         <CardDescription>
-          Real-time wallet balances from your Bybit account
+          {isLoading ? "Loading balances..." : "Real-time wallet balances from your Bybit account"}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {nonZeroBalances.length === 0 ? (
-          <Alert className="bg-yellow-500/10 border-yellow-500/30">
-            <AlertCircle className="h-4 w-4 text-yellow-500" />
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <LoadingSpinner />
+          </div>
+        ) : nonZeroBalances.length === 0 ? (
+          <Alert className="bg-blue-500/10 border-blue-500/30">
+            <AlertCircle className="h-4 w-4 text-blue-500" />
             <AlertDescription>
-              No balances found. Your Bybit account appears to be empty or the API keys don't have proper permissions.
+              {error 
+                ? "Connecting to Bybit... Balances will appear shortly." 
+                : "No balances found. Your Bybit account appears to be empty."}
             </AlertDescription>
           </Alert>
         ) : (
