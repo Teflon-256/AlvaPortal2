@@ -42,18 +42,14 @@ export function CopyTradingSettings({
     },
   });
 
-  const { data: actionLogs, isLoading: logsLoading } = useQuery({
+  const { data: actionLogs, isLoading: logsLoading } = useQuery<any[]>({
     queryKey: ["/api/action-logs"],
     refetchInterval: 30000,
   });
 
   const updateSettingsMutation = useMutation({
     mutationFn: async (data: SettingsForm) => {
-      return await apiRequest(`/api/trading-accounts/${accountId}/settings`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      return await apiRequest("PATCH", `/api/trading-accounts/${accountId}/settings`, data);
     },
     onSuccess: () => {
       toast({
@@ -225,7 +221,7 @@ export function CopyTradingSettings({
 }
 
 function ProfitTransfersTable() {
-  const { data: transfers, isLoading } = useQuery({
+  const { data: transfers, isLoading } = useQuery<any[]>({
     queryKey: ["/api/profit-transfers"],
     refetchInterval: 30000,
   });

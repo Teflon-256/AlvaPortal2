@@ -30,19 +30,9 @@ import {
   RefreshCw,
   Bot,
   Award,
-  User,
   LogOut,
-  ChevronDown,
   Shield
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { SiBinance } from "react-icons/si";
 import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
@@ -300,7 +290,7 @@ export default function Home() {
             </Link>
             <div className="flex items-center space-x-2 md:space-x-4">
               {/* Only show Admin button for authorized admins */}
-              {user?.email && ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'].includes(user.email) ? (
+              {user?.email && ['sahabyoona@gmail.com', 'mihhaa2p@gmail.com'].includes(user.email) && (
                 <Link href="/admin">
                   <Button
                     variant="outline"
@@ -312,43 +302,18 @@ export default function Home() {
                     ADMIN
                   </Button>
                 </Link>
-              ) : (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono"
-                      data-testid="user-profile-dropdown"
-                    >
-                      <div className="flex items-center space-x-2">
-                        {user?.profileImageUrl ? (
-                          <img 
-                            src={user.profileImageUrl} 
-                            alt="Profile" 
-                            className="w-6 h-6 rounded-full object-cover"
-                            data-testid="user-avatar"
-                          />
-                        ) : (
-                          <User className="h-4 w-4" />
-                        )}
-                        <span className="text-sm font-medium" data-testid="user-name">
-                          {user?.firstName || user?.email || 'User'}
-                        </span>
-                        <ChevronDown className="h-4 w-4" />
-                      </div>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} data-testid="logout-menu-item">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Logout</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               )}
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-mono"
+                data-testid="button-logout"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                LOGOUT
+              </Button>
             </div>
           </div>
         </div>
